@@ -1,0 +1,16 @@
+Subsystems
+
+Swerve - 8 Falcones, 4 MagEncoders, 1 Pigeon
+
+Intake - 1 Falcone, 1 Banner
+Serializer - 1 Falcone, 1 MagEncoder, 1 Piston (Kicker), 1 Banner (In position with kicker if 6 true open slots and in the positon before kicker if 5 true open slots)
+Turret Feeder Column - 1 Falcone, 1 Banner
+Turret - 1 Falcone, 1 MagEncoder
+Shooter - 1 Falcone
+
+Wheel of Fortune - 1 Servo, 1 Color Sensor
+
+Hanger/Wrangler - 2 Falcones, 1 MagEncoder, 1 Piston (Erector), 1 Piston (Friction Brake)
+Slider - 1 Falcone, 1 MagEncoder
+
+LEDs
