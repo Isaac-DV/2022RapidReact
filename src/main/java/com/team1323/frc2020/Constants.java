@@ -25,21 +25,6 @@ public class Constants {
     public static final double kFieldLength = 629.25;
     
     //Field Landmarks
-    public static final Pose2d kFirstTrenchBall = new Pose2d(new Translation2d(kFieldLength - (120.0 + 122.63), 133.875), Rotation2d.fromDegrees(180.0));
-    public static final Pose2d kLastTrenchBall = new Pose2d(new Translation2d(kFieldLength - (120.0 + 194.63), 133.875), Rotation2d.fromDegrees(180.0));
-    public static final Pose2d kTrenchBallSet = new Pose2d(new Translation2d(kFieldLength - (120.0 + 258.90), 133.875), Rotation2d.fromDegrees(180.0));
-    public static final Pose2d kOppositeTrenchBalls = new Pose2d(new Translation2d(kFieldLength - (120.0 + 130.36), -133.875), Rotation2d.fromDegrees(180.0));
-    // Ball 1 starts on 2 ball side and goes in order till last ball on 3 ball side
-    public static final Pose2d kGeneratorBall1 = new Pose2d(new Translation2d(kFieldLength - (120.0 + 130.25), (161.625 - 94.66 - 19.79)), Rotation2d.fromDegrees(67.5 + 180.0));
-    public static final Pose2d kGeneratorBall2 = new Pose2d(new Translation2d(kFieldLength - (120.0 + 114.94), (161.625 - 94.66 - 26.16)), Rotation2d.fromDegrees(67.5 + 180.0));
-    public static final Pose2d kGeneratorBall3 = new Pose2d(new Translation2d(kFieldLength - (120.0 + 107.83), (161.625 - 94.66 - 50.54)), Rotation2d.fromDegrees(-22.5 + 180.0));
-    public static final Pose2d kGeneratorBall4 = new Pose2d(new Translation2d(kFieldLength - (120.0 + 114.17), (161.625 - 94.66 - 65.84)), Rotation2d.fromDegrees(-22.5 + 180.0));
-    public static final Pose2d kGeneratorBall5 = new Pose2d(new Translation2d(kFieldLength - (120.0 + 120.51), (161.625 - 94.66 - 81.14)), Rotation2d.fromDegrees(-22.5 + 180.0));
-    public static final Pose2d kGeneratorBall1and2 = new Pose2d(new Translation2d((kGeneratorBall1.getTranslation().x() + kGeneratorBall2.getTranslation().x()) / 2.0, (kGeneratorBall1.getTranslation().y() + kGeneratorBall2.getTranslation().y()) / 2.0), Rotation2d.fromDegrees(67.5 + 180.0));
-    public static final Pose2d kGeneratorBall3and4 = new Pose2d(new Translation2d((kGeneratorBall3.getTranslation().x() + kGeneratorBall4.getTranslation().x()) / 2.0, (kGeneratorBall3.getTranslation().y() + kGeneratorBall4.getTranslation().y()) / 2.0), Rotation2d.fromDegrees(-22.5 + 180.0));
-
-    public static final Pose2d kEnemyHumanLoader = new Pose2d(new Translation2d(kFieldLength, -56.0), Rotation2d.fromDegrees(0.0));
-    
     public static final Pose2d kRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), (161.625 - 94.66)), Rotation2d.fromDegrees(180.0));
     public static final Pose2d kPartnerRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), (161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
     public static final Pose2d kAltRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), -(161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
