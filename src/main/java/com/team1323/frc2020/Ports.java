@@ -21,11 +21,14 @@ public class Ports {
     public static final int SHOOTER_TOP = 7;
     public static final int SHOOTER_BOTTOM = 13;
 
-    public static final int FEEDER = 2;
+    public static final int BALL_FEEDER = 2;
+    public static final int BALL_EJECTOR = 0;
+    public static final int BALL_SPLITTER = 0;
+
+    public static final int UPPER_HOPPER = 0;
 
     public static final int HOOD_TALON = 10;
 
-    public static final int TRAVERSE = 0; 
 
     public static final int HANGER = 1;
         
@@ -46,6 +49,7 @@ public class Ports {
     
     public static final int TURRET_ENCODER = 4;
     public static final int FEEDER_BANNER = 5;
+    public static final int COLOR_SENSOR = 0;
     public static final int HOOD_ENCODER = 6;
     public static final int HANGER_ENCODER = 7;
 
@@ -56,6 +60,7 @@ public class Ports {
     public static final int INTAKE_EXTENDER = 1;
     public static final int WOF_EXTENDER = 3;
     public static final int HANGER_EXTENDER = 0;
+    public static final int FEEDER_SHIFTER = 0;
 
 
     //Canifier

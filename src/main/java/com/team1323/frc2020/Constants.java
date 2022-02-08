@@ -29,6 +29,12 @@ public class Constants {
     public static final Pose2d kPartnerRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), (161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
     public static final Pose2d kAltRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), -(161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
     
+    public static final Pose2d kTopRightQuadrantPose = new Pose2d(new Translation2d(605.0, -118.0), new Rotation2d());
+    public static final Pose2d kTopLeftQuadrantPose = new Pose2d(new Translation2d(5.0, -152.0), new Rotation2d());
+    public static final Pose2d kBottomLeftQuadrantPose = new Pose2d(new Translation2d(44.0, 115.0), new Rotation2d());
+    public static final Pose2d kBottomRightQuadrantPose = new Pose2d(new Translation2d(632.0, 150), new Rotation2d());
+    public static final List<Pose2d> kFieldCornerPositions = Arrays.asList(kTopRightQuadrantPose, kTopLeftQuadrantPose,
+        kBottomLeftQuadrantPose, kBottomRightQuadrantPose);
     /**
     * Target Specifications
     */
