@@ -139,56 +139,31 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; // use for constructors
     
     public static class Turret {
-        public static final double kMaxControlAngle = 200.0; //In both positive and negative directions | 220.0
-        public static final double kMinControlAngle = -35.0; // -25.0
-        public static final double kMaxInitialAngle = 220.0; // 220.0
-        public static final double kMinInitialAngle = -35.0; //-25.0
         
-        public static final double kEncoderStartingAngle = Settings.kIsUsingCompBot ? -40.2 : -110.5; // Absolute position of the magnet 309.25
+        public static final double kMaxCurrent = 30.0;
+        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
+        public static final double kStartingAngle = 0.0; // Turret facing straight forward
+        public static final double kFalconToTurretRatio = 70.0; // Falcon Encoder : Turret - Ratio
+        public static final double kFalconToEncoderRatio = 0.0;
         public static final double kAngleTolerance = 1.0;
+        public static final double kMinControlAngle = -90.0;
+        public static final double kMaxControlAngle = 90.0;
+        public static final double kMinInitialAngle = -135.0;
+        public static final double kMaxInitialAngle = 30.0;
+
+        public static final double kTrackingOffset = 2.0; //3.0 = Close
         
-        // Ratios
-        public static final double kInternalEncToOutputRatio = 100.0;
-        public static final double kEncoderToOutputRatio = 1.0;
-        
-        //PID
-        public static final double kP = 0.3;
+        public static final double kP = 0.25;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kF = 0.0465; // Theoretical: 0.0465
-        
-        public static final double kMaxSpeed = 22000.0;
+        public static final double kF = 1023.0 / kMaxSpeed;
         
         // Turret pose with respect to the robot's center
-        public static final double kXOffset = -4.25;
-        public static final double kYOffset = 0.0; 
-
-        public static final List<double[]> kVisionRanges = Arrays.asList(
-            new double[] {kMinControlAngle, 87.0},
-            new double[] {93.0, kMaxControlAngle}
-        );
+        public static final double kXOffset = -4.9;
+        public static final double kYOffset = 0.0;
+    
     }
     
-    public static class WheelOfFortune {
-        
-        public static final double kFieldWheelDiameter = 32.0;
-        public static final double kWheelDiameter = 3.0;
-        public static final double kTileDegrees = 45.0;
-        public static final int kColorOffset = 2;
-        
-        public static final double kP = 0.0;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kF = 0.0;
-        public static final double kMaxRawVelocity = 30000.0; // TODO: Tune
-
-        public static final double kMaxRPM = 55.0;
-        public static final double kWheelToFieldWheelRotations = 96*2; // Need To Calculate
-
-        public static final double kInternalEncToOutputRatio = 3.0;
-        public static final double kRamp = 0.5;
-        
-    }
     
     public static class LEDs {
         

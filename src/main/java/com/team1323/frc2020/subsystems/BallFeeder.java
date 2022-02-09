@@ -114,13 +114,13 @@ public class BallFeeder extends Subsystem {
             }
             switch(currentState) {
                 case OFF:
-                    
+                    setFeederOpenLoop(0.0);
                     break;
                 case DETECT:
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
                         if(feederStartTimestamp == Double.POSITIVE_INFINITY) {
                             feederStartTimestamp = timestamp;
-                            feeder.set(ControlMode.PercentOutput, -0.5);
+                            setFeederOpenLoop(-0.5);
                         }
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         ballSplitter.fieldRelativeEject(timestamp);
@@ -128,12 +128,14 @@ public class BallFeeder extends Subsystem {
                     break;
                 case HOLD:
                     ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                    setFeederOpenLoop(1.0);
                     break;
                 default:
                     break;
             }
             if((timestamp - feederStartTimestamp) > 0.25) {
                 setFeederOpenLoop(0.0);
+                feederStartTimestamp = Double.POSITIVE_INFINITY;
             }
             
         }
