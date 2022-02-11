@@ -13,7 +13,8 @@ public class Constants {
     /*All distance measurements are in inches, unless otherwise noted.*/
     
     public static final double kLooperDt = 0.02;
-    
+    public static final double kAutoAimPredictionTime = 0.14;
+
     public static final double kEpsilon = 0.0001;
     
     //Physical Robot Dimensions (including bumpers)
@@ -181,49 +182,39 @@ public class Constants {
         
     }
     
-    // Top Wheel Treemap
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTopWheelTreeMap = new InterpolatingTreeMap<>();
-    static{
-        kTopWheelTreeMap.put(new InterpolatingDouble(-500.0), new InterpolatingDouble(0.051)); //0.041 0.079
-        kTopWheelTreeMap.put(new InterpolatingDouble(500.0), new InterpolatingDouble(0.051)); //0.041 0.079
-        kTopWheelTreeMap.put(new InterpolatingDouble(1500.0), new InterpolatingDouble(0.048)); //0.042 0.08
-        kTopWheelTreeMap.put(new InterpolatingDouble(3000.0), new InterpolatingDouble(0.048)); //0.044 0.082
-        kTopWheelTreeMap.put(new InterpolatingDouble(5000.0), new InterpolatingDouble(0.048)); //0.0445 0.0825
-    }
     
-    // Bottom Wheel Treemap
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kBottomWheelTreeMap = new InterpolatingTreeMap<>();
-    static{
-        kBottomWheelTreeMap.put(new InterpolatingDouble(-500.0), new InterpolatingDouble(0.051)); //0.051
-        kBottomWheelTreeMap.put(new InterpolatingDouble(500.0), new InterpolatingDouble(0.051)); //0.051
-        kBottomWheelTreeMap.put(new InterpolatingDouble(1500.0), new InterpolatingDouble(0.048)); //0.048
-        kBottomWheelTreeMap.put(new InterpolatingDouble(3000.0), new InterpolatingDouble(0.048)); //0.075
-        kBottomWheelTreeMap.put(new InterpolatingDouble(5000.0), new InterpolatingDouble(0.048)); //0.048
-    }
-    
-    /**
-    * First double is distance and second double is the rpm for the bottom wheel
-    */
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kBottomWheelRPMToDistanceTreeMap = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kBottomShooterTreeMap = new InterpolatingTreeMap<>();
     static {
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(3400.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(3400.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(3400.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(150.0), new InterpolatingDouble(3400.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(170.0), new InterpolatingDouble(4200.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(190.0), new InterpolatingDouble(4200.0));
-        kBottomWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(4200.0));
+        // Key: Distance (inches), Value: RPM
+        kBottomShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(2300.0));
+        kBottomShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(2850.0));
+        kBottomShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(2650.0));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTopShooterTreeMap = new InterpolatingTreeMap<>();
+    static {
+        // Key: Distance (inches), Value: RPM
+        kTopShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(1150.0));
+        kTopShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(1425.0));
+        kTopShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(2650.0));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceToHorizontalVelocity = new InterpolatingTreeMap<>();
+    static {
+        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(100.0), new InterpolatingDouble(110.163));
+        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(160.0), new InterpolatingDouble(124.458));
+    }
+
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHorizontalVelocityToBottomRPM = new InterpolatingTreeMap<>();
+    static {
+        kHorizontalVelocityToBottomRPM.put(new InterpolatingDouble(110.163), new InterpolatingDouble(2300.0));
+        kHorizontalVelocityToBottomRPM.put(new InterpolatingDouble(124.458), new InterpolatingDouble(2850.0));
     }
     
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTopWheelRPMToDistanceTreeMap = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHorizontalVelocityToTopRPM = new InterpolatingTreeMap<>();
     static {
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(1200.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(120.0), new InterpolatingDouble(1200.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(130.0), new InterpolatingDouble(1200.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(150.0), new InterpolatingDouble(1200.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(170.0), new InterpolatingDouble(1400.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(190.0), new InterpolatingDouble(1400.0));
-        kTopWheelRPMToDistanceTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(1400.0));
+        kHorizontalVelocityToTopRPM.put(new InterpolatingDouble(110.163), new InterpolatingDouble(1150.0));
+        kHorizontalVelocityToTopRPM.put(new InterpolatingDouble(124.458), new InterpolatingDouble(1425.0));
     }
     
     public static class Shooter{
@@ -285,7 +276,33 @@ public class Constants {
         public static final double kHumanLoadSpeed = 0.5;
         public static final double kFastIntakeSpeed = 0.75;
     }
-    
+    public static class Wrist {
+        public static final double kWristRatio = 0.0; //This value needs to be found.
+        public static final double kWristSpeed = 0.5;
+        public static final double kWristStartingAngle = 0.0;
+        public static final double kWristStartingEncoderPosition = 0.0;
+        public static final double kCANCoderToWristRatio = 0.0;
+        public static final double kFalconToWristRatio = 112.5;
+
+        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
+        public static final double kMaxInitialAngle = 0.0;
+        public static final double kMinInitialAngle = 0.0;
+
+
+        public static final double kMaxWristAngle = 70.0;
+        public static final double kMinWristAngle = -60.0;
+        public static final double kWristHardStopAngle = -67.0;
+
+        public static final double kP = 0.1;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 1023.0/kMaxSpeed;
+
+        public static final double kIntakeAngle = 57.0;
+        public static final double kStowedAngle = -60.0;
+        public static final double kBallDebouncerAngle = 25.0;
+
+    }
     public static class Feeder {
         public static final double kFeedingSpeed = 0.9;
         public static final double kReverseSpeed = -0.5;

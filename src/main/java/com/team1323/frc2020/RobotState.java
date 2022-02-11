@@ -214,58 +214,27 @@ public class RobotState {
 
         private boolean isAimingAtInnerPort = false;
         private boolean isTrackerEmpty = true;
-        public synchronized Optional<ShooterAimingParameters> getAimingParameters(boolean aimInnerPort) {
+        public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
+				TrackReport report = reports.get(0);
+				Pose2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime)
+						.transformBy(kVehicleToTurretFixed).inverse();
+				Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_field
+						.transformBy(Pose2d.fromTranslation(report.field_to_goal));
+				Translation2d stationary_shot_vector = latest_turret_fixed_to_goal.getTranslation().direction().toTranslation()
+						.scale(Constants.kDistanceToHorizontalVelocity.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm())).value);
+				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy));
 
-                TrackReportComparator comparator = new TrackReportComparator(
-                    Constants.kTrackStabilityWeight,
-                    Constants.kTrackAgeWeight,
-                    Constants.kTrackSwitchingWeight,
-                    -1, Timer.getFPGATimestamp());
-                reports.sort(comparator);
-
-                TrackReport report = reports.get(0);
-                Pose2d vehicle_pose = getPredictedFieldToVehicle(Constants.kPosePredictionTime);
-                //Rotation2d orientation = Rotation2d.fromDegrees(target_orientation.getAverage());
-
-                Translation2d outerPortPosition = lastKnownTargetPosition = report.field_to_goal;
-                Translation2d innerPortPosition = new Pose2d(report.field_to_goal, Constants.kPortTargetOrientation/*orientation*/)
-                    .transformBy(Pose2d.fromTranslation(Constants.kOuterPortToInnerPort)).getTranslation();
-
-                Translation2d turret_to_outer_port = vehicle_pose.transformBy(kVehicleToTurretFixed)
-                    .getTranslation().inverse().translateBy(outerPortPosition);
-                Translation2d turret_to_inner_port = vehicle_pose.transformBy(kVehicleToTurretFixed)
-                    .getTranslation().inverse().translateBy(innerPortPosition);
-
-                Pose2d turret_to_goal_robot_centric = vehicle_pose.transformBy(kVehicleToTurretFixed)
-                    .inverse().transformBy(Pose2d.fromTranslation(outerPortPosition));
-                
-                if (aimInnerPort) {
-                    turret_to_goal_robot_centric = vehicle_pose.transformBy(kVehicleToTurretFixed)
-                        .inverse().transformBy(Pose2d.fromTranslation(innerPortPosition));
-
-                    if (Math.abs(turret_to_inner_port.direction().distance(Constants.kPortTargetOrientation /*orientation*/)) > Math.toRadians(20.0)) {
-                        turret_to_goal_robot_centric = vehicle_pose.transformBy(kVehicleToTurretFixed).inverse().transformBy(Pose2d.fromTranslation(outerPortPosition));
-                        //System.out.println("Aiming at the OUTER port");
-                        isAimingAtInnerPort = false;
-                    } else {
-                        isAimingAtInnerPort = true;
-                        //System.out.println("Aiming at the INNER port");
-                    }
-                }
-                isTrackerEmpty = false;
-
-                //System.out.println("TURRET TO INNER PORT ANGLE: " + turret_to_inner_port.direction().getDegrees());
-
-				ShooterAimingParameters params = new ShooterAimingParameters(turret_to_outer_port.norm(), 
-						turret_to_goal_robot_centric.getTranslation().direction(), turret_to_outer_port, report.latest_timestamp, report.stability);
+				/*ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
+						new Rotation2d(latest_turret_fixed_to_goal.getTranslation().x(), latest_turret_fixed_to_goal.getTranslation().y(), true), 
+						latest_turret_fixed_to_goal.getTranslation(), report.latest_timestamp, report.stability);*/
+				ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(),
+						moving_shot_vector.direction(), latest_turret_fixed_to_goal.getTranslation(), moving_shot_vector.norm(), report.latest_timestamp, report.stability);
 				cached_shooter_aiming_params_ = params;
 
 				return Optional.of(params);
 			} else {
-                isTrackerEmpty = true;
-                //System.out.println("Empty goal tracker");
 				return Optional.empty();
 			}
 		}
@@ -389,7 +358,7 @@ public class RobotState {
                     
                     break;
                 }
-                Optional<ShooterAimingParameters> aiming_params = /*getCachedAimingParameters();*/getAimingParameters(false);
+                Optional<ShooterAimingParameters> aiming_params = /*getCachedAimingParameters();*/getAimingParameters();
                 if (aiming_params.isPresent()) {
                     SmartDashboard.putNumber("goal_range", aiming_params.get().getRange());
                     SmartDashboard.putNumber("goal_theta", aiming_params.get().getTurretAngle().getDegrees());

@@ -25,14 +25,29 @@ public class Superstructure extends Subsystem {
 	private Compressor compressor;
 	
 	public Swerve swerve;
-
-	private RobotState robotState;
+	public Intake intake;
+    public Wrist wrist;
+    public BallSplitter ballSplitter;
+    public BallEjector ballEjector;
+    public BallFeeder ballFeeder;
+    public Column column;
+    public Turret turret;
+    public Shooter shooter;
+	public RobotState robotState;
 	
 	public Superstructure(){
 		compressor = new Compressor(Ports.PCM, PneumaticsModuleType.CTREPCM);
 		
 		swerve = Swerve.getInstance();
-
+		intake = Intake.getInstance();
+        wrist = Wrist.getInstance();
+        ballSplitter = BallSplitter.getInstance();
+        ballEjector = BallEjector.getInstance();
+        ballFeeder = BallFeeder.getInstance();
+        column = Column.getInstance();
+        turret = Turret.getInstance();
+        shooter = Shooter.getInstance();
+		
 		robotState = RobotState.getInstance();
 		
 		queuedRequests = new ArrayList<>(0);

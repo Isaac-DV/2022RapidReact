@@ -133,6 +133,7 @@ public class Turret extends Subsystem {
     
     public void lockAngle() {
         setAngle(getAngle());
+
         currentState = ControlState.POSITION;
     }
     public void lockTargetAngle() {
@@ -238,25 +239,12 @@ public class Turret extends Subsystem {
                         System.out.println("Target not visible");
                     }
                     break;
-                case VISION_OFFSET:
-                    Optional<ShooterAimingParameters> aim_offset = robotState.getAimingParameters();
-                    if (aim_offset.isPresent()) {
-                        setAngle(aim_offset.get().getTurretAngle().getDegrees() + goalTrackingOffset);
-                        System.out.println("Turret vision angle: " + (aim_offset.get().getTurretAngle().getDegrees() + Constants.Turret.kTrackingOffset + goalTrackingOffset));
-                    } else {
-                        System.out.println("Aiming parameters not present");
-                    }
-                    break;
-                    
                 case ROBOT_STATE_VISION:
                     Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
                     if (aim.isPresent()) {
                         
-                        Pose2d perpendicular = new Pose2d(aim.get().getTurretToGoal(), aim.get().getTurretToGoal().direction().rotateBy(Rotation2d.fromDegrees(90.0)));
-                        Pose2d offsetTarget = perpendicular.transformBy(Pose2d.fromTranslation(new Translation2d(Math.tan(Math.toRadians(Constants.Turret.kTrackingOffset)) * 100.0, 0.0)));
-                        Rotation2d offsetAngle = offsetTarget.getTranslation().direction().rotateBy(aim.get().getTurretToGoal().direction().inverse());
-                        Rotation2d turretAngle = aim.get().getTurretAngle().rotateBy(offsetAngle);
-                        setAngle(turretAngle.getDegrees());
+                        double targetPosition = aim.get().getTurretAngle().getDegrees();
+                        setAngle(targetPosition);
                     } else {
                         //System.out.println("Aiming parameters not present");
                     }
@@ -319,19 +307,7 @@ public class Turret extends Subsystem {
             }
         };
     }
-    public Request offsetVisionTurretRequest(double offsetValue) { //Uses the old vision system
-        return new Request() {
-            @Override
-            public void act() {
-                startVisionOffset();
-                goalTrackingOffset = offsetValue;
-            }
-            @Override
-            public boolean isFinished() {
-                return hasReachedAngle();
-            }
-        };
-    }
+    
     public Request openLoopRequest(double output) {
         return new Request(){
             

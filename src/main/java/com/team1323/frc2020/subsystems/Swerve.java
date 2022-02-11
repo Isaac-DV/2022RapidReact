@@ -622,7 +622,7 @@ public class Swerve extends Subsystem{
 	
 	// Vision PID (new, simpler vision tracking system)
 	public void startVisionPID(Translation2d endTranslation, Rotation2d approachAngle, Rotation2d targetHeading) {
-		Optional<ShooterAimingParameters> aim = robotState.getAimingParameters(false);
+		Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
 		if(aim.isPresent()) {
 			useFixedVisionOrientation = (approachAngle != null);
 			Optional<Pose2d> scoringPos = robotState.getRobotScoringPosition(aim, useFixedVisionOrientation ? approachAngle.rotateBy(robotState.estimatedGyroDrift().inverse()) : aim.get().getTurretToGoal().direction(), endTranslation);
@@ -658,7 +658,7 @@ public class Swerve extends Subsystem{
 	}
 	
 	Translation2d updateVisionPID(double dt) {
-		Optional<ShooterAimingParameters> aim = robotState.getAimingParameters(false);
+		Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
 		if(aim.isPresent() /*&& visionTargetReached*/) {
 			if(!useFixedVisionOrientation) 
 				fixedVisionOrientation = aim.get().getTurretToGoal().direction();

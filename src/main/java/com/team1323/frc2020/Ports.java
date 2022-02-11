@@ -26,6 +26,7 @@ public class Ports {
     public static final int BALL_SPLITTER = 0;
 
     public static final int UPPER_HOPPER = 0;
+    public static final int WRIST = 0;
 
     public static final int HOOD_TALON = 10;
 
@@ -65,6 +66,7 @@ public class Ports {
 
     //Canifier
     public static final int CANIFIER = 30;
+    public static final int WRIST_ENCODER = 0;
         
     }
     

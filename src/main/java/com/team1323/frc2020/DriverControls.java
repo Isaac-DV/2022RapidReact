@@ -10,9 +10,17 @@ package com.team1323.frc2020;
 import java.util.Arrays;
 
 import com.team1323.frc2020.loops.Loop;
+import com.team1323.frc2020.subsystems.BallEjector;
+import com.team1323.frc2020.subsystems.BallFeeder;
+import com.team1323.frc2020.subsystems.BallSplitter;
+import com.team1323.frc2020.subsystems.Column;
+import com.team1323.frc2020.subsystems.Intake;
+import com.team1323.frc2020.subsystems.Shooter;
 import com.team1323.frc2020.subsystems.SubsystemManager;
 import com.team1323.frc2020.subsystems.Superstructure;
 import com.team1323.frc2020.subsystems.Swerve;
+import com.team1323.frc2020.subsystems.Turret;
+import com.team1323.frc2020.subsystems.Wrist;
 import com.team1323.io.Xbox;
 import com.team254.lib.geometry.Pose2d;
 
@@ -32,6 +40,14 @@ public class DriverControls implements Loop {
 	Xbox driver, coDriver;
 
     private Swerve swerve;
+    private Intake intake;
+    private Wrist wrist;
+    private BallSplitter ballSplitter;
+    private BallEjector ballEjector;
+    private BallFeeder ballFeeder;
+    private Column column;
+    private Turret turret;
+    private Shooter shooter;
     private Superstructure s;
 
     private SubsystemManager subsystems;
@@ -57,10 +73,19 @@ public class DriverControls implements Loop {
 		coDriver.rightBumper.setLongPressDuration(1.0);
 
         swerve = Swerve.getInstance();
+        intake = Intake.getInstance();
+        wrist = Wrist.getInstance();
+        ballSplitter = BallSplitter.getInstance();
+        ballEjector = BallEjector.getInstance();
+        ballFeeder = BallFeeder.getInstance();
+        column = Column.getInstance();
+        turret = Turret.getInstance();
+        shooter = Shooter.getInstance();
+
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, s));
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret, shooter, s));
     }
 
     @Override
