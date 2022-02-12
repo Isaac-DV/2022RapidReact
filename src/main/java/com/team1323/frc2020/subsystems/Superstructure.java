@@ -244,4 +244,35 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+	
+	public void intakeBallState() {
+		request(
+			new SequentialRequest(
+				wrist.setWristIntakeRequest(),
+				intake.stateRequest(Intake.ControlState.INTAKE)
+			),
+			new ParallelRequest(
+				ballEjector.stateRequest(BallEjector.ControlState.EJECT),
+				ballFeeder.stateRequest(BallFeeder.State.DETECT)
+			)
+		);
+	}
+	public void postIntakeState() {
+		request(
+			new ParallelRequest(
+				wrist.setWristStowedRequest(),
+				intake.stateRequest(Intake.ControlState.OFF),
+				ballEjector.stateRequest(BallEjector.ControlState.OFF),
+				ballFeeder.stateRequest(BallFeeder.State.OFF)
+			)
+		);
+	}
+	
+	public SequentialRequest feedBallState() {
+		return new SequentialRequest(
+			new ParallelRequest(
+				column.stateRequest(Column.ControlState.ENGAGED)
+			)
+		);
+	}
 }

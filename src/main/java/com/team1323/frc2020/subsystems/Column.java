@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.BallSplitter.ControlState;
+import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -56,6 +57,16 @@ public class Column extends Subsystem {
         rollersPowered = shiftToRollers;
         ballFeeder.shiftPower(shiftToRollers);
         PTOShifter.set(shiftToRollers);
+    }
+
+    public Request stateRequest(ControlState desiredState) {
+        return new Request() {
+
+            @Override
+            public void act() {
+                setControlState(desiredState);
+            }  
+        };
     }
 
     @Override

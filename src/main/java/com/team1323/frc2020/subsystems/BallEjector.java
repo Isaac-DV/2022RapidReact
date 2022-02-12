@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
 /** Add your docs here. */
@@ -43,10 +44,31 @@ public class BallEjector extends Subsystem {
     public ControlState getState() {
         return currentState;
     }
-    public void setEjectorState(ControlState desiredState) {
+    public void setState(ControlState desiredState) {
         currentState = desiredState;
     }
 
+    public void setOpenLoop(double demand) {
+        ejector.set(ControlMode.PercentOutput, demand);
+    }
+    public void conformToState(ControlState desiredState) {
+        conformToState(desiredState, desiredState.speed);
+    }
+    public void conformToState(ControlState desiredState, double demand) {
+        setState(desiredState);
+        setOpenLoop(demand);
+    }
+
+    public Request stateRequest(ControlState desiredState) {
+        return new Request() {
+
+            @Override
+            public void act() {
+                conformToState(desiredState);                
+            }
+            
+        };
+    }
     @Override
     public void outputTelemetry() {
         

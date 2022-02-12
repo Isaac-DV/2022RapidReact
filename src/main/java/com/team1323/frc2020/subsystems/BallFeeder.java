@@ -13,6 +13,7 @@ import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
+import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -76,7 +77,7 @@ public class BallFeeder extends Subsystem {
     }
 
     public enum State {
-        OFF, DETECT, HOLD
+        OFF, DETECT, HOLD, HOLD_DETECT
     }
     private State currentState;
     public State getState() {
@@ -110,7 +111,7 @@ public class BallFeeder extends Subsystem {
         public void onLoop(double timestamp) {
             updateDetectedBall();
             if(rollersShifted) {
-                setState(State.HOLD);
+                setState(State.HOLD_DETECT);
             }
             switch(currentState) {
                 case OFF:
@@ -130,6 +131,12 @@ public class BallFeeder extends Subsystem {
                     ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                     setFeederOpenLoop(1.0);
                     break;
+                case HOLD_DETECT:
+                    if(DetectedBall != Ball.None) {//Detected opponents ball
+                        ballSplitter.fieldRelativeEject(timestamp);
+                    }
+                    setFeederOpenLoop(1.0);
+                    break;
                 default:
                     break;
             }
@@ -146,6 +153,16 @@ public class BallFeeder extends Subsystem {
         }
         
     };
+
+    public Request stateRequest(State desiredState) {
+        return new Request() {
+            @Override
+            public void act() {
+                setState(desiredState);
+            }
+            
+        };
+    }
     @Override
     public void outputTelemetry() {
         SmartDashboard.putString("Ball Feeder State", getState().toString());        

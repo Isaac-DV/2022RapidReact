@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
 /** Add your docs here. */
@@ -47,7 +48,7 @@ public class Intake extends Subsystem {
         return currentState;
     }
 
-    public void confromToState(ControlState desiredState) {
+    public void conformToState(ControlState desiredState) {
         conformToState(desiredState, desiredState.speed);
     }
     public void conformToState(ControlState desiredState, double outputOverride) {
@@ -59,6 +60,17 @@ public class Intake extends Subsystem {
         intake.set(ControlMode.PercentOutput, demand);
     }
 
+    public Request stateRequest(ControlState desiredState) {
+        return new Request() {
+
+            @Override
+            public void act() {
+                conformToState(desiredState);     
+            }
+            
+        };
+    }
+
     @Override
     public void outputTelemetry() {
         
@@ -66,7 +78,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void stop() {
-        
+        intake.set(ControlMode.PercentOutput, 0.0);
     }
     
 }
