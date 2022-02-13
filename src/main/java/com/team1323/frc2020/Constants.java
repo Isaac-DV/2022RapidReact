@@ -220,8 +220,7 @@ public class Constants {
     public static class Shooter{
         public static final double kTopEncToOutputRatio = 36.0 / 16.0;
         public static final double kBottomEncToOutputRatio = 1.0;
-        public static final double kShooterRamp = 1.0; //2.0
-        
+
         //Shooter RPM 
         public static final double kCloseTopRPM = 875.0;
         public static final double kCloseBottomRPM = 2200.0;
@@ -232,8 +231,7 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kCornerTopRPM = 1135.0;
-        public static final double kCornerBottomRPM = 4000.0;
+    
         
         /**
         * Spin Up
@@ -247,19 +245,7 @@ public class Constants {
         public static final double kBottomI = 0.0001; // 0.0001
         public static final double kBottomD = 0.0;
         public static final double kBottomF = 0.048; // Theoretical is 0.568 | WCP 3 x 4in: 0.048
-        /**
-        * Hold
-        */
-        public static final double kTopHoldP = 0.2; // WCP Single 4in: 0.4
-        public static final double kTopHoldI = 0.0;
-        public static final double kTopHoldD = 1.0; // WCP Single 4in: 6.38
-        public static final double kTopHoldF = 0.048; // Value gets changed as soon as it enters hold state so value never gets used3
-        
-        public static final double kBottomHoldP = 1.0; // WCP 3 x 4in: 1.9 | 1.8
-        public static final double kBottomHoldI = 0.0;
-        public static final double kBottomHoldD = 5.0; // WCP 3 x 4in: 10.0 | 1.8 | 3.6
-        public static final double kBottomHoldF = 0.048; // Value gets changed as soon as it enters hold state so value never gets used
-        
+
         public static final double kShooterRPMTolerance = 150.0;
     }
     
@@ -311,51 +297,7 @@ public class Constants {
         public static final double kRamp = 0.125;
     }
     
-    public static class Hood {
-        public static final double kHoodExtensionDelay = 0.25;
-    }
 
-    public static class ActuatingHood {
-        public static final double kMinHoodAngle = 30.0;
-        public static final double kMaxHoodAngle = 70.0;
-        public static final double kDeltaAngle = kMaxHoodAngle - kMinHoodAngle;
-
-        public static final double kCloseProtectedAngle = 32.0;
-        public static final double kMidHoodAngle = 62.0;
-
-        public static final double kMaxLength = 1.9685;
-        public static final double kMinLength = 0.0;
-        public static final double kLengthToAngle = 180.0 / 1.9685;
-    }
-
-    public static class MotorizedHood {
-        public static final double kReduction = 80.89;
-
-        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-
-        public static final double kP = 0.1; //Bag: 6.0
-        public static final double kI = 0.0;
-        public static final double kD = 0.0; //Bag: 32.0
-        public static final double kF = 1023.0 / kMaxSpeed;
-
-        public static final double kHoodStartingAngle = 65.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? -249.1 : -233.2; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
-
-        public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
-
-        public static final double kMinInitialAngle = 10.0;
-        public static final double kMaxInitialAngle = 70.0;
-
-        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 16.0 : 18.0;
-        public static final double kMaxControlAngle = 63.0;
-
-        public static final double kAngleTolerance = 2.0;
-
-        //Shooter Hood Angles
-        public static final double kCloseAngle = 32.25;
-        public static final double kMidAngle = 42.5; //55 deg
-        public static final double kFarAngle = 59.0;
-    }
 
     public static class Hanger {
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
@@ -379,6 +321,11 @@ public class Constants {
         public static final double kEncoderStartingAngle = 97.64; //3.433 inches per rotation
 
         public static final double kManualSpeed = 0.5;
+    }
+
+    public static class Telescope {
+        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
+        public static final double kTicksPerInch = 0;
     }
 
 }
