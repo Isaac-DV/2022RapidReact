@@ -25,8 +25,7 @@ public class Ports {
     public static final int SHOOTER_BOTTOM = 13;
 
 
-    public static final int HANGER = 1;
-    public static final int TELESCOPE = 0;
+    public static final int HANGER_WRIST = 1;
 
     // MISC CAN
     public static final int PIGEON = 22;
@@ -44,17 +43,18 @@ public class Ports {
     public static final int TURRET_ENCODER = 4;
     public static final int FEEDER_BANNER = 5;
     public static final int COLOR_SENSOR = 0;
+    public static final int WRIST_ENCODER = 0;
+    public static final int HANGER_WRIST_ENCODER = 0;
 
     // Pneumatics
     public static final int PCM = 21;
     public static final int FEEDER_SHIFTER = 0;
     public static final int ELEVATOR_SHIFTER = 0;
-    public static final int TELESCOPE_BRAKE = 0;
-
+    public static final int TELESCOPE = 0;
+    public static final int CLAW = 0;
 
     //Canifier
     public static final int CANIFIER = 30;
-    public static final int WRIST_ENCODER = 0;
         
     }
     

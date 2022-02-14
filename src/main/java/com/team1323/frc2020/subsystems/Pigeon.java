@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ctre.phoenix.sensors.PigeonIMU.PigeonState;
 import com.team1323.frc2020.Ports;
 import com.team254.lib.geometry.Rotation2d;
@@ -20,13 +21,13 @@ public class Pigeon {
 		return instance;
 	}
 	
-	private PigeonIMU pigeon/*, secondPigeon*/;
+	private Pigeon2 pigeon/*, secondPigeon*/;
 
 	private Rotation2d lastYaw = new Rotation2d();
     
 	private Pigeon(){
 		try{
-			pigeon = new PigeonIMU(Ports.PIGEON);
+			pigeon = new Pigeon2(Ports.PIGEON);
 			//secondPigeon = new PigeonIMU(Ports.SECONDARY_PIGEON);
 		}catch(Exception e){
 			System.out.println(e);
@@ -55,7 +56,7 @@ public class Pigeon {
 				//System.out.println("DIDN'T GET ANY PIGEON");
 				return lastYaw;
 			}*/
-			return Rotation2d.fromDegrees(pigeon.getFusedHeading());
+			return Rotation2d.fromDegrees(pigeon.getYaw());
 		}
 		return new Rotation2d();
 	}
@@ -79,7 +80,7 @@ public class Pigeon {
 	}
 	
 	public void setAngle(double angle){
-		pigeon.setFusedHeading(angle * 64.0, 10);
+		//pigeon.setFusedHeading(angle * 64.0, 10);
 		pigeon.setYaw(angle, 10);
 		//secondPigeon.setFusedHeading(-angle * 64.0, 10);
 		//secondPigeon.setYaw(-angle, 10);

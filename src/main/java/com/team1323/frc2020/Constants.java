@@ -326,6 +326,43 @@ public class Constants {
     public static class Telescope {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kTicksPerInch = 0;
+
+        public static final double kMinControlHeight = 0.5;
+        public static final double kMaxControlHeight = 10.0;
+        public static final double kHeightTolerance = 0.2;
+
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 0.0;
+    }
+    public static class Elevator {
+        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
+        public static final double kTicksPerInch = 0;
+
+        public static final double kMinControlHeight = 0.5;
+        public static final double kMaxControlHeight = 10.0;
+        public static final double kHeightTolerance = 0.2;
+
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 0.0;
+    }
+    public static class ClawWrist {
+        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
+        public static final double kMinControlAngle = 0.0;
+        public static final double kMaxControlAngle = 0.0;
+        public static final double kMinInitialAngle = 0.0;
+        public static final double kMaxInitialAngle = 0.0;
+        public static final double kFalconToWristRatio = 0;
+        public static final double kFalconToCANCoderRatio = 0.0;
+        public static final double kWristAngleTolerance = 2.0;
+        
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 0.0;
     }
 
 }

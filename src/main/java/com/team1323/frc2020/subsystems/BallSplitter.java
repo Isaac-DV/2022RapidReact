@@ -6,6 +6,7 @@ package com.team1323.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
@@ -28,18 +29,22 @@ public class BallSplitter extends Subsystem {
             instance = new BallSplitter();
         return instance;
     }
+    public LazyTalonFX getTalon() {
+        return splitter;
+    }
     public BallSplitter() {
         robotState = RobotState.getInstance();
 
         splitter = new LazyTalonFX(Ports.BALL_SPLITTER);
         splitter.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
+        splitter.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs); 
         splitter.enableVoltageCompensation(true);
         splitter.setNeutralMode(NeutralMode.Brake);
         splitter.setInverted(TalonFXInvertType.Clockwise);
     }
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(-0.5), RIGHT_EJECT(0.5);
+        OFF(0.0), LEFT_EJECT(-0.5), RIGHT_EJECT(0.5), POWER_SHIFED(0);
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -57,10 +62,16 @@ public class BallSplitter extends Subsystem {
         conformToState(desiredState, desiredState.speed);
     }
     public void conformToState(ControlState desiredState, double outputOverride) {
-        setState(desiredState);
-        setOpenLoop(outputOverride);
+        if ((!isShifted) || (desiredState == ControlState.POWER_SHIFED)) {
+            setState(desiredState);
+            setOpenLoop(outputOverride);
+        }
     }
-
+    private boolean isShifted = false;
+    public void shiftPower(boolean shiftedToElevator) {
+        isShifted = shiftedToElevator;
+        conformToState(ControlState.POWER_SHIFED);
+    }
     public DriverStation.Alliance DSAlliance;
     public void setDSAlliance(DriverStation.Alliance alliance) {
         DSAlliance = alliance;

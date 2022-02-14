@@ -4,14 +4,10 @@
 
 package com.team1323.frc2020.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
-import com.team1323.frc2020.subsystems.BallSplitter.ControlState;
 import com.team1323.frc2020.subsystems.requests.Request;
-import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
