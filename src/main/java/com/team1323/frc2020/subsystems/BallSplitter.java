@@ -35,7 +35,8 @@ public class BallSplitter extends Subsystem {
     public BallSplitter() {
         robotState = RobotState.getInstance();
 
-        splitter = new LazyTalonFX(Ports.BALL_SPLITTER);
+        splitter = new LazyTalonFX(Ports.BALL_SPLITTER, "main");
+
         splitter.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         splitter.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs); 
         splitter.enableVoltageCompensation(true);

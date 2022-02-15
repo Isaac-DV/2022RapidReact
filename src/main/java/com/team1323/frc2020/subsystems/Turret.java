@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
@@ -41,7 +42,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret extends Subsystem {
     
     LazyTalonFX turret;
-    DutyCycle encoder;
+    CANCoder encoder;
 
     RobotState robotState;
     
@@ -81,8 +82,8 @@ public class Turret extends Subsystem {
     private Turret() {
         robotState = RobotState.getInstance();
         
-        turret = new LazyTalonFX(Ports.TURRET);
-        encoder = new DutyCycle(new DigitalInput(Ports.TURRET_ENCODER));
+        turret = new LazyTalonFX(Ports.TURRET, "main");
+        encoder = new CANCoder(Ports.TURRET_ENCODER, "main");
 
         turret.configVoltageCompSaturation(12.0, 10);
         turret.enableVoltageCompensation(true);
@@ -115,7 +116,7 @@ public class Turret extends Subsystem {
     }
 
     public double getAbsolutePosition() {
-        return encoder.getOutput() * 360.0;
+        return encoder.getAbsolutePosition();
     }
     
     public void setAngle(double angle) {
@@ -172,7 +173,7 @@ public class Turret extends Subsystem {
     
 
     public boolean isEncoderConnected(){
-        return ((encoder.getFrequency() != 0) ? true : false);
+        return ((encoder.getBusVoltage() > 0.0) ? true : false);
     }
     
     public void setOpenLoop(double output) {

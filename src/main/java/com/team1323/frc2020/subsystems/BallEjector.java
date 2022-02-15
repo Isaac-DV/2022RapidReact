@@ -25,7 +25,7 @@ public class BallEjector extends Subsystem {
     }
     
     public BallEjector() {
-        ejector = new LazyTalonFX(Ports.BALL_EJECTOR);
+        ejector = new LazyTalonFX(Ports.BALL_EJECTOR, "main");
 
         ejector.setNeutralMode(NeutralMode.Brake);
         ejector.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);

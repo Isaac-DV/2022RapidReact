@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
@@ -35,7 +36,7 @@ public class Wrist extends Subsystem {
         return instance;
     }
     public Wrist() {
-        wrist = new LazyTalonFX(Ports.WRIST);
+        wrist = new LazyTalonFX(Ports.WRIST, "main");
 
         wrist.setInverted(TalonFXInvertType.CounterClockwise);
         wrist.setStatusFramePeriod(StatusFrame.Status_1_General, 50);

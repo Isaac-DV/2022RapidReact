@@ -24,7 +24,7 @@ public class Intake extends Subsystem {
     }
 
     public Intake() {
-        intake = new LazyTalonFX(Ports.INTAKE);
+        intake = new LazyTalonFX(Ports.INTAKE, "main");
         intake.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         intake.enableVoltageCompensation(true);
         intake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);

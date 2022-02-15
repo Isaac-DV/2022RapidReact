@@ -45,7 +45,7 @@ public class BallFeeder extends Subsystem {
         ballEjector = BallEjector.getInstance();
         ballSplitter = BallSplitter.getInstance();
 
-        feeder = new LazyTalonFX(Ports.BALL_FEEDER);
+        feeder = new LazyTalonFX(Ports.BALL_FEEDER, "main");
 
         feeder.setNeutralMode(NeutralMode.Brake);
         feeder.configVoltageCompSaturation(12, Constants.kCANTimeoutMs);

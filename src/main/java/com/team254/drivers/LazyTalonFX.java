@@ -47,6 +47,20 @@ public class LazyTalonFX extends TalonFX {
             super.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 1000, Constants.kLongCANTimeoutMs);
         }
     }
+    public LazyTalonFX(int deviceNumber, String canbus) {
+        super(deviceNumber, canbus);
+        if(Settings.kResetTalons) super.configFactoryDefault();
+        id = deviceNumber;
+        if (kSimulated) {
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_4_AinTempVbat, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_10_Targets, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_12_Feedback1, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_13_Base_PIDF0, 1000, Constants.kLongCANTimeoutMs);
+            super.setStatusFramePeriod(StatusFrameEnhanced.Status_14_Turn_PIDF1, 1000, Constants.kLongCANTimeoutMs);
+        }
+    }
 
     public void enableLogging(boolean on) {
         log = on;

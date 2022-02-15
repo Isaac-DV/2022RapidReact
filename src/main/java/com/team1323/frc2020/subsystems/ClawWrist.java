@@ -37,8 +37,8 @@ public class ClawWrist extends Subsystem {
     }
 
     public ClawWrist() {
-        wrist = new LazyTalonFX(Ports.HANGER_WRIST);
-        encoder = new CANCoder(Ports.HANGER_WRIST_ENCODER);
+        wrist = new LazyTalonFX(Ports.HANGER_WRIST, "main");
+        encoder = new CANCoder(Ports.HANGER_WRIST_ENCODER, "main");
 
         claw = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH, Ports.CLAW);
 

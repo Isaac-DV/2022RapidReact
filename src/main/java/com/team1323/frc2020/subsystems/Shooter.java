@@ -52,7 +52,7 @@ public class Shooter extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
     
     private Shooter() {
-        master = new LazyTalonFX(Ports.SHOOTER_BOTTOM);
+        master = new LazyTalonFX(Ports.SHOOTER_BOTTOM, "main");
 
         motors = Arrays.asList(master);
         

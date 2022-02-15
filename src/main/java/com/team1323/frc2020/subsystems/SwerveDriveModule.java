@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorVelocityMeasPeriod;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
@@ -26,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
 	LazyTalonFX rotationMotor, driveMotor;
-	DutyCycle rotationEncoder;
+	CANCoder rotationEncoder;
 	int moduleID;
 	String name = "Module ";
 	int rotationSetpoint = 0;
@@ -52,10 +53,10 @@ public class SwerveDriveModule extends Subsystem{
 	public SwerveDriveModule(int rotationSlot, int driveSlot, int moduleID, 
 	double encoderOffset, Translation2d startingPose, boolean flipMagEncoder){
 		name += (moduleID + " ");
-		rotationMotor = new LazyTalonFX(rotationSlot);
-		driveMotor = new LazyTalonFX(driveSlot);
+		rotationMotor = new LazyTalonFX(rotationSlot, "main");
+		driveMotor = new LazyTalonFX(driveSlot, "main");
 		if (RobotBase.isReal())
-			rotationEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
+			rotationEncoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
 		this.encoderOffset = encoderOffset;
 		this.isRotationEncoderFlipped = flipMagEncoder;
 		configureMotors();
@@ -179,7 +180,7 @@ public class SwerveDriveModule extends Subsystem{
 	
 	private boolean isRotationSensorConnected(){
 		if(RobotBase.isReal()){
-			return rotationEncoder.getFrequency() != 0;
+			return rotationEncoder.getBusVoltage() > 0.0;
 		}
 		return true;
 	}
@@ -263,7 +264,7 @@ public class SwerveDriveModule extends Subsystem{
 	private double getAbsoluteEncoderDegrees() {
 		if (!RobotBase.isReal())
 			return 0.0;
-		return (isRotationEncoderFlipped ? -1.0 : 1.0) * (rotationEncoder.getOutput()) * 360.0;
+		return (isRotationEncoderFlipped ? -1.0 : 1.0) * (rotationEncoder.getAbsolutePosition());
 	}
 	
 	private double getDriveDistanceInches(){
