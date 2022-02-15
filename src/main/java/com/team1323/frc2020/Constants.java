@@ -218,8 +218,8 @@ public class Constants {
     }
     
     public static class Shooter{
-        public static final double kTopEncToOutputRatio = 36.0 / 16.0;
-        public static final double kBottomEncToOutputRatio = 1.0;
+        public static final double kEncToOutputRatio = 1.0;
+        public static final double kBottomEncToOutputRatio = 18.0 / 24.0;
 
         //Shooter RPM 
         public static final double kCloseTopRPM = 875.0;
@@ -231,7 +231,10 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-    
+        public static final double kShooterP = 0.0;
+        public static final double kShooterI = 0.0;
+        public static final double kShooterD = 0.0;
+        public static final double kShooterF = 0.048;
         
         /**
         * Spin Up
