@@ -36,7 +36,7 @@ public class Superstructure extends Subsystem {
 	public RobotState robotState;
 	
 	public Superstructure(){
-		compressor = new Compressor(Ports.PCM, PneumaticsModuleType.CTREPCM);
+		//compressor = new Compressor(Ports.PCM, PneumaticsModuleType.CTREPCM);
 		
 		swerve = Swerve.getInstance();
 		intake = Intake.getInstance();
@@ -141,11 +141,11 @@ public class Superstructure extends Subsystem {
 	};
 	
 	public void enableCompressor(boolean enable){
-		if (enable) {
+		/*if (enable) {
 			compressor.enableDigital();
 		} else {
 			compressor.disable();
-		}
+		}*/
 	}
 
 	@Override

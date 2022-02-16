@@ -79,7 +79,7 @@ public class BallFeeder extends Subsystem {
     public enum State {
         OFF, DETECT, HOLD, HOLD_DETECT
     }
-    private State currentState;
+    private State currentState = State.OFF;
     public State getState() {
         return currentState;
     }
@@ -165,7 +165,7 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putString("Ball Feeder State", getState().toString());        
+        //SmartDashboard.putString("Ball Feeder State", getState().toString());        
     }
 
 

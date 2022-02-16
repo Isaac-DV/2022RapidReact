@@ -27,7 +27,7 @@ public class Pigeon {
     
 	private Pigeon(){
 		try{
-			pigeon = new Pigeon2(Ports.PIGEON);
+			pigeon = new Pigeon2(Ports.PIGEON, "main");
 			//secondPigeon = new PigeonIMU(Ports.SECONDARY_PIGEON);
 		}catch(Exception e){
 			System.out.println(e);

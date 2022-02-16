@@ -31,19 +31,19 @@ public class Ports {
     public static final int HANGER_WRIST = 1;
 
     // MISC CAN
-    public static final int PIGEON = 22;
+    public static final int PIGEON = 45;
     
     //PWM
     public static final int MOTORIZED_HOOD = 0;
 
     //Digital Inputs
-    public static final int FRONT_RIGHT_ENCODER = 0;
-    public static final int FRONT_LEFT_ENCODER = 1;
-    public static final int REAR_LEFT_ENCODER = 2;
-    public static final int REAR_RIGHT_ENCODER = 3;
+    public static final int FRONT_RIGHT_ENCODER = 30;
+    public static final int FRONT_LEFT_ENCODER = 31;
+    public static final int REAR_LEFT_ENCODER = 32;
+    public static final int REAR_RIGHT_ENCODER = 33;
     public static final int[] kModuleEncoders = new int[]{FRONT_RIGHT_ENCODER, FRONT_LEFT_ENCODER,
         REAR_LEFT_ENCODER, REAR_RIGHT_ENCODER};
-    
+    //CANCoders
     public static final int TURRET_ENCODER = 4;
     public static final int FEEDER_BANNER = 5;
     public static final int COLOR_SENSOR = 0;

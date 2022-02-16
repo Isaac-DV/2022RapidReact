@@ -96,10 +96,10 @@ public class Constants {
     * Enter angle read by the absolute encoder. Insert as degrees and subtract or add 90° to the value
     * based on where the bevel ended up.
     */
-    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -322.2 : -186.455; //Module 0 - Front Right -3.52 | -7.91 | 5.71
-    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -141.5 : -137.695; //Module 1 - Front Left -109.97 | -109.95
-    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -22.64 : -255.376; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
-    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -12.54 : -61.306; //Module 3 - Rear Right -353.5 | 351.77
+    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -322.2 : -298.828125; //Module 0 - Front Right -3.52 | -7.91 | 5.71
+    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -141.5 : -113.642578; //Module 1 - Front Left -109.97 | -109.95
+    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -22.64 : -298.828125; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
+    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -12.54 : -189.052734; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
     public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength / 2, kWheelbaseWidth / 2);
@@ -130,9 +130,9 @@ public class Constants {
     public static final double kSwerveDriveEncoderResolution = 2048.0; //2048.0 for falcon 500
     public static final double kSwerveRotationEncoderResolution = 2048.0;
     /** The number of rotations the swerve rotation motor undergoes for every rotation of the module. */
-    public static final double kSwerveRotationReduction = 12.0;
+    public static final double kSwerveRotationReduction = 15.42857143;
     /** The number of rotations the swerve drive encoder undergoes for every rotation of the wheel. */
-    public static final double kSwerveEncoderToWheelRatio = 7.29;
+    public static final double kSwerveEncoderToWheelRatio = 6.538461538;
     public static final double kSwerveEncUnitsPerWheelRev = kSwerveDriveEncoderResolution * kSwerveEncoderToWheelRatio;
     public static final double kSwerveEncUnitsPerInch = kSwerveEncUnitsPerWheelRev / (Math.PI * kSwerveWheelDiameter);
     
