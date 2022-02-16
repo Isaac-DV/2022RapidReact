@@ -146,6 +146,9 @@ public class Swerve extends Subsystem{
 		return 0.0;
 	}
 	double rotationScalar;
+	public void setRotationScalar(double scalar) {
+		rotationScalar = scalar;
+	}
 	double trajectoryStartTime = 0;
 	Translation2d lastTrajectoryVector = new Translation2d();
 	public Translation2d getLastTrajectoryVector(){ return lastTrajectoryVector; }
@@ -285,7 +288,7 @@ public class Swerve extends Subsystem{
 		
 		/* Scale x and y by applying a power to the magnitude of the vector they create, in order
 		to make the controls less sensitive at the lower end. */
-		double deadband = 0.25;
+		double deadband = 0.05;
 		inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, deadband);
 		final double power = (lowPower) ? 1.75 : 1.5;
 		inputMagnitude = Math.pow(inputMagnitude, power);
@@ -341,7 +344,7 @@ public class Swerve extends Subsystem{
 		
 		this.robotCentric = robotCentric;
 
-		System.out.println("Swerve translational input: " + translationalVector.toString());
+		//System.out.println("Swerve translational input: " + translationalVector.toString());
 	}
 	
 	//Possible new control method for rotation
@@ -573,7 +576,7 @@ public class Swerve extends Subsystem{
 	* @param rotationScalar Scalar to increase or decrease the robot's rotation speed
 	* @param followingCenter The point (relative to the robot) that will follow the trajectory
 	*/
-	public synchronized void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
+	public void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 	double rotationScalar, Translation2d followingCenter){
 		hasStartedFollowing = false;
 		hasFinishedPath = false;
@@ -588,16 +591,16 @@ public class Swerve extends Subsystem{
 		setState(ControlState.TRAJECTORY);
 	}
 	
-	public synchronized void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
+	public void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 	double rotationScalar){
 		setTrajectory(trajectory, targetHeading, rotationScalar, Translation2d.identity());
 	}
 	
-	public synchronized void setRobotCentricTrajectory(Translation2d relativeEndPos, double targetHeading){
+	public void setRobotCentricTrajectory(Translation2d relativeEndPos, double targetHeading){
 		setRobotCentricTrajectory(relativeEndPos, targetHeading, 45.0);
 	}
 	
-	public synchronized void setRobotCentricTrajectory(Translation2d relativeEndPos, double targetHeading, double defaultVel){
+	public void setRobotCentricTrajectory(Translation2d relativeEndPos, double targetHeading, double defaultVel){
 		modulesReady = true;
 		Translation2d endPos = pose.transformBy(Pose2d.fromTranslation(relativeEndPos)).getTranslation();
 		Rotation2d startHeading = endPos.translateBy(pose.getTranslation().inverse()).direction();
@@ -625,11 +628,11 @@ public class Swerve extends Subsystem{
 		Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
 		if(aim.isPresent()) {
 			useFixedVisionOrientation = (approachAngle != null);
-			Optional<Pose2d> scoringPos = robotState.getRobotScoringPosition(aim, useFixedVisionOrientation ? approachAngle.rotateBy(robotState.estimatedGyroDrift().inverse()) : aim.get().getTurretToGoal().direction(), endTranslation);
+			Optional<Pose2d> scoringPos = robotState.getRobotScoringPosition(aim, useFixedVisionOrientation ? approachAngle : aim.get().getTurretToGoal().direction(), endTranslation);
 			if(scoringPos.isPresent()) {
 				lateralPID.setSetpoint(0.0);
 				forwardPID.setSetpoint(0.0);
-				fixedVisionOrientation = (useFixedVisionOrientation ? approachAngle.rotateBy(robotState.estimatedGyroDrift().inverse()) : aim.get().getTurretToGoal().direction());
+				fixedVisionOrientation = (useFixedVisionOrientation ? approachAngle : aim.get().getTurretToGoal().direction());
 				if (useFixedVisionOrientation)
 					visionApproachAngle = approachAngle;
 				lastVisionEndTranslation = endTranslation;
@@ -663,7 +666,7 @@ public class Swerve extends Subsystem{
 			if(!useFixedVisionOrientation) 
 				fixedVisionOrientation = aim.get().getTurretToGoal().direction();
 			else
-				fixedVisionOrientation = visionApproachAngle.rotateBy(robotState.estimatedGyroDrift().inverse());
+				fixedVisionOrientation = visionApproachAngle;
 			Optional<Pose2d> scoringPos = robotState.getRobotScoringPosition(aim, fixedVisionOrientation, lastVisionEndTranslation);
 			if(scoringPos.isPresent()) {
 				visionPIDTarget = scoringPos.get();
@@ -950,16 +953,14 @@ public class Swerve extends Subsystem{
 		
 		@Override
 		public void onStart(double timestamp) {
-			synchronized(Swerve.this){
-				translationalVector = new Translation2d();
-				lastDriveVector = rotationalVector;
-				rotationalInput = 0;
-				resetAveragedDirection();
-				headingController.temporarilyDisable();
-				stop();
-				outputWpiPose = false;
-				lastUpdateTimestamp = timestamp;
-			}
+			translationalVector = new Translation2d();
+			lastDriveVector = rotationalVector;
+			rotationalInput = 0;
+			resetAveragedDirection();
+			headingController.temporarilyDisable();
+			stop();
+			outputWpiPose = false;
+			lastUpdateTimestamp = timestamp;
 		}
 		
 		@Override
@@ -980,12 +981,10 @@ public class Swerve extends Subsystem{
 		
 		@Override
 		public void onStop(double timestamp) {
-			synchronized(Swerve.this){
-				translationalVector = new Translation2d();
-				rotationalInput = 0;
-				outputWpiPose = false;
-				stop();
-			}
+			translationalVector = new Translation2d();
+			rotationalInput = 0;
+			outputWpiPose = false;
+			stop();
 		}
 		
 	};
@@ -1135,6 +1134,15 @@ public class Swerve extends Subsystem{
 			
 		};
 	}
+	public Request setDriveMaxPowerRequest(double power) {
+		return new Request() {
+
+			@Override
+			public void act() {
+				setMaxSpeed(power);
+			}
+		};
+	}
 	
 	public void setNominalDriveOutput(double voltage){
 		modules.forEach((m) -> m.setNominalDriveOutput(voltage));
@@ -1182,17 +1190,17 @@ public class Swerve extends Subsystem{
 		modules.forEach((m) -> m.resetRotationToAbsolute());
 	}
 
-	public synchronized void setRotationMotorZeroed(boolean isZeroed) {
+	public void setRotationMotorZeroed(boolean isZeroed) {
 		modules.forEach((m) -> m.setRotationMotorZeroed(isZeroed));
 	}
 	
 	@Override
-	public synchronized void readPeriodicInputs() {
+	public void readPeriodicInputs() {
 		modules.forEach((m) -> m.readPeriodicInputs());
 	}
 	
 	@Override
-	public synchronized void writePeriodicOutputs() {
+	public void writePeriodicOutputs() {
 		modules.forEach((m) -> m.writePeriodicOutputs());
 	}
 	
@@ -1208,30 +1216,31 @@ public class Swerve extends Subsystem{
 	}
 	
 	@Override
-	public synchronized void stop() {
+	public void stop() {
 		setState(ControlState.NEUTRAL);
 		modules.forEach((m) -> m.stop());
 	}
 	
 	@Override
-	public synchronized void zeroSensors() {
+	public void zeroSensors() {
 		zeroSensors(Constants.kRobotStartingPose);
 	}
 	
 	/** Zeroes the drive motors, and sets the robot's internal position and heading to match that of the fed pose */
-	public synchronized void zeroSensors(Pose2d startingPose){
+	public void zeroSensors(Pose2d startingPose){
 		pigeon.setAngle(startingPose.getRotation().getUnboundedDegrees());
 		modules.forEach((m) -> m.zeroSensors(startingPose));
 		pose = startingPose;
 		odometry.resetPosition(startingPose, startingPose.getRotation());
-		robotState.reset(Timer.getFPGATimestamp(), startingPose, Rotation2d.identity());
+		robotState.reset(Timer.getFPGATimestamp(), startingPose, Rotation2d.fromDegrees(Turret.getInstance().getAngle()));
 		distanceTraveled = 0;
 	}
 	
 	public synchronized void resetPosition(Pose2d newPose){
 		pose = new Pose2d(newPose.getTranslation(), pose.getRotation());
 		modules.forEach((m) -> m.zeroSensors(pose));
-		odometry.resetPosition(newPose, pose.getRotation());
+		odometry.resetPosition(pose, pose.getRotation());
+		robotState.reset(Timer.getFPGATimestamp(), pose, Rotation2d.fromDegrees(Turret.getInstance().getAngle()));
 		distanceTraveled = 0;
 	}
 	
@@ -1263,7 +1272,7 @@ public class Swerve extends Subsystem{
 			SmartDashboard.putString("Heading Controller", headingController.getState().toString());
 			SmartDashboard.putNumber("Target Heading", headingController.getTargetHeading());
 			SmartDashboard.putNumber("Distance Traveled", distanceTraveled);
-			SmartDashboard.putNumber("Robot Velocity", currentVelocity);
+			SmartDashboard.putString("Robot Velocity", velocity.toString());
 			SmartDashboard.putString("Swerve State", currentState.toString());
 			SmartDashboard.putBoolean("Vision Updates Allowed", visionUpdatesAllowed);
 			SmartDashboard.putNumberArray("Pigeon YPR", pigeon.getYPR());

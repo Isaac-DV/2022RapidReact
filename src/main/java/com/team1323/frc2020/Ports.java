@@ -23,18 +23,18 @@ public class Ports {
     public static final int BALL_SPLITTER = 12;
     public static final int BALL_EJECTOR = 16;
     public static final int BALL_FEEDER = 13;
-    public static final int TURRET = 6;    
+    public static final int TURRET = 14;    
     public static final int SHOOTER_TOP = 7;
-    public static final int SHOOTER_BOTTOM = 0;
+    public static final int SHOOTER_BOTTOM = 50;
 
 
-    public static final int HANGER_WRIST = 1;
+    public static final int HANGER_WRIST = 53;
 
     // MISC CAN
     public static final int PIGEON = 45;
     
     //PWM
-    public static final int MOTORIZED_HOOD = 0;
+    public static final int MOTORIZED_HOOD = 51;
 
     //Digital Inputs
     public static final int FRONT_RIGHT_ENCODER = 30;

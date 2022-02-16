@@ -7,6 +7,8 @@
 
 package com.team1323.frc2020;
 
+import java.util.Set;
+
 import com.team1323.frc2020.auto.AutoModeBase;
 import com.team1323.frc2020.auto.AutoModeExecuter;
 import com.team1323.frc2020.auto.SmartDashboardInteractions;
@@ -92,7 +94,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() {
 		subsystems.outputToSmartDashboard();
-		robotState.outputToSmartDashboard();
+		//robotState.outputToSmartDashboard();
 		SmartDashboard.putBoolean("Enabled", DriverStation.isEnabled());
 		SmartDashboard.putNumber("Match time", DriverStation.getMatchTime());
 	}
@@ -125,6 +127,7 @@ public class Robot extends TimedRobot {
 			driverControls.setAutoMode(false);
 			disabledLooper.stop();
 			enabledLooper.start();
+			printStackTrace();
 			SmartDashboard.putBoolean("Auto", false);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -176,5 +179,20 @@ public class Robot extends TimedRobot {
 	public void testInit() {
 
 	}
+
+	public void printStackTrace() {
+		Set<Thread> threads = Thread.getAllStackTraces().keySet();
+	
+		for (Thread thread : threads) {
+		  System.out.println("Thread name: " + thread.getName());
+		  System.out.println("Thread state: " + thread.getState());
+	
+		  StackTraceElement[] stackTraceElements = thread.getStackTrace();
+		  for (StackTraceElement stackTraceElement : stackTraceElements) {
+			System.out.println("\t" + stackTraceElement);
+		  }
+		  System.out.println("\n");
+		}
+	  }
 
 }

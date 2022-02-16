@@ -151,13 +151,39 @@ public class DriverControls implements Loop {
 
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
-        double coDriverLeftY = -coDriver.getLeftY();
+        double coDriverLeftY = coDriver.getLeftY();
 
         if (coDriver.backButton.wasActivated()){
             s.neutralState();
             swerve.setState(Swerve.ControlState.NEUTRAL);
         }
 
+        if(coDriverLeftY != 0) {
+            wrist.setOpenLoop(coDriverLeftY);
+        } else if(wrist.getState() == Wrist.State.OPEN_LOOP) {
+            wrist.setWristLockedAtCurrentAngle();
+        }
+        if(coDriverRightX != 0) {
+            turret.setOpenLoop(coDriverRightX);
+        } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
+            turret.lockAngle();
+        }
+        if(coDriver.aButton.wasActivated()) {
+            s.testIntakeState();
+        } else if(coDriver.aButton.wasReleased()) {
+            s.postIntakeState();
+        }
+        
+        if(coDriver.rightCenterClick.wasActivated()) {
+            turret.setAngle(0.0);
+        }
+
+        if(coDriver.rightBumper.wasActivated()) {
+            s.reverseAllSubsystems();
+        }
+        if(coDriver.backButton.wasActivated()) {
+            s.disableState();
+        }
     }
 
     private void oneControllerMode() {

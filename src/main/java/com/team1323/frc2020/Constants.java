@@ -98,7 +98,7 @@ public class Constants {
     */
     public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -322.2 : -298.828125; //Module 0 - Front Right -3.52 | -7.91 | 5.71
     public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -141.5 : -113.642578; //Module 1 - Front Left -109.97 | -109.95
-    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -22.64 : -298.828125; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
+    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -22.64 : -215.948125; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
     public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -12.54 : -189.052734; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
@@ -144,14 +144,13 @@ public class Constants {
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
         public static final double kStartingAngle = 0.0; // Turret facing straight forward
-        public static final double kFalconToTurretRatio = 70.0; // Falcon Encoder : Turret - Ratio
+        public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kFalconToEncoderRatio = 0.0;
         public static final double kAngleTolerance = 1.0;
         public static final double kMinControlAngle = -90.0;
         public static final double kMaxControlAngle = 90.0;
         public static final double kMinInitialAngle = -135.0;
         public static final double kMaxInitialAngle = 30.0;
-
         public static final double kTrackingOffset = 2.0; //3.0 = Close
         
         public static final double kP = 0.25;
@@ -270,25 +269,25 @@ public class Constants {
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = 0.0;
         public static final double kWristStartingEncoderPosition = 0.0;
-        public static final double kCANCoderToWristRatio = 0.0;
-        public static final double kFalconToWristRatio = 112.5;
+        public static final double kCANCoderToWristRatio = 22.0 / 12.0;
+        public static final double kFalconToWristRatio = 66.0;
 
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kMaxInitialAngle = 0.0;
-        public static final double kMinInitialAngle = 0.0;
+        public static final double kMaxInitialAngle = 120.0;
+        public static final double kMinInitialAngle = -10.0;
 
 
-        public static final double kMaxWristAngle = 70.0;
-        public static final double kMinWristAngle = -60.0;
-        public static final double kWristHardStopAngle = -67.0;
+        public static final double kMaxWristAngle = 110.0;
+        public static final double kMinWristAngle = -15.0;
+        public static final double kWristHardStopAngle = -25.47;
 
-        public static final double kP = 0.1;
+        public static final double kP = 0.145;
         public static final double kI = 0.0;
-        public static final double kD = 0.0;
+        public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = 57.0;
-        public static final double kStowedAngle = -60.0;
+        public static final double kIntakeAngle = 98.0;
+        public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 25.0;
 
     }

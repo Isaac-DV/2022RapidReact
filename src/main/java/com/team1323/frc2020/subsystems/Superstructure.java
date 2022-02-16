@@ -263,7 +263,8 @@ public class Superstructure extends Subsystem {
 				wrist.setWristStowedRequest(),
 				intake.stateRequest(Intake.ControlState.OFF),
 				ballEjector.stateRequest(BallEjector.ControlState.OFF),
-				ballFeeder.stateRequest(BallFeeder.State.OFF)
+				ballFeeder.stateRequest(BallFeeder.State.OFF),
+				ballSplitter.stateRequest(BallSplitter.ControlState.OFF)
 			)
 		);
 	}
@@ -272,6 +273,38 @@ public class Superstructure extends Subsystem {
 		return new SequentialRequest(
 			new ParallelRequest(
 				column.stateRequest(Column.ControlState.ENGAGED)
+			)
+		);
+	}
+	public void testIntakeState() {
+		request(
+			new SequentialRequest(
+				new ParallelRequest(
+					intake.stateRequest(Intake.ControlState.INTAKE),
+					wrist.setWristIntakeRequest()
+				),
+				new ParallelRequest(
+					ballFeeder.openLoopRequest(1.0),
+					ballSplitter.stateRequest(BallSplitter.ControlState.LEFT_EJECT),
+					ballEjector.stateRequest(BallEjector.ControlState.EJECT)
+				)
+			)
+		);
+	}
+	public void reverseAllSubsystems() {
+		request(
+			new ParallelRequest(
+				intake.stateRequest(Intake.ControlState.EJECT)
+			)
+		);
+	}
+	public void disableState() {
+		request(
+			new ParallelRequest(
+				intake.stateRequest(Intake.ControlState.OFF),
+				ballFeeder.stateRequest(BallFeeder.State.OFF),
+				ballEjector.stateRequest(BallEjector.ControlState.OFF),
+				ballSplitter.stateRequest(BallSplitter.ControlState.OFF)
 			)
 		);
 	}

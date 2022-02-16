@@ -8,6 +8,7 @@ import java.sql.Driver;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
@@ -50,6 +51,8 @@ public class BallFeeder extends Subsystem {
         feeder.setNeutralMode(NeutralMode.Brake);
         feeder.configVoltageCompSaturation(12, Constants.kCANTimeoutMs);
         feeder.enableVoltageCompensation(true);
+        feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);
+        feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 50);
         feeder.setInverted(TalonFXInvertType.Clockwise);
 
         banner = new DigitalInput(Ports.FEEDER_BANNER);
@@ -77,7 +80,7 @@ public class BallFeeder extends Subsystem {
     }
 
     public enum State {
-        OFF, DETECT, HOLD, HOLD_DETECT
+        OFF, DETECT, HOLD, HOLD_DETECT, OPEN_LOOP
     }
     private State currentState = State.OFF;
     public State getState() {
@@ -88,7 +91,12 @@ public class BallFeeder extends Subsystem {
     }
 
     public void setFeederOpenLoop(double demand) {
+        System.out.println(demand);
         feeder.set(ControlMode.PercentOutput, demand);
+    }
+    public void setOpenLoopState(double demand) {
+        setState(State.OPEN_LOOP);
+        setFeederOpenLoop(demand);
     }
 
     
@@ -161,6 +169,14 @@ public class BallFeeder extends Subsystem {
                 setState(desiredState);
             }
             
+        };
+    }
+    public Request openLoopRequest(double speed) {
+        return new Request() {
+            @Override
+            public void act() {
+                setOpenLoopState(speed);
+            }
         };
     }
     @Override

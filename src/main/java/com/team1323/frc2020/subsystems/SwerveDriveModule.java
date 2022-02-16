@@ -66,41 +66,41 @@ public class SwerveDriveModule extends Subsystem{
 		this.startingPosition = startingPose;
 	}
 	
-	public synchronized void invertDriveMotor(TalonFXInvertType invertType){
+	public void invertDriveMotor(TalonFXInvertType invertType){
 		driveMotor.setInverted(invertType);
 	}
 
-	public synchronized void invertDriveMotor(boolean invert) {
+	public void invertDriveMotor(boolean invert) {
 		driveMotor.setInverted(invert);
 	}
 	
-	public synchronized void invertRotationMotor(TalonFXInvertType invertType){
+	public void invertRotationMotor(TalonFXInvertType invertType){
 		rotationMotor.setInverted(invertType);
 	}
 
-	public synchronized void reverseRotationMagEncoder(boolean invert) {
+	public void reverseRotationMagEncoder(boolean invert) {
 		this.isRotationEncoderFlipped = invert;
 	}
 	
-	public synchronized void reverseDriveSensor(boolean reverse){
+	public void reverseDriveSensor(boolean reverse){
 		driveMotor.setSensorPhase(reverse);
 	}
 	
-	public synchronized void reverseRotationSensor(boolean reverse){
+	public void reverseRotationSensor(boolean reverse){
 		encoderReverseFactor = reverse ? -1 : 1;
 		rotationMotor.setSensorPhase(reverse);
 	}
 	
-	public synchronized void setNominalDriveOutput(double voltage){
+	public void setNominalDriveOutput(double voltage){
 		driveMotor.configNominalOutputForward(voltage / 12.0, 10);
 		driveMotor.configNominalOutputReverse(-voltage / 12.0, 10);
 	}
 	
-	public synchronized void setMaxRotationSpeed(double maxSpeed){
+	public void setMaxRotationSpeed(double maxSpeed){
 		rotationMotor.configMotionCruiseVelocity((int)maxSpeed, 0);
 	}
 	
-	public synchronized void disableDriveEncoder(){
+	public void disableDriveEncoder(){
 		useDriveEncoder = false;
 	}
 	
@@ -158,7 +158,7 @@ public class SwerveDriveModule extends Subsystem{
 		driveMotor.setInverted(true);
 		driveMotor.setSensorPhase(true);
 		*/
-		driveMotor.setNeutralMode(NeutralMode.Brake);
+		driveMotor.setNeutralMode(NeutralMode.Coast);
 		// Slot 0 is reserved for MotionMagic
 		driveMotor.selectProfileSlot(0, 0);
 		driveMotor.config_kP(0, 0.18, 10);
@@ -180,7 +180,7 @@ public class SwerveDriveModule extends Subsystem{
 	
 	private boolean isRotationSensorConnected(){
 		if(RobotBase.isReal()){
-			return rotationEncoder.getBusVoltage() > 0.0;
+			return rotationEncoder.getBusVoltage() > 0;
 		}
 		return true;
 	}
@@ -264,7 +264,7 @@ public class SwerveDriveModule extends Subsystem{
 	private double getAbsoluteEncoderDegrees() {
 		if (!RobotBase.isReal())
 			return 0.0;
-		return (isRotationEncoderFlipped ? -1.0 : 1.0) * (rotationEncoder.getAbsolutePosition());
+		return (isRotationEncoderFlipped ? -1.0 : 1.0) * rotationEncoder.getAbsolutePosition();
 	}
 	
 	private double getDriveDistanceInches(){
@@ -308,7 +308,7 @@ public class SwerveDriveModule extends Subsystem{
 		return new SwerveModuleState(encVelocityToInchesPerSecond(periodicIO.velocity), getModuleAngle());
 	}
 	
-	public synchronized void updatePose(Rotation2d robotHeading){
+	public void updatePose(Rotation2d robotHeading){
 		double currentEncDistance = getDriveDistanceInches();
 		double deltaEncDistance = (currentEncDistance - previousEncDistance) * Constants.kWheelScrubFactors[moduleID];
 		Rotation2d currentWheelAngle = getFieldCentricAngle(robotHeading);
@@ -383,21 +383,21 @@ public class SwerveDriveModule extends Subsystem{
 		previousEncDistance = currentEncDistance;
 	}
 	
-	public synchronized void resetPose(Pose2d robotPose){
+	public void resetPose(Pose2d robotPose){
 		Translation2d modulePosition = robotPose.transformBy(Pose2d.fromTranslation(startingPosition)).getTranslation();
 		position = modulePosition;
 	}
 	
-	public synchronized void resetPose(){
+	public void resetPose(){
 		position = startingPosition;
 	}
 	
-	public synchronized void resetLastEncoderReading(){
+	public void resetLastEncoderReading(){
 		previousEncDistance = getDriveDistanceInches();
 	}
 	
 	@Override
-	public synchronized void readPeriodicInputs() {
+	public void readPeriodicInputs() {
 		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
@@ -408,24 +408,24 @@ public class SwerveDriveModule extends Subsystem{
 	}
 	
 	@Override
-	public synchronized void writePeriodicOutputs() {
+	public void writePeriodicOutputs() {
 		rotationMotor.set(periodicIO.rotationControlMode, periodicIO.rotationDemand);
 		driveMotor.set(periodicIO.driveControlMode, periodicIO.driveDemand);
 	}
 	
 	@Override
-	public synchronized void stop(){
+	public void stop(){
 		setDriveOpenLoop(0.0);
 		setModuleAngle(getModuleAngle().getDegrees());
 	}
 	
-	public synchronized void disable(){
+	public void disable(){
 		setDriveOpenLoop(0.0);
 		setRotationOpenLoop(0.0);
 	}
 	
 	int zeroCount = 0;
-	public synchronized void resetRotationToAbsolute(){
+	public void resetRotationToAbsolute(){
 		if (!rotationMotorZeroed) {
 			ErrorCode rotationFalconCheck = rotationMotor.setSelectedSensorPosition(0);
 			if (rotationFalconCheck == ErrorCode.OK) {
@@ -452,16 +452,16 @@ public class SwerveDriveModule extends Subsystem{
 		}
 	}
 
-	public synchronized void setRotationMotorZeroed(boolean isZeroed) {
+	public void setRotationMotorZeroed(boolean isZeroed) {
 		rotationMotorZeroed = isZeroed;
 	}
 	
 	@Override
-	public synchronized void zeroSensors() {
+	public void zeroSensors() {
 		zeroSensors(new Pose2d());
 	}
 	
-	public synchronized void zeroSensors(Pose2d robotPose) {
+	public void zeroSensors(Pose2d robotPose) {
 		//driveMotor.setSelectedSensorPosition(0, 0, 100); TODO check if this is necessary
 		resetPose(robotPose);
 		estimatedRobotPose = robotPose;
@@ -473,7 +473,7 @@ public class SwerveDriveModule extends Subsystem{
 		
 	}
 
-	public synchronized double getModuleVelocity() {
+	public double getModuleVelocity() {
 		return encVelocityToInchesPerSecond(periodicIO.velocity);
 	}
 	

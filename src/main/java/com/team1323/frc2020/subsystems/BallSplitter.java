@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
@@ -45,7 +46,7 @@ public class BallSplitter extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(-0.5), RIGHT_EJECT(0.5), POWER_SHIFED(0);
+        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -90,6 +91,17 @@ public class BallSplitter extends Subsystem {
                    closestCornerVector = vehicleToCorner; 
             }
         }
+    }
+
+    public Request stateRequest(ControlState desiredState) {
+        return new Request() {
+
+            @Override
+            public void act() {
+                conformToState(desiredState);                
+            }
+            
+        };
     }
 
     @Override

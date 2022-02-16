@@ -107,7 +107,7 @@ public class Shooter extends Subsystem {
         return RPM * 2048.0 / 600.0 * Constants.Shooter.kEncToOutputRatio;
     }
     
-    public synchronized boolean hasReachedSetpoint() {
+    public  boolean hasReachedSetpoint() {
         return getState() == State.VELOCITY && Math.abs(targetRPM - getRPM()) < Constants.Shooter.kShooterRPMTolerance;
     }
 
@@ -120,23 +120,22 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            synchronized (Shooter.this) {
-                switch (currentState) {
-                    case VISION:
-                        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
-                        if (aim.isPresent()) {
-                            InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToBottomRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
-                            setVelocity(visionRPM.value);
-                        } else {
-                            setVelocity(Constants.Shooter.kCloseBottomRPM);
-                            System.out.println("Vision target not visible in shooter loop!");
-                        }
-                        break;
-                    default:
-                        break;
-                }
+            switch (currentState) {
+                case VISION:
+                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+                    if (aim.isPresent()) {
+                        InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToBottomRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
+                        setVelocity(visionRPM.value);
+                    } else {
+                        setVelocity(Constants.Shooter.kCloseBottomRPM);
+                        System.out.println("Vision target not visible in shooter loop!");
+                    }
+                    break;
+                default:
+                    break;
             }
         }
+        
 
         @Override
         public void onStop(double timestamp) {
@@ -208,13 +207,13 @@ public class Shooter extends Subsystem {
     }
 
     @Override
-    public synchronized void readPeriodicInputs() {
+    public void readPeriodicInputs() {
         periodicIO.velocity = master.getSelectedSensorVelocity();
         periodicIO.current = master.getStatorCurrent();
     }
 
     @Override
-    public synchronized void writePeriodicOutputs() {
+    public void writePeriodicOutputs() {
         if (getState() == State.VELOCITY || getState() == State.VISION) {
             master.set(ControlMode.Velocity, periodicIO.demand);
         } else {

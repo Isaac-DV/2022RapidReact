@@ -91,8 +91,7 @@ public class Turret extends Subsystem {
         turret.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 25, 30, 0.25));
         
         turret.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-        turret.setInverted(TalonFXInvertType.CounterClockwise);
-        resetMotorEncoderPosition(0.0);
+        turret.setInverted(TalonFXInvertType.Clockwise);
         
         turret.selectProfileSlot(0, 0);
         turret.config_kP(0, Constants.Turret.kP, Constants.kCANTimeoutMs);
@@ -100,6 +99,7 @@ public class Turret extends Subsystem {
         turret.config_kD(0, Constants.Turret.kD, Constants.kCANTimeoutMs);
         turret.config_kF(0, Constants.Turret.kF, Constants.kCANTimeoutMs);
         
+        turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
         turret.configMotionCruiseVelocity((int)(Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
         turret.configMotionAcceleration((int)(Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs);
         turret.configMotionSCurveStrength(0);
@@ -155,18 +155,18 @@ public class Turret extends Subsystem {
     }
     
     public double getAngle() {
-        return encUnitsToTurretDegrees(periodicIO.position);
+        return encUnitsToDegrees(periodicIO.position);
     }
     /**MagCoder to Falcon's integrated Encoder */
-    public double degreesToEncUnits(double degrees) {
-        return (int) (degrees / 360 * Constants.Turret.kFalconToEncoderRatio * 2048.0);
-    }
+    // public double degreesToEncUnits(double degrees) {
+    //     return (int) (degrees / 360 * Constants.Turret.kFalconToEncoderRatio * 2048.0);
+    // }
     
-    public double encUnitsToTurretDegrees(double encUnits) {
+    public double encUnitsToDegrees(double encUnits) {
         return encUnits / 2048.0 / Constants.Turret.kFalconToTurretRatio * 360.0;
     }
     
-    public int turretDegreesToEncUnits(double degrees) {
+    public int degreesToEncUnits(double degrees) {
         return (int) (degrees / 360.0 * Constants.Turret.kFalconToTurretRatio * 2048.0);
     }
     
@@ -349,6 +349,8 @@ public class Turret extends Subsystem {
             }
         };
     }
+
+    
     
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

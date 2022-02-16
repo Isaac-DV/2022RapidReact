@@ -18,7 +18,9 @@ import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
@@ -26,7 +28,7 @@ public class Wrist extends Subsystem {
 
 
     LazyTalonFX wrist;
-    CANCoder encoder;
+    DutyCycle encoder;
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
     private static Wrist instance = null;
@@ -50,10 +52,11 @@ public class Wrist extends Subsystem {
 
         wrist.setNeutralMode(NeutralMode.Coast);
 
-        encoder = new CANCoder(Ports.WRIST_ENCODER);
+        encoder = new DutyCycle(new DigitalInput(Ports.WRIST_ENCODER));
 
         //periodicIO.demand = degreesToEncUnits(Constants.Wrist.kStowedAngle);
         configWristPID();
+        resetToAbsolutePosition();
     }
 
     private void configWristPID() {
@@ -65,12 +68,12 @@ public class Wrist extends Subsystem {
 
         wrist.config_IntegralZone(0, (int)degreesToEncUnits(5), 10);
         wrist.configMotionCruiseVelocity((int)(Constants.Wrist.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 4.0), Constants.kCANTimeoutMs);
+        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 1.25), Constants.kCANTimeoutMs);
         wrist.configMotionSCurveStrength(0);
 
     }
     public double getAbsoluteEncoderDegrees() {
-        return encoder.getPosition();
+        return encoder.getOutput() * 360.0;
     }
     public enum State {
         OFF, OPEN_LOOP, POSITION, LOCK, DISABLED
@@ -110,7 +113,7 @@ public class Wrist extends Subsystem {
     }
 
     public void setOpenLoop(double demand) {
-        periodicIO.demand = demand * 0.4;
+        periodicIO.demand = demand * 0.25;
         setState(State.OPEN_LOOP);
     }
     PeriodicIO periodicIO = new PeriodicIO();
@@ -214,6 +217,7 @@ public class Wrist extends Subsystem {
     public void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
         SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
+        SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
         
     }
 
