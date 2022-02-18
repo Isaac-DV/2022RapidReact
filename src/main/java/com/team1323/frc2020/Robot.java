@@ -19,6 +19,8 @@ import com.team1323.frc2020.loops.QuinticPathTransmitter;
 import com.team1323.frc2020.loops.RobotStateEstimator;
 import com.team1323.frc2020.subsystems.SubsystemManager;
 import com.team1323.frc2020.subsystems.Superstructure;
+import com.team1323.frc2020.subsystems.Turret;
+import com.team1323.frc2020.subsystems.Wrist;
 import com.team1323.lib.util.CrashTracker;
 import com.team1323.lib.util.Logger;
 import com.team254.lib.geometry.Pose2d;
@@ -106,6 +108,8 @@ public class Robot extends TimedRobot {
 				autoModeExecuter.stop();
 
 			driverControls.setAutoMode(true);
+			Wrist.getInstance().zeroWrist();
+			Turret.getInstance().zeroTurret();
 
 			disabledLooper.stop();
 			enabledLooper.start();
@@ -128,6 +132,8 @@ public class Robot extends TimedRobot {
 			disabledLooper.stop();
 			enabledLooper.start();
 			printStackTrace();
+			Wrist.getInstance().zeroWrist();
+			Turret.getInstance().zeroTurret();
 			SmartDashboard.putBoolean("Auto", false);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -169,6 +175,8 @@ public class Robot extends TimedRobot {
 			smartDashboardInteractions.output();
 			Settings.update();
 			s.swerve.zeroModuleAngles();
+			Wrist.getInstance().resetToAbsolutePosition();
+			Turret.getInstance().resetToAbsolutePosition();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

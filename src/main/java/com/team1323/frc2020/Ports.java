@@ -24,11 +24,11 @@ public class Ports {
     public static final int BALL_EJECTOR = 16;
     public static final int BALL_FEEDER = 13;
     public static final int TURRET = 14;    
-    public static final int SHOOTER_TOP = 7;
-    public static final int SHOOTER_BOTTOM = 50;
+    //public static final int SHOOTER_TOP = 7;
+    public static final int SHOOTER_BOTTOM = 7;
 
 
-    public static final int HANGER_WRIST = 53;
+    public static final int HANGER_WRIST = 20;
 
     // MISC CAN
     public static final int PIGEON = 45;
@@ -44,18 +44,19 @@ public class Ports {
     public static final int[] kModuleEncoders = new int[]{FRONT_RIGHT_ENCODER, FRONT_LEFT_ENCODER,
         REAR_LEFT_ENCODER, REAR_RIGHT_ENCODER};
     //CANCoders
-    public static final int TURRET_ENCODER = 4;
-    public static final int FEEDER_BANNER = 5;
-    public static final int COLOR_SENSOR = 0;
-    public static final int WRIST_ENCODER = 0;
+    public static final int TURRET_ENCODER = 2;
+    public static final int FEEDER_BANNER = 4;
+    public static final int COLOR_SENSOR = 5;
+    public static final int WRIST_ENCODER = 1;
     public static final int HANGER_WRIST_ENCODER = 0;
+    public static final int ELEVATOR_ENCODER = 3;
 
     // Pneumatics
-    public static final int PCM = 21;
+    public static final int PCM = 41;
     public static final int FEEDER_SHIFTER = 0;
-    public static final int ELEVATOR_SHIFTER = 0;
-    public static final int TELESCOPE = 0;
-    public static final int CLAW = 0;
+    public static final int ELEVATOR_SHIFTER = 1;
+    public static final int TELESCOPE = 2;
+    public static final int CLAW = 3;
 
     //Canifier
     public static final int CANIFIER = 30;

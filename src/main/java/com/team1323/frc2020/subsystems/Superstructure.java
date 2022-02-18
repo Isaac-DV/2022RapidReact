@@ -284,9 +284,7 @@ public class Superstructure extends Subsystem {
 					wrist.setWristIntakeRequest()
 				),
 				new ParallelRequest(
-					ballFeeder.openLoopRequest(1.0),
-					ballSplitter.stateRequest(BallSplitter.ControlState.LEFT_EJECT),
-					ballEjector.stateRequest(BallEjector.ControlState.EJECT)
+					ballFeeder.stateRequest(BallFeeder.State.DETECT)
 				)
 			)
 		);
@@ -294,7 +292,8 @@ public class Superstructure extends Subsystem {
 	public void reverseAllSubsystems() {
 		request(
 			new ParallelRequest(
-				intake.stateRequest(Intake.ControlState.EJECT)
+				intake.stateRequest(Intake.ControlState.EJECT),
+				ballFeeder.openLoopRequest(-0.30)
 			)
 		);
 	}

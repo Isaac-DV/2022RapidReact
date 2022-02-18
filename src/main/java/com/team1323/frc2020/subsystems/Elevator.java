@@ -11,13 +11,18 @@ import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Elevator extends Subsystem {
     BallSplitter ballSplitter;
     LazyTalonFX splitterMotor;
+    DutyCycle absoluteEncoder;
 
     Solenoid PTOShifter;
 
@@ -36,6 +41,18 @@ public class Elevator extends Subsystem {
         splitterMotor = ballSplitter.getTalon();
 
         PTOShifter = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH, Ports.ELEVATOR_SHIFTER);
+        absoluteEncoder = new DutyCycle(new DigitalInput(Ports.ELEVATOR_ENCODER));
+
+        splitterMotor.configForwardSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMaxControlHeight), Constants.kCANTimeoutMs);
+        splitterMotor.configReverseSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMinControlHeight), Constants.kCANTimeoutMs);
+        enableLimits(false);
+
+        splitterMotor.setSelectedSensorPosition(0);
+    }
+
+    public void enableLimits(boolean enable) {
+        splitterMotor.configForwardSoftLimitEnable(enable, Constants.kCANTimeoutMs);
+        splitterMotor.configReverseSoftLimitEnable(enable, Constants.kCANTimeoutMs);
     }
 
     public void configForAssent() {
@@ -59,15 +76,48 @@ public class Elevator extends Subsystem {
         currentState = desiredState;
     }
 
-    public double encUnitsToInches(double encUnits) {
-        return (encUnits / Constants.Elevator.kTicksPerInch);
+    public double getAbsoluteEncoderPosition() {
+        return absoluteEncoder.getOutput();
     }
-    public int inchesToEncUnits(double inches) {
-        return (int)(inches * Constants.Elevator.kTicksPerInch);
+
+    public double encUnitsToInches(double encUnits) {
+        return (encUnits / Constants.Elevator.kFalconTicksPerInch);
+    }
+
+    public double inchesToEncUnits(double inches) {
+        return (inches * Constants.Elevator.kFalconTicksPerInch);
+    }
+
+    public double absoluteEncoderRotationsToInches(double rotations) {
+        return encUnitsToInches(rotations * Constants.Elevator.kFalconToMagEncoderRatio * 2048.0);
+    }
+
+    public void resetToAbsolutePosition() {
+        double cancoderOffset = getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition;
+        double absoluteElevatorHeight = Constants.Elevator.kStartingHeight + absoluteEncoderRotationsToInches(cancoderOffset);
+        if (absoluteElevatorHeight > Constants.Elevator.kMaxInitialHeight) {
+            cancoderOffset -= 1.0;
+            absoluteElevatorHeight = Constants.Elevator.kStartingHeight + absoluteEncoderRotationsToInches(cancoderOffset);
+        } else if (absoluteElevatorHeight < Constants.Elevator.kMinInitialHeight) {
+            cancoderOffset += 1.0;
+            absoluteElevatorHeight = Constants.Elevator.kStartingHeight + absoluteEncoderRotationsToInches(cancoderOffset);
+        }
+
+        if (absoluteElevatorHeight > Constants.Elevator.kMaxInitialHeight || absoluteElevatorHeight < Constants.Elevator.kMinInitialHeight) {
+            DriverStation.reportError("Elevator height is out of bounds", false);
+        }
+
+        splitterMotor.setSelectedSensorPosition(inchesToEncUnits(absoluteElevatorHeight), 0, Constants.kCANTimeoutMs);
     }
 
     private boolean elevatorPowered = false;
     public void shiftPower(boolean shiftedToElevator) {
+        if (shiftedToElevator && !elevatorPowered) {
+            resetToAbsolutePosition();
+            enableLimits(false);
+        } else if (!shiftedToElevator && elevatorPowered) {
+            enableLimits(false);
+        }
         elevatorPowered = shiftedToElevator;
         PTOShifter.set(shiftedToElevator);
         ballSplitter.shiftPower(shiftedToElevator);
@@ -79,6 +129,12 @@ public class Elevator extends Subsystem {
         periodicIO.demand = inchesToEncUnits(heightInches);
         onTarget = false;
         targetHeight = heightInches;
+    }
+    public void lockElevatorHeight() {
+        setState(State.POSITION);
+        shiftPower(State.POSITION.isEngaged);
+        targetHeight = encUnitsToInches(periodicIO.position);
+        periodicIO.demand = periodicIO.position;
     }
     public void setOpenLoop(double demand) {
         setState(State.OPEN_LOOP);
@@ -122,7 +178,9 @@ public class Elevator extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        
+        SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
+        SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));
+        SmartDashboard.putNumber("Elevator Absolute Height", encUnitsToInches(inchesToEncUnits(absoluteEncoderRotationsToInches(getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition))));
     }
 
     @Override

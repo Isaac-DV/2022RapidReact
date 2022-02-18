@@ -7,7 +7,6 @@
 
 package com.team1323.frc2020.subsystems;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
-import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
@@ -23,14 +21,10 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
+import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
-import com.team254.lib.geometry.Pose2d;
-import com.team254.lib.geometry.Rotation2d;
-import com.team254.lib.geometry.Translation2d;
 
-import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycle;
@@ -42,7 +36,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Turret extends Subsystem {
     
     LazyTalonFX turret;
-    CANCoder encoder;
+    DutyCycle encoder;
 
     RobotState robotState;
     
@@ -55,6 +49,7 @@ public class Turret extends Subsystem {
     private double stateStartTime = 0.0;
     private double lastTrackWhileShooting = Double.POSITIVE_INFINITY;
     
+    private boolean zeroedAbsolutely = false;
     public double goalX = 0.0;
     public double goalY = 0.0;
 
@@ -83,7 +78,7 @@ public class Turret extends Subsystem {
         robotState = RobotState.getInstance();
         
         turret = new LazyTalonFX(Ports.TURRET, "main");
-        encoder = new CANCoder(Ports.TURRET_ENCODER, "main");
+        encoder = new DutyCycle(new DigitalInput(Ports.TURRET_ENCODER));
 
         turret.configVoltageCompSaturation(12.0, 10);
         turret.enableVoltageCompensation(true);
@@ -99,7 +94,7 @@ public class Turret extends Subsystem {
         turret.config_kD(0, Constants.Turret.kD, Constants.kCANTimeoutMs);
         turret.config_kF(0, Constants.Turret.kF, Constants.kCANTimeoutMs);
         
-        turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
+        //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
         turret.configMotionCruiseVelocity((int)(Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
         turret.configMotionAcceleration((int)(Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs);
         turret.configMotionSCurveStrength(0);
@@ -115,8 +110,8 @@ public class Turret extends Subsystem {
         
     }
 
-    public double getAbsolutePosition() {
-        return encoder.getAbsolutePosition();
+    public double getAbsoluteEncoderPosition() {
+        return encoder.getOutput() * 360.0;
     }
     
     public void setAngle(double angle) {
@@ -172,8 +167,8 @@ public class Turret extends Subsystem {
     
     
 
-    public boolean isEncoderConnected(){
-        return ((encoder.getBusVoltage() > 0.0) ? true : false);
+    public boolean isEncoderConnected() {
+        return encoder.getFrequency() != 0.0;
     }
     
     public void setOpenLoop(double output) {
@@ -194,6 +189,7 @@ public class Turret extends Subsystem {
         turret.setSelectedSensorPosition(degreesToEncUnits(angle));
         setOpenLoop(0.0);
     }
+
     @Override
     public synchronized void readPeriodicInputs() {
         periodicIO.position = turret.getSelectedSensorPosition();
@@ -203,16 +199,17 @@ public class Turret extends Subsystem {
     
     @Override
     public void writePeriodicOutputs() {
-        if (currentState == ControlState.POSITION || currentState == ControlState.VISION || currentState == ControlState.ROBOT_STATE_VISION || currentState == ControlState.VISION_OFFSET) {
-            turret.set(ControlMode.MotionMagic, periodicIO.demand);
-        } else {
+        if (currentState == ControlState.OPEN_LOOP) {
             turret.set(ControlMode.PercentOutput, periodicIO.demand);
+        } else {
+            turret.set(ControlMode.MotionMagic, periodicIO.demand);
         }
     }
     
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
+        SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
         //SmartDashboard.putNumber("Turret Current", periodicIO.current);
         //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);
         //SmartDashboard.putNumber("Turret Velocity", periodicIO.velocity);
@@ -356,6 +353,28 @@ public class Turret extends Subsystem {
     public void registerEnabledLoops(ILooper enabledLooper) {
         enabledLooper.register(loop);
     }
+    public void zeroTurret() {
+        zeroedAbsolutely = true;
+    }
+    public void resetToAbsolutePosition() {
+        if(!zeroedAbsolutely) {
+            double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderPosition() - Constants.Turret.kTurretStartingEncoderPosition);
+            double absoluteTurretAngle = Constants.Turret.kTurretStartingAngle + (cancoderOffset / Constants.Turret.kEncoderToTurretRatio);
+            if (absoluteTurretAngle > Constants.Turret.kMaxInitialAngle) {
+                cancoderOffset -= 360.0;
+                absoluteTurretAngle = Constants.Turret.kTurretStartingAngle + (cancoderOffset / Constants.Turret.kEncoderToTurretRatio);
+            } else if (absoluteTurretAngle < Constants.Turret.kMinInitialAngle) {
+                cancoderOffset += 360.0;
+                absoluteTurretAngle = Constants.Turret.kTurretStartingAngle + (cancoderOffset / Constants.Turret.kEncoderToTurretRatio);
+            }
+
+            if (absoluteTurretAngle > Constants.Turret.kMaxInitialAngle || absoluteTurretAngle < Constants.Turret.kMinInitialAngle) {
+                DriverStation.reportError("Turret angle is out of bounds", false);
+            }
+
+            turret.setSelectedSensorPosition(degreesToEncUnits(absoluteTurretAngle), 0, Constants.kCANTimeoutMs);
+        }
+    }
     
     @Override
     public void stop() {
@@ -363,7 +382,7 @@ public class Turret extends Subsystem {
     }
     
     private static class PeriodicIO {
-        //Inputss
+        //Inputs
         public double position;
         public double velocity;
         public double voltage;

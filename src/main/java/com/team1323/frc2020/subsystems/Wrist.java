@@ -31,6 +31,7 @@ public class Wrist extends Subsystem {
     DutyCycle encoder;
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
+    private boolean zeroedAbsolutely = false;
     private static Wrist instance = null;
     public static Wrist getInstance() {
         if (instance==null)
@@ -39,12 +40,10 @@ public class Wrist extends Subsystem {
     }
     public Wrist() {
         wrist = new LazyTalonFX(Ports.WRIST, "main");
+        encoder = new DutyCycle(new DigitalInput(Ports.WRIST_ENCODER));
 
         wrist.setInverted(TalonFXInvertType.CounterClockwise);
-        wrist.setStatusFramePeriod(StatusFrame.Status_1_General, 50);
-        wrist.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100);
         wrist.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
-        wrist.setSelectedSensorPosition(degreesToEncUnits(Constants.Wrist.kWristHardStopAngle));
         wrist.configForwardSoftLimitThreshold((int)degreesToEncUnits(Constants.Wrist.kMaxWristAngle), Constants.kCANTimeoutMs);
         wrist.configReverseSoftLimitThreshold((int)degreesToEncUnits(Constants.Wrist.kMinWristAngle),Constants.kCANTimeoutMs);
         wrist.configForwardSoftLimitEnable(true);
@@ -52,7 +51,6 @@ public class Wrist extends Subsystem {
 
         wrist.setNeutralMode(NeutralMode.Coast);
 
-        encoder = new DutyCycle(new DigitalInput(Ports.WRIST_ENCODER));
 
         //periodicIO.demand = degreesToEncUnits(Constants.Wrist.kStowedAngle);
         configWristPID();
@@ -73,7 +71,7 @@ public class Wrist extends Subsystem {
 
     }
     public double getAbsoluteEncoderDegrees() {
-        return encoder.getOutput() * 360.0;
+        return encoder.getOutput() * 360.0 * 1.0;
     }
     public enum State {
         OFF, OPEN_LOOP, POSITION, LOCK, DISABLED
@@ -127,23 +125,28 @@ public class Wrist extends Subsystem {
         return ((encUnits / 2048.0) / Constants.Wrist.kFalconToWristRatio * 360.0);
     }
 
+    public void zeroWrist() {
+        zeroedAbsolutely = true;
+    }
+
     public void resetToAbsolutePosition() {
-        double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.Wrist.kWristStartingEncoderPosition);
-        double absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+        if(!zeroedAbsolutely) {
+            double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.Wrist.kWristStartingEncoderPosition);
+            double absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+            if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle) {
+                cancoderOffset -= 360.0;
+                absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+            } else if (absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
+                cancoderOffset += 360.0;
+                absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+            }
 
-        if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle) {
-            cancoderOffset -= 360.0;
-            absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
-        } else if (absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
-            cancoderOffset += 360.0;
-            absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+            if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
+                DriverStation.reportError("Wrist angle is out of bounds", false);
+            }
+
+            wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, Constants.kCANTimeoutMs);
         }
-
-        if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
-            DriverStation.reportError("Wrist angle is out of bounds", false);
-        }
-
-        wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, Constants.kCANTimeoutMs);
     }
 
 
@@ -218,6 +221,7 @@ public class Wrist extends Subsystem {
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
         SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
         SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
+        SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
         
     }
 

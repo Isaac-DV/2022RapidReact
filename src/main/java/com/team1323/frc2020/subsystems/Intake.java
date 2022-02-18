@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.subsystems.BallEjector.ControlState;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
@@ -33,7 +34,7 @@ public class Intake extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), INTAKE(1.0), EJECT(-0.25);
+        OFF(0.0), INTAKE(Constants.Intake.kIntakeSpeed), EJECT(-0.25);
         double speed;
         ControlState(double speed){
             this.speed = speed;
@@ -78,7 +79,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void stop() {
-        intake.set(ControlMode.PercentOutput, 0.0);
+        conformToState(ControlState.OFF);
     }
     
 }

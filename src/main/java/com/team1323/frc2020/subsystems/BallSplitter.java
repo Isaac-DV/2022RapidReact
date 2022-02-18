@@ -42,11 +42,11 @@ public class BallSplitter extends Subsystem {
         splitter.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs); 
         splitter.enableVoltageCompensation(true);
         splitter.setNeutralMode(NeutralMode.Brake);
-        splitter.setInverted(TalonFXInvertType.Clockwise);
+        splitter.setInverted(TalonFXInvertType.CounterClockwise);
     }
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
+        OFF(0.0), LEFT_EJECT(1.0), RIGHT_EJECT(-1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
         double speed;
         ControlState(double speed) {
             this.speed = speed;

@@ -34,7 +34,7 @@ public class BallEjector extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), EJECT(1.0);/* LEFT_EJECT(0.75), RIGHT_EJECT(-0.75);*/
+        OFF(0.0), EJECT(0.75);/* LEFT_EJECT(0.75), RIGHT_EJECT(-0.75);*/
         double speed;
         ControlState(double speed) {
             this.speed = speed;

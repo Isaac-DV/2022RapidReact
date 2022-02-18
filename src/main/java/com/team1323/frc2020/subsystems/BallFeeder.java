@@ -33,6 +33,7 @@ public class BallFeeder extends Subsystem {
     DigitalInput banner, colorSensor;
 
     double feederStartTimestamp = Double.POSITIVE_INFINITY;
+    double ejectorStartTimestamp = Double.POSITIVE_INFINITY;
 
 
     private static BallFeeder instance = null;
@@ -70,11 +71,11 @@ public class BallFeeder extends Subsystem {
         DSAlliance = alliance;
     }
     public void updateDetectedBall() {
-        if(banner.get() && colorSensor.get()) { //detected a red ball
+        if(banner.get() && isColorSensorRed()) { //detected a red ball
             DetectedBall = Ball.Red;
-        } else if(banner.get() && !colorSensor.get()) { //detected a blue ball
+        } else if(banner.get() && !isColorSensorRed()) { //detected a blue ball
             DetectedBall = Ball.Blue;
-        } else if(!banner.get() && !colorSensor.get()) { //does not detect a ball
+        } else if(!banner.get()) { //does not detect a ball
             DetectedBall = Ball.None;
         }
     }
@@ -91,14 +92,18 @@ public class BallFeeder extends Subsystem {
     }
 
     public void setFeederOpenLoop(double demand) {
-        System.out.println(demand);
         feeder.set(ControlMode.PercentOutput, demand);
     }
     public void setOpenLoopState(double demand) {
         setState(State.OPEN_LOOP);
         setFeederOpenLoop(demand);
     }
-
+    public boolean isBannerSensorConnected() {
+        return true;
+    }
+    public boolean isColorSensorRed() {
+        return !colorSensor.get();
+    }
     
 
     private boolean rollersShifted = false;
@@ -111,7 +116,7 @@ public class BallFeeder extends Subsystem {
         @Override
         public void onStart(double timestamp) {
             setState(State.OFF);
-            setDSAlliance(DriverStation.getAlliance());
+            setDSAlliance(DriverStation.Alliance.Red/*DriverStation.getAlliance()*/);
             ballSplitter.setDSAlliance(DriverStation.getAlliance());
         }
 
@@ -127,30 +132,39 @@ public class BallFeeder extends Subsystem {
                     break;
                 case DETECT:
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        if(feederStartTimestamp == Double.POSITIVE_INFINITY) {
-                            feederStartTimestamp = timestamp;
-                            setFeederOpenLoop(-0.5);
-                        }
+                        ballEjector.conformToState(BallEjector.ControlState.OFF);
+                        setFeederOpenLoop(-0.25);
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
-                        ballSplitter.fieldRelativeEject(timestamp);
+                        //ballSplitter.fieldRelativeEject(timestamp);
+                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
+                        ballSplitter.conformToState(BallSplitter.ControlState.RIGHT_EJECT);
+                        if(ejectorStartTimestamp == Double.POSITIVE_INFINITY) {
+                            ballEjector.conformToState(BallEjector.ControlState.EJECT);
+                            ejectorStartTimestamp = timestamp;
+                        }
+                    } else if (DetectedBall == Ball.None) {
+                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
                     }
                     break;
                 case HOLD:
                     ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                    setFeederOpenLoop(1.0);
+                    //setFeederOpenLoop(1.0);
                     break;
                 case HOLD_DETECT:
                     if(DetectedBall != Ball.None) {//Detected opponents ball
                         ballSplitter.fieldRelativeEject(timestamp);
                     }
-                    setFeederOpenLoop(1.0);
+                    //setFeederOpenLoop(1.0);
                     break;
                 default:
                     break;
             }
-            if((timestamp - feederStartTimestamp) > 0.25) {
-                setFeederOpenLoop(0.0);
-                feederStartTimestamp = Double.POSITIVE_INFINITY;
+            
+        
+            if((timestamp - ejectorStartTimestamp) > 1.5) {
+                ballEjector.conformToState(BallEjector.ControlState.OFF);
+                ejectorStartTimestamp = Double.POSITIVE_INFINITY;
             }
             
         }
@@ -181,7 +195,10 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        //SmartDashboard.putString("Ball Feeder State", getState().toString());        
+        //SmartDashboard.putString("Ball Feeder State", getState().toString()); 
+        SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
+        SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
+        SmartDashboard.putString("Detected Ball", DetectedBall.toString());   
     }
 
 

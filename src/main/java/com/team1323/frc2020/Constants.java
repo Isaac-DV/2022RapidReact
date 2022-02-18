@@ -143,14 +143,15 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kStartingAngle = 0.0; // Turret facing straight forward
+        public static final double kTurretStartingEncoderPosition = 41.5;
+        public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
-        public static final double kFalconToEncoderRatio = 0.0;
+        public static final double kEncoderToTurretRatio = 1.0;
         public static final double kAngleTolerance = 1.0;
-        public static final double kMinControlAngle = -90.0;
-        public static final double kMaxControlAngle = 90.0;
-        public static final double kMinInitialAngle = -135.0;
-        public static final double kMaxInitialAngle = 30.0;
+        public static final double kMinControlAngle = -300.0;
+        public static final double kMaxControlAngle = 60.0;
+        public static final double kMinInitialAngle = -300.0;
+        public static final double kMaxInitialAngle = 60.0;
         public static final double kTrackingOffset = 2.0; //3.0 = Close
         
         public static final double kP = 0.25;
@@ -258,7 +259,7 @@ public class Constants {
         public static final double kIntakeD = 0.0;
         public static final double kIntakeF = 0.0;
         
-        public static final double kIntakeSpeed = 0.6;
+        public static final double kIntakeSpeed = 1.0;
         public static final double kOuttakeSpeed = -0.5;
         public static final double kFeedingSpeed = 0.5;
         public static final double kHumanLoadSpeed = 0.5;
@@ -267,14 +268,14 @@ public class Constants {
     public static class Wrist {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
-        public static final double kWristStartingAngle = 0.0;
-        public static final double kWristStartingEncoderPosition = 0.0;
+        public static final double kWristStartingAngle = -25.47;
+        public static final double kWristStartingEncoderPosition = 358.2;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kMaxInitialAngle = 120.0;
-        public static final double kMinInitialAngle = -10.0;
+        public static final double kMaxInitialAngle = 165.0;
+        public static final double kMinInitialAngle = -30.0;
 
 
         public static final double kMaxWristAngle = 110.0;
@@ -340,10 +341,15 @@ public class Constants {
     }
     public static class Elevator {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
-        public static final double kTicksPerInch = 0;
+        public static final double kFalconTicksPerInch = 150355.0 / 10.25;
+        public static final double kFalconToMagEncoderRatio = 45.0;
+        public static final double kMagEncoderStartingPosition = 0.319385;
+        public static final double kStartingHeight = 0.0;
+        public static final double kMinInitialHeight = -1.0;
+        public static final double kMaxInitialHeight = 2.0;
 
         public static final double kMinControlHeight = 0.5;
-        public static final double kMaxControlHeight = 10.0;
+        public static final double kMaxControlHeight = 29.0;
         public static final double kHeightTolerance = 0.2;
 
         public static final double kP = 0.0;
@@ -354,10 +360,10 @@ public class Constants {
     public static class ClawWrist {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kMinControlAngle = 0.0;
-        public static final double kMaxControlAngle = 0.0;
+        public static final double kMaxControlAngle = 90.0;
         public static final double kMinInitialAngle = 0.0;
         public static final double kMaxInitialAngle = 0.0;
-        public static final double kFalconToWristRatio = 0;
+        public static final double kFalconToWristRatio = 1096.875;
         public static final double kFalconToCANCoderRatio = 0.0;
         public static final double kWristAngleTolerance = 2.0;
         
@@ -365,6 +371,11 @@ public class Constants {
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kF = 0.0;
+    }
+    public static class MotorizedHood {
+        public static final double kMinControlAngle = 0.0;
+        public static final double kMaxControlAngle = 0.0;
+        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values
     }
 
 }

@@ -13,6 +13,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -37,7 +38,7 @@ public class ClawWrist extends Subsystem {
     }
 
     public ClawWrist() {
-        wrist = new LazyTalonFX(Ports.HANGER_WRIST, "main");
+        wrist = new LazyTalonFX(Ports.HANGER_WRIST);
         encoder = new CANCoder(Ports.HANGER_WRIST_ENCODER, "main");
 
         claw = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH, Ports.CLAW);
@@ -46,8 +47,8 @@ public class ClawWrist extends Subsystem {
         wrist.enableVoltageCompensation(true);
 
         wrist.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
-        wrist.configForwardSoftLimitThreshold(0, Constants.kCANTimeoutMs);
-        wrist.configReverseSoftLimitThreshold(0, Constants.kCANTimeoutMs);
+        wrist.configForwardSoftLimitThreshold(degreesToEncUnits(Constants.ClawWrist.kMaxControlAngle), Constants.kCANTimeoutMs);
+        wrist.configReverseSoftLimitThreshold(degreesToEncUnits(Constants.ClawWrist.kMinControlAngle), Constants.kCANTimeoutMs);
         wrist.configForwardSoftLimitEnable(true);
         wrist.configReverseSoftLimitEnable(true);
 
@@ -94,10 +95,12 @@ public class ClawWrist extends Subsystem {
         periodicIO.demand = demand;
     }
     public void setWristAngle(double degrees) {
+        degrees = Util.limit(degrees, Constants.ClawWrist.kMinControlAngle, Constants.ClawWrist.kMaxControlAngle);
         targetAngle = degrees;
         setState(State.POSITION);
         periodicIO.demand = degreesToEncUnits(degrees);
     }
+    
     public void lockWrist() {
         setState(State.LOCKED);
         targetAngle = encUnitsToDegrees(periodicIO.position);

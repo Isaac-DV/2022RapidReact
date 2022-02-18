@@ -14,6 +14,7 @@ import com.team1323.frc2020.subsystems.BallEjector;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
 import com.team1323.frc2020.subsystems.Column;
+import com.team1323.frc2020.subsystems.Elevator;
 import com.team1323.frc2020.subsystems.Intake;
 import com.team1323.frc2020.subsystems.Shooter;
 import com.team1323.frc2020.subsystems.SubsystemManager;
@@ -37,7 +38,7 @@ public class DriverControls implements Loop {
         return instance;
     }
 
-	Xbox driver, coDriver;
+	Xbox driver, coDriver, testController;
 
     private Swerve swerve;
     private Intake intake;
@@ -48,6 +49,7 @@ public class DriverControls implements Loop {
     private Column column;
     private Turret turret;
     private Shooter shooter;
+    private Elevator elevator;
     private Superstructure s;
 
     private SubsystemManager subsystems;
@@ -68,6 +70,7 @@ public class DriverControls implements Loop {
     public DriverControls() {
         driver = new Xbox(0);
 		coDriver = new Xbox(1);
+        testController = new Xbox(2);
         driver.setDeadband(0.0);
 		coDriver.setDeadband(0.25);
 		coDriver.rightBumper.setLongPressDuration(1.0);
@@ -81,11 +84,12 @@ public class DriverControls implements Loop {
         column = Column.getInstance();
         turret = Turret.getInstance();
         shooter = Shooter.getInstance();
+        elevator = Elevator.getInstance();
 
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret, shooter, s));
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret, shooter,elevator, s));
     }
 
     @Override
@@ -153,10 +157,11 @@ public class DriverControls implements Loop {
         double coDriverRightX = coDriver.getRightX();
         double coDriverLeftY = coDriver.getLeftY();
 
-        if (coDriver.backButton.wasActivated()){
+        /*if (coDriver.backButton.wasActivated()){
             s.neutralState();
             swerve.setState(Swerve.ControlState.NEUTRAL);
         }
+        */
 
         if(coDriverLeftY != 0) {
             wrist.setOpenLoop(coDriverLeftY);
@@ -180,9 +185,20 @@ public class DriverControls implements Loop {
 
         if(coDriver.rightBumper.wasActivated()) {
             s.reverseAllSubsystems();
+        } else if(coDriver.rightBumper.wasReleased()) {
+            s.disableState();
         }
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
+        }
+
+
+        double testControllerLeftY = -testController.getLeftY();
+        if(testControllerLeftY != 0) {
+            elevator.setOpenLoop(testControllerLeftY);
+        } else if((testControllerLeftY == 0) && (elevator.getState() == Elevator.State.OPEN_LOOP)) {
+            //elevator.lockElevatorHeight();
+            elevator.setOpenLoop(0.0);
         }
     }
 

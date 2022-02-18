@@ -29,30 +29,30 @@ public class Column extends Subsystem {
         ballFeeder = BallFeeder.getInstance();
 
         PTOShifter = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH , Ports.FEEDER_SHIFTER);
-
+        stop();
     }
 
     public enum ControlState {
-        DISENGAGED(false), ENGAGED(true);
-        boolean isEngaged;
+        DISENGAGED(true), ENGAGED(false);
+        boolean isColumnEngaged;
         ControlState(boolean isEngaged) {
-            this.isEngaged = isEngaged;
+            this.isColumnEngaged = isEngaged;
         }
     }
     private ControlState currentState = ControlState.DISENGAGED;
     public ControlState getState() {
         return currentState;
     }
-    public void setControlState(ControlState desiredState) {
+    public void conformToState(ControlState desiredState) {
         currentState = desiredState;
-        shiftPower(desiredState.isEngaged);
+        shiftPower(!desiredState.isColumnEngaged);
     }
 
     private boolean rollersPowered = false;
     private void shiftPower(boolean shiftToRollers) {
         rollersPowered = shiftToRollers;
         ballFeeder.shiftPower(shiftToRollers);
-        PTOShifter.set(shiftToRollers);
+        PTOShifter.set(!shiftToRollers);
     }
 
     public Request stateRequest(ControlState desiredState) {
@@ -60,7 +60,7 @@ public class Column extends Subsystem {
 
             @Override
             public void act() {
-                setControlState(desiredState);
+                conformToState(desiredState);
             }  
         };
     }
@@ -72,7 +72,7 @@ public class Column extends Subsystem {
 
     @Override
     public void stop() {
-        
+        conformToState(ControlState.DISENGAGED);
     }
 
 }
