@@ -52,11 +52,17 @@ public class ClawWrist extends Subsystem {
         wrist.configForwardSoftLimitEnable(true);
         wrist.configReverseSoftLimitEnable(true);
 
+        wrist.setSelectedSensorPosition(0);
 
         wrist.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);
         wrist.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 50);
 
         wrist.setNeutralMode(NeutralMode.Brake);
+
+        wrist.config_kP(0, Constants.ClawWrist.kP);
+        wrist.config_kI(0, Constants.ClawWrist.kI);
+        wrist.config_kD(0, Constants.ClawWrist.kD);
+        wrist.config_kF(0, Constants.ClawWrist.kF);
 
         setCurrentLimit(40);
 
@@ -70,7 +76,7 @@ public class ClawWrist extends Subsystem {
         SupplyCurrentLimitConfiguration currentLimit = new SupplyCurrentLimitConfiguration(true, amps, amps, 0.1);
         wrist.configSupplyCurrentLimit(currentLimit);
     }
-
+    
     PeriodicIO periodicIO = new PeriodicIO();
 
     public enum State {
@@ -108,7 +114,7 @@ public class ClawWrist extends Subsystem {
     }
 
     public double encUnitsToDegrees(double encUnits) {
-        return ((encUnits / 2048.0) / 360.0) / Constants.ClawWrist.kFalconToWristRatio;
+        return ((encUnits / 2048.0) * 360.0) / Constants.ClawWrist.kFalconToWristRatio;
     }
     public double degreesToEncUnits(double degrees) {
         return ((degrees / 360) * 2048.0 * Constants.ClawWrist.kFalconToWristRatio);
@@ -145,8 +151,6 @@ public class ClawWrist extends Subsystem {
     @Override
     public void readPeriodicInputs() {
         periodicIO.position = wrist.getSelectedSensorPosition(0);
-        periodicIO.current = wrist.getOutputCurrent();
-        periodicIO.voltage = wrist.getMotorOutputVoltage();
     }
 
     @Override
@@ -160,7 +164,8 @@ public class ClawWrist extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Hanger Wrist Angle", encUnitsToDegrees(periodicIO.position));
+        SmartDashboard.putNumber("Claw Wrist Angle", encUnitsToDegrees(periodicIO.position));
+        SmartDashboard.putNumber("Claw Current", wrist.getOutputCurrent());
     }
 
     @Override

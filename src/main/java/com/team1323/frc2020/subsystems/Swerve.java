@@ -965,18 +965,17 @@ public class Swerve extends Subsystem{
 		
 		@Override
 		public void onLoop(double timestamp) {
-			synchronized(Swerve.this){
-				if(modulesReady || (getState() != ControlState.TRAJECTORY)){
-					//updatePose(timestamp);
-					//alternatePoseUpdate();
-					//wpiPose = odometry.update(pose.getRotation(), getModuleStates());
-					pose = odometry.update(pigeon.getYaw(), getModuleStates());
-					velocity = odometry.getVelocity();
-					//pose = robotState.getLatestFieldToVehicle().getValue();
-				}
-				updateControlCycle(timestamp);
-				lastUpdateTimestamp = timestamp;
+			if(modulesReady || (getState() != ControlState.TRAJECTORY)){
+				//updatePose(timestamp);
+				//alternatePoseUpdate();
+				//wpiPose = odometry.update(pose.getRotation(), getModuleStates());
+				pose = odometry.update(pigeon.getYaw(), getModuleStates());
+				velocity = odometry.getVelocity();
+				//pose = robotState.getLatestFieldToVehicle().getValue();
 			}
+			updateControlCycle(timestamp);
+			lastUpdateTimestamp = timestamp;
+		
 		}
 		
 		@Override

@@ -56,7 +56,7 @@ public class Pigeon {
 				//System.out.println("DIDN'T GET ANY PIGEON");
 				return lastYaw;
 			}*/
-			return Rotation2d.fromDegrees(pigeon.getYaw());
+			return Rotation2d.fromDegrees(-pigeon.getYaw());
 		}
 		return new Rotation2d();
 	}
@@ -81,10 +81,10 @@ public class Pigeon {
 	
 	public void setAngle(double angle){
 		//pigeon.setFusedHeading(angle * 64.0, 10);
-		pigeon.setYaw(angle, 10);
+		pigeon.setYaw(-angle, 10);
 		//secondPigeon.setFusedHeading(-angle * 64.0, 10);
 		//secondPigeon.setYaw(-angle, 10);
-		System.out.println("Pigeon angle set to: " + angle);
+		System.out.println("Pigeon angle set to: " + -angle);
 	}
 	
 	public void outputToSmartDashboard(){

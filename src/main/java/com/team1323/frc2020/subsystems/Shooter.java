@@ -127,7 +127,6 @@ public class Shooter extends Subsystem {
                         InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToBottomRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
                         setVelocity(visionRPM.value);
                     } else {
-                        setVelocity(Constants.Shooter.kCloseBottomRPM);
                         System.out.println("Vision target not visible in shooter loop!");
                     }
                     break;

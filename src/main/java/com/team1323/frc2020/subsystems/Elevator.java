@@ -47,6 +47,11 @@ public class Elevator extends Subsystem {
         splitterMotor.configReverseSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMinControlHeight), Constants.kCANTimeoutMs);
         enableLimits(false);
 
+        splitterMotor.config_kP(0, Constants.Elevator.kP);
+        splitterMotor.config_kI(0, Constants.Elevator.kI);
+        splitterMotor.config_kD(0, Constants.Elevator.kD);
+        splitterMotor.config_kF(0, Constants.Elevator.kF);
+
         splitterMotor.setSelectedSensorPosition(0);
     }
 
@@ -77,7 +82,7 @@ public class Elevator extends Subsystem {
     }
 
     public double getAbsoluteEncoderPosition() {
-        return absoluteEncoder.getOutput();
+        return -absoluteEncoder.getOutput();
     }
 
     public double encUnitsToInches(double encUnits) {
@@ -114,7 +119,7 @@ public class Elevator extends Subsystem {
     public void shiftPower(boolean shiftedToElevator) {
         if (shiftedToElevator && !elevatorPowered) {
             resetToAbsolutePosition();
-            enableLimits(false);
+            enableLimits(true);
         } else if (!shiftedToElevator && elevatorPowered) {
             enableLimits(false);
         }
@@ -178,6 +183,7 @@ public class Elevator extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber("Elevator Current", splitterMotor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
         SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));
         SmartDashboard.putNumber("Elevator Absolute Height", encUnitsToInches(inchesToEncUnits(absoluteEncoderRotationsToInches(getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition))));

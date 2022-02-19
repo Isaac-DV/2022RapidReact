@@ -13,9 +13,11 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallEjector;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
+import com.team1323.frc2020.subsystems.ClawWrist;
 import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Elevator;
 import com.team1323.frc2020.subsystems.Intake;
+import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.Shooter;
 import com.team1323.frc2020.subsystems.SubsystemManager;
 import com.team1323.frc2020.subsystems.Superstructure;
@@ -48,8 +50,10 @@ public class DriverControls implements Loop {
     private BallFeeder ballFeeder;
     private Column column;
     private Turret turret;
+    private MotorizedHood motorizedHood;
     private Shooter shooter;
     private Elevator elevator;
+    private ClawWrist clawWrist;
     private Superstructure s;
 
     private SubsystemManager subsystems;
@@ -83,13 +87,15 @@ public class DriverControls implements Loop {
         ballFeeder = BallFeeder.getInstance();
         column = Column.getInstance();
         turret = Turret.getInstance();
+        motorizedHood = MotorizedHood.getInstance();
         shooter = Shooter.getInstance();
-        elevator = Elevator.getInstance();
+        elevator = Elevator.getInstance();  
+        clawWrist = ClawWrist.getInstance();
 
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret, shooter,elevator, s));
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret,motorizedHood, shooter,elevator,clawWrist, s));
     }
 
     @Override
@@ -108,6 +114,7 @@ public class DriverControls implements Loop {
 
     @Override
     public void onLoop(double timestamp) {
+        RobotState.getInstance().outputToSmartDashboard();
         if(inAuto) {
             // Any auto-specific LED controls can go here
         } else {
@@ -174,11 +181,25 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
         if(coDriver.aButton.wasActivated()) {
-            s.testIntakeState();
+            s.intakeState();
         } else if(coDriver.aButton.wasReleased()) {
             s.postIntakeState();
         }
-        
+       
+        if(coDriver.rightTrigger.wasActivated()) {
+            //shooter.setVelocity(3000);
+            s.visionShotState();            
+        } else if(coDriver.rightTrigger.wasReleased()) {
+            //shooter.stop();
+            s.postShotState();
+            turret.lockAngle();
+        }
+        if(coDriver.yButton.wasActivated()) {
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle + 7.75);
+        }
+        if(coDriver.xButton.wasActivated()) {
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
+        }
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
@@ -188,17 +209,26 @@ public class DriverControls implements Loop {
         } else if(coDriver.rightBumper.wasReleased()) {
             s.disableState();
         }
+        if(coDriver.leftBumper.wasActivated()) {
+            ballSplitter.conformToState(BallSplitter.ControlState.LEFT_EJECT);
+        }
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
         }
 
-
+        
         double testControllerLeftY = -testController.getLeftY();
+        double testControllerRightY = testController.getRightY();
         if(testControllerLeftY != 0) {
             elevator.setOpenLoop(testControllerLeftY);
-        } else if((testControllerLeftY == 0) && (elevator.getState() == Elevator.State.OPEN_LOOP)) {
-            //elevator.lockElevatorHeight();
-            elevator.setOpenLoop(0.0);
+            turret.setAngle(0.0);
+        } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
+            elevator.lockElevatorHeight();
+        }
+        if (testControllerRightY != 0) {
+            clawWrist.setOpenLoop(testControllerRightY);
+        } else if(clawWrist.getState() == ClawWrist.State.OPEN_LOOP) {
+            clawWrist.lockWrist();
         }
     }
 

@@ -7,11 +7,13 @@
 
 package com.team1323.frc2020.subsystems;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
@@ -24,7 +26,9 @@ import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycle;
@@ -95,8 +99,8 @@ public class Turret extends Subsystem {
         turret.config_kF(0, Constants.Turret.kF, Constants.kCANTimeoutMs);
         
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
-        turret.configMotionCruiseVelocity((int)(Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        turret.configMotionAcceleration((int)(Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs);
+        turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
+        turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs);
         turret.configMotionSCurveStrength(0);
         
         turret.configForwardSoftLimitThreshold(degreesToEncUnits(Constants.Turret.kMaxControlAngle), Constants.kCANTimeoutMs);
@@ -104,9 +108,12 @@ public class Turret extends Subsystem {
         turret.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
         turret.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
         
+        turret.setNeutralMode(NeutralMode.Brake);
         setOpenLoop(0.0);
         
-        
+        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
+        targetInfo = Arrays.asList(table.getEntry("tx"), table.getEntry("ty"),
+        table.getEntry("ta"), table.getEntry("tv"));
         
     }
 
@@ -172,7 +179,7 @@ public class Turret extends Subsystem {
     }
     
     public void setOpenLoop(double output) {
-        periodicIO.demand = output * 0.25;
+        periodicIO.demand = output * 0.1;
         currentState = ControlState.OPEN_LOOP;
     }
     
@@ -191,7 +198,7 @@ public class Turret extends Subsystem {
     }
 
     @Override
-    public synchronized void readPeriodicInputs() {
+    public void readPeriodicInputs() {
         periodicIO.position = turret.getSelectedSensorPosition();
         periodicIO.velocity = turret.getSelectedSensorVelocity();
         periodicIO.current = turret.getOutputCurrent();
@@ -241,7 +248,7 @@ public class Turret extends Subsystem {
                     Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
                     if (aim.isPresent()) {
                         
-                        double targetPosition = aim.get().getTurretAngle().getDegrees();
+                        double targetPosition = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, aim.get().getTurretAngle().getDegrees());
                         setAngle(targetPosition);
                     } else {
                         //System.out.println("Aiming parameters not present");

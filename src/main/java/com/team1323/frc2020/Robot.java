@@ -159,9 +159,11 @@ public class Robot extends TimedRobot {
 		try {
 			if (autoModeExecuter != null)
 				autoModeExecuter.stop();
+			printStackTrace();
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
+			
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

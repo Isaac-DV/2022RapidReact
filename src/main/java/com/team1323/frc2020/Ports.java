@@ -34,7 +34,8 @@ public class Ports {
     public static final int PIGEON = 45;
     
     //PWM
-    public static final int MOTORIZED_HOOD = 51;
+    public static final int HOOD_RIGHT_SERVO = 0;
+    public static final int HOOD_LEFT_SERVO = 1;
 
     //Digital Inputs
     public static final int FRONT_RIGHT_ENCODER = 30;

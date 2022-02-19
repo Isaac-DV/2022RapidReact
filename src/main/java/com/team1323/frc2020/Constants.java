@@ -26,6 +26,7 @@ public class Constants {
     public static final double kFieldLength = 629.25;
     
     //Field Landmarks
+    public static final Translation2d kCenterOfField = new Translation2d(324.0, 0.0);
     public static final Pose2d kRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), (161.625 - 94.66)), Rotation2d.fromDegrees(180.0));
     public static final Pose2d kPartnerRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), (161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
     public static final Pose2d kAltRobotStartingPose = new Pose2d(new Translation2d(kFieldLength - (120.0 + 2.0 + kRobotHalfLength), -(161.625 - 27.75)), Rotation2d.fromDegrees(180.0));
@@ -39,21 +40,20 @@ public class Constants {
     /**
     * Target Specifications
     */
-    public static final double kVisionTargetHeight = 98.25; //81.0 to bottom
-    public static final Rotation2d kPortTargetOrientation = Rotation2d.fromDegrees(0.0);
-    public static final Translation2d kOuterPortToInnerPort = new Translation2d(29.25, 0.0);
+    public static final double kVisionTargetHeight = 104.625; //81.0 to bottom
+    public static final double kVisionTargetRadius = 26.6875;
     
     //Swerve Calculations Constants (measurements are in inches)
-    public static final double kWheelbaseLength = 21.0;
-    public static final double kWheelbaseWidth = 21.0;
+    public static final double kWheelbaseLength = 24.75;
+    public static final double kWheelbaseWidth = 24.75;
     public static final double kSwerveDiagonal = Math.hypot(kWheelbaseLength, kWheelbaseWidth);
     
     //Camera Constants (X and Y are with respect to the turret's center)
     public static final double kCameraYOffset = 0.0;//0.25
-    public static final double kCameraXOffset = 8.216; //8.5
-    public static final double kCameraZOffset = 25.0; //26.776 24.524
-    public static final double kCameraYawAngleDegrees = -1.0;//-12.7
-    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 0.0 : 35.5; //21.75 for bottom 34.3 37.0604
+    public static final double kCameraXOffset = 9.586; //8.5
+    public static final double kCameraZOffset = 42.095; //26.776 24.524
+    public static final double kCameraYawAngleDegrees = 0.0;//-12.7
+    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.0 : 39.0; //21.75 for bottom 34.3 37.0604
 
     //Limelight
     public static final double kHorizontalFOV = 59.6; // degrees
@@ -143,12 +143,12 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = 41.5;
+        public static final double kTurretStartingEncoderPosition = 43.4;
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
         public static final double kAngleTolerance = 1.0;
-        public static final double kMinControlAngle = -300.0;
+        public static final double kMinControlAngle = -250.0;
         public static final double kMaxControlAngle = 60.0;
         public static final double kMinInitialAngle = -300.0;
         public static final double kMaxInitialAngle = 60.0;
@@ -160,7 +160,7 @@ public class Constants {
         public static final double kF = 1023.0 / kMaxSpeed;
         
         // Turret pose with respect to the robot's center
-        public static final double kXOffset = -4.9;
+        public static final double kXOffset = 0.0;
         public static final double kYOffset = 0.0;
     
     }
@@ -231,23 +231,10 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.0;
+        public static final double kShooterP = 0.15;
         public static final double kShooterI = 0.0;
         public static final double kShooterD = 0.0;
-        public static final double kShooterF = 0.048;
-        
-        /**
-        * Spin Up
-        */
-        public static final double kTopP = 0.019; // WCP Single 4in: 0.02
-        public static final double kTopI = 0.0001; // WCP Single 4in: 0.0001
-        public static final double kTopD = 0.0;
-        public static final double kTopF = 0.048; // Theoretical is 0.568 | WCP Single 4in: 0.08
-        
-        public static final double kBottomP = 0.008; //0.01
-        public static final double kBottomI = 0.0001; // 0.0001
-        public static final double kBottomD = 0.0;
-        public static final double kBottomF = 0.048; // Theoretical is 0.568 | WCP 3 x 4in: 0.048
+        public static final double kShooterF = 0.051;
 
         public static final double kShooterRPMTolerance = 150.0;
     }
@@ -343,39 +330,39 @@ public class Constants {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kFalconTicksPerInch = 150355.0 / 10.25;
         public static final double kFalconToMagEncoderRatio = 45.0;
-        public static final double kMagEncoderStartingPosition = 0.319385;
+        public static final double kMagEncoderStartingPosition = -0.319385;
         public static final double kStartingHeight = 0.0;
-        public static final double kMinInitialHeight = -1.0;
-        public static final double kMaxInitialHeight = 2.0;
+        public static final double kMinInitialHeight = -1.0; // 6.5 inches before encoder wrap
+        public static final double kMaxInitialHeight = 5.5;
 
         public static final double kMinControlHeight = 0.5;
-        public static final double kMaxControlHeight = 29.0;
+        public static final double kMaxControlHeight = 37.0;
         public static final double kHeightTolerance = 0.2;
 
-        public static final double kP = 0.0;
+        public static final double kP = 0.01;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kF = 0.0;
+        public static final double kF = 1023.0 / kMaxSpeed;
     }
     public static class ClawWrist {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kMinControlAngle = 0.0;
-        public static final double kMaxControlAngle = 90.0;
+        public static final double kMaxControlAngle = 100.0;
         public static final double kMinInitialAngle = 0.0;
         public static final double kMaxInitialAngle = 0.0;
         public static final double kFalconToWristRatio = 1096.875;
         public static final double kFalconToCANCoderRatio = 0.0;
         public static final double kWristAngleTolerance = 2.0;
         
-        public static final double kP = 0.0;
+        public static final double kP = 0.01;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
-        public static final double kF = 0.0;
+        public static final double kF = 1023.0 / kMaxSpeed;
     }
     public static class MotorizedHood {
-        public static final double kMinControlAngle = 0.0;
-        public static final double kMaxControlAngle = 0.0;
-        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values
+        public static final double kMinControlAngle = 27.0; //Lowest Hood physical Angle = 27deg
+        public static final double kMaxControlAngle = 42.5; //Highest Hood physical angle = 42.5deg
+        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
     }
 
 }

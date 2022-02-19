@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
@@ -33,6 +34,7 @@ public class Superstructure extends Subsystem {
     public Column column;
     public Turret turret;
     public Shooter shooter;
+	public MotorizedHood motorizedHood;
 	public RobotState robotState;
 	
 	public Superstructure(){
@@ -47,7 +49,8 @@ public class Superstructure extends Subsystem {
         column = Column.getInstance();
         turret = Turret.getInstance();
         shooter = Shooter.getInstance();
-		
+		motorizedHood = MotorizedHood.getInstance();
+
 		robotState = RobotState.getInstance();
 		
 		queuedRequests = new ArrayList<>(0);
@@ -114,22 +117,19 @@ public class Superstructure extends Subsystem {
 
 		@Override
 		public void onLoop(double timestamp) {
-			synchronized(Superstructure.this){
-				if(newRequest && activeRequest != null) {
-					activeRequest.act();
-					newRequest = false;
-				} 
+			if(newRequest && activeRequest != null) {
+				activeRequest.act();
+				newRequest = false;
+			} 
 
-				if(activeRequest == null) {
-					if(queuedRequests.isEmpty()) {
-						allRequestsCompleted = true;
-					} else {
-						setActiveRequest(queuedRequests.remove(0));
-					}
-				} else if(activeRequest.isFinished()) {
-					activeRequest = null;
+			if(activeRequest == null) {
+				if(queuedRequests.isEmpty()) {
+					allRequestsCompleted = true;
+				} else {
+					setActiveRequest(queuedRequests.remove(0));
 				}
-			
+			} else if(activeRequest.isFinished()) {
+				activeRequest = null;
 			}
 		}
 
@@ -276,7 +276,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
-	public void testIntakeState() {
+	public void intakeState() {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
@@ -286,6 +286,31 @@ public class Superstructure extends Subsystem {
 				new ParallelRequest(
 					ballFeeder.stateRequest(BallFeeder.State.DETECT)
 				)
+			)
+		);
+	}
+	public void visionShotState() {
+		request(
+			new SequentialRequest(
+				new ParallelRequest(
+					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+					turret.robotStateVisionRequest(),
+					shooter.velocityRequest(2700.0)
+				),
+				intake.stateRequest(Intake.ControlState.INTAKE),
+				column.stateRequest(Column.ControlState.ENGAGED),
+				ballFeeder.openLoopRequest(0.75)
+			)
+		);
+	}
+	public void postShotState() {
+		request(
+			new ParallelRequest(
+				column.stateRequest(Column.ControlState.DISENGAGED),
+				ballFeeder.stateRequest(BallFeeder.State.OFF),
+				motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+				shooter.openLoopRequest(0.0),
+				intake.stateRequest(Intake.ControlState.OFF)
 			)
 		);
 	}

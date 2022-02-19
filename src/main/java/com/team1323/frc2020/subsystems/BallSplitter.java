@@ -46,7 +46,7 @@ public class BallSplitter extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(1.0), RIGHT_EJECT(-1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
+        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
         double speed;
         ControlState(double speed) {
             this.speed = speed;

@@ -106,8 +106,7 @@ public class SwerveDriveOdometry {
     m_prevTimeSeconds = currentTimeSeconds;
 
     var chassisState = m_kinematics.toChassisSpeeds(moduleStates);
-    m_velocity = new Twist2d(chassisState.vxMetersPerSecond, chassisState.vyMetersPerSecond,
-        gyroAngle.rotateBy(m_previousAngle.inverse()).times(1.0 / period).getRadians());
+    m_velocity = new Twist2d(chassisState.vxMetersPerSecond, chassisState.vyMetersPerSecond, chassisState.omegaRadiansPerSecond);
     var newPose = m_poseMeters.wpiExp(
         new Twist2d(chassisState.vxMetersPerSecond * period,
             chassisState.vyMetersPerSecond * period,

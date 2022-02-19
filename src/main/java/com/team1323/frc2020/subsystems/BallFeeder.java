@@ -149,12 +149,13 @@ public class BallFeeder extends Subsystem {
                     break;
                 case HOLD:
                     ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                    //setFeederOpenLoop(1.0);
+                    setFeederOpenLoop(1.0);
                     break;
                 case HOLD_DETECT:
-                    if(DetectedBall != Ball.None) {//Detected opponents ball
+                    /*if(DetectedBall != Ball.None) {//Detected opponents ball
                         ballSplitter.fieldRelativeEject(timestamp);
                     }
+                    */
                     //setFeederOpenLoop(1.0);
                     break;
                 default:
