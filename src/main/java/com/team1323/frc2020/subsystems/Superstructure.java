@@ -293,13 +293,13 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-					turret.robotStateVisionRequest(),
-					shooter.velocityRequest(2700.0)
+					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+					//turret.robotStateVisionRequest(),
+					shooter.velocityRequest(2050.0)
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
 				column.stateRequest(Column.ControlState.ENGAGED),
-				ballFeeder.openLoopRequest(0.75)
+				ballFeeder.stateRequest(BallFeeder.State.FEED_BALLS)
 			)
 		);
 	}

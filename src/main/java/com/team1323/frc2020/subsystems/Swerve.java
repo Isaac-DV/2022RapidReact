@@ -288,7 +288,7 @@ public class Swerve extends Subsystem{
 		
 		/* Scale x and y by applying a power to the magnitude of the vector they create, in order
 		to make the controls less sensitive at the lower end. */
-		double deadband = 0.05;
+		double deadband = 0.025;
 		inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, deadband);
 		final double power = (lowPower) ? 1.75 : 1.5;
 		inputMagnitude = Math.pow(inputMagnitude, power);

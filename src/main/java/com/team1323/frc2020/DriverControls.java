@@ -195,7 +195,7 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
         if(coDriver.yButton.wasActivated()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle + 7.75);
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMaxControlAngle);
         }
         if(coDriver.xButton.wasActivated()) {
             motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);

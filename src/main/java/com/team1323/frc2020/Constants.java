@@ -12,7 +12,7 @@ import com.team254.lib.geometry.Translation2d;
 public class Constants {
     /*All distance measurements are in inches, unless otherwise noted.*/
     
-    public static final double kLooperDt = 0.02;
+    public static final double kLooperDt = 0.015;
     public static final double kAutoAimPredictionTime = 0.14;
 
     public static final double kEpsilon = 0.0001;
@@ -186,17 +186,17 @@ public class Constants {
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kBottomShooterTreeMap = new InterpolatingTreeMap<>();
     static {
         // Key: Distance (inches), Value: RPM
-        kBottomShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(2300.0));
-        kBottomShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(2850.0));
-        kBottomShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(2650.0));
+        kBottomShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.0));
+        kBottomShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(0.0));
+        kBottomShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(0.0));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTopShooterTreeMap = new InterpolatingTreeMap<>();
     static {
         // Key: Distance (inches), Value: RPM
-        kTopShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(1150.0));
-        kTopShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(1425.0));
-        kTopShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(2650.0));
+        kTopShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.0));
+        kTopShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(0.0));
+        kTopShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(0.0));
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceToHorizontalVelocity = new InterpolatingTreeMap<>();
@@ -231,20 +231,17 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.15;
-        public static final double kShooterI = 0.0;
+        public static final double kShooterP = 1.0; //0.15
+        public static final double kShooterI = 0.000;
         public static final double kShooterD = 0.0;
-        public static final double kShooterF = 0.051;
+        public static final double kShooterF = 0.051; //0.051
 
         public static final double kShooterRPMTolerance = 150.0;
     }
     
     public static class Intake{
         
-        public static final double kIntakeP = 1.0;
-        public static final double kIntakeI = 0.0;
-        public static final double kIntakeD = 0.0;
-        public static final double kIntakeF = 0.0;
+       
         
         public static final double kIntakeSpeed = 1.0;
         public static final double kOuttakeSpeed = -0.5;
@@ -364,5 +361,8 @@ public class Constants {
         public static final double kMaxControlAngle = 42.5; //Highest Hood physical angle = 42.5deg
         public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
     }
-
+    public static class BallSplitter {
+        public static final double kEjectorLength = 50; //The length in which the ball is fired from the ejectors, in inches
+        
+    }
 }

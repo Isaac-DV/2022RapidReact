@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class BallFeeder extends Subsystem {
     BallEjector ballEjector;
     BallSplitter ballSplitter;
+    Shooter shooter;
     
     
     LazyTalonFX feeder;
@@ -46,6 +47,7 @@ public class BallFeeder extends Subsystem {
     public BallFeeder() {
         ballEjector = BallEjector.getInstance();
         ballSplitter = BallSplitter.getInstance();
+        shooter = Shooter.getInstance();
 
         feeder = new LazyTalonFX(Ports.BALL_FEEDER, "main");
 
@@ -81,7 +83,7 @@ public class BallFeeder extends Subsystem {
     }
 
     public enum State {
-        OFF, DETECT, HOLD, HOLD_DETECT, OPEN_LOOP
+        OFF, DETECT, HOLD, HOLD_DETECT, OPEN_LOOP, FEED_BALLS
     }
     private State currentState = State.OFF;
     public State getState() {
@@ -123,9 +125,6 @@ public class BallFeeder extends Subsystem {
         @Override
         public void onLoop(double timestamp) {
             updateDetectedBall();
-            if(rollersShifted) {
-                setState(State.HOLD_DETECT);
-            }
             switch(currentState) {
                 case OFF:
                     setFeederOpenLoop(0.0);
@@ -137,7 +136,7 @@ public class BallFeeder extends Subsystem {
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         //ballSplitter.fieldRelativeEject(timestamp);
                         setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
-                        ballSplitter.conformToState(BallSplitter.ControlState.RIGHT_EJECT);
+                        ballSplitter.conformToState(BallSplitter.ControlState.LEFT_EJECT);
                         if(ejectorStartTimestamp == Double.POSITIVE_INFINITY) {
                             ballEjector.conformToState(BallEjector.ControlState.EJECT);
                             ejectorStartTimestamp = timestamp;
@@ -157,6 +156,13 @@ public class BallFeeder extends Subsystem {
                     }
                     */
                     //setFeederOpenLoop(1.0);
+                    break;
+                case FEED_BALLS:
+                    if(shooter.hasReachedSetpoint()) {
+                        setFeederOpenLoop(1.0);
+                    } else {
+                        setFeederOpenLoop(0.0);
+                    }
                     break;
                 default:
                     break;

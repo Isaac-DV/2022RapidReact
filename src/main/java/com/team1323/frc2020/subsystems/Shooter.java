@@ -60,11 +60,13 @@ public class Shooter extends Subsystem {
             motor.setNeutralMode(NeutralMode.Coast);
             motor.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
             motor.enableVoltageCompensation(true);
+            motor.configClosedloopRamp(0.0, Constants.kCANTimeoutMs);
+            motor.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
         }
         
         master.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
         master.selectProfileSlot(0, 0);
-        master.config_IntegralZone(0, (int)rpmToEncVelocity(200.0));
+        master.config_IntegralZone(0, rpmToEncVelocity(200.0));
         //PID Needs to be tuned
         master.config_kP(0, Constants.Shooter.kShooterP);
         master.config_kI(0, Constants.Shooter.kShooterI);
@@ -79,7 +81,8 @@ public class Shooter extends Subsystem {
         master.setInverted(TalonFXInvertType.CounterClockwise);
 
         master.configPeakOutputReverse(0.0, 10);
-        
+        master.setNeutralMode(NeutralMode.Coast);
+
         setOpenLoop(0.0);
     }
 
