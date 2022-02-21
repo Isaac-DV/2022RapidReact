@@ -31,7 +31,7 @@ public class Wrist extends Subsystem {
     DutyCycle encoder;
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
-    private boolean zeroedAbsolutely = false;
+    private boolean zeroedAbsolutely = true;
     private static Wrist instance = null;
     public static Wrist getInstance() {
         if (instance==null)
@@ -66,7 +66,7 @@ public class Wrist extends Subsystem {
 
         wrist.config_IntegralZone(0, (int)degreesToEncUnits(5), 10);
         wrist.configMotionCruiseVelocity((int)(Constants.Wrist.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 1.25), Constants.kCANTimeoutMs);
+        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 2.5), Constants.kCANTimeoutMs);
         wrist.configMotionSCurveStrength(0);
 
     }
@@ -147,6 +147,7 @@ public class Wrist extends Subsystem {
 
             wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, Constants.kCANTimeoutMs);
         }
+        wrist.setSelectedSensorPosition((int)degreesToEncUnits(-26.7), 0, Constants.kCANTimeoutMs);
     }
 
 

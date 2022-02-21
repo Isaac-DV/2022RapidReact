@@ -289,13 +289,20 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+	public void autoEjectState(boolean enabled) {
+		request(
+			new ParallelRequest(
+				ballSplitter.swerveAutoRotateRequest(enabled)
+			)
+		);
+	}
 	public void visionShotState() {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
 					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 					//turret.robotStateVisionRequest(),
-					shooter.velocityRequest(2050.0)
+					shooter.visionVelocityRequest()
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
 				column.stateRequest(Column.ControlState.ENGAGED),

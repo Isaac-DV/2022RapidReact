@@ -31,6 +31,7 @@ public class Intake extends Subsystem {
         intake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);
         intake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1000);
         intake.setInverted(TalonFXInvertType.Clockwise);
+        intake.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
     }
 
     public enum ControlState {

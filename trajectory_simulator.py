@@ -65,7 +65,7 @@ def getInitialVelocityVector(motor_rpm, exit_angle_degrees):
 
 def findTimeToReachGoal(distance_to_goal, motor_rpm, exit_angle_degrees, tolerance):
     initial_ball_velocity = getInitialVelocityVector(motor_rpm, exit_angle_degrees)
-    goal_position = Vector2d(distance_to_goal + 0.5 * kGoalRadius, (kGoalHeight - kInitialBallHeight) + 0.5 * (104 - kGoalHeight))
+    goal_position = Vector2d(distance_to_goal + 0.25 * kGoalRadius, (kGoalHeight - kInitialBallHeight) + 0.25 * (104 - kGoalHeight))
     t_values = np.arange(start=0, stop=3, step=0.01)
     x_values = []
     y_values = []
@@ -123,13 +123,30 @@ def generateDistanceToHorizontalVelocityMap():
                 print("Couldn't find an RPM for %d inches!"%(distance))
         file.write("    }")
 
+def generateHorizontalVelocityToRPMMap():
+    with open("horizontalVelocityToRPMMap.txt", "w") as file:
+        file.write("    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHorizontalVelocityToRPM = new InterpolatingTreeMap<>();\n")
+        file.write ("    static {\n")
+        file.write("        // Key: Horizontal Velocity (inches/sec), Value: Shooter RPM\n")
+        horizontal_velocity_values = np.arange(start=88, stop=145, step=1)
+        for horizontal_velocity in horizontal_velocity_values:
+            found = False
+            for rpm in np.arange(start=1000, stop=kMotorMaxSpeedRPM, step=1):
+                ball_velocity = getInitialVelocityVector(rpm, kMaxExitAngleDegrees)
+                if abs(ball_velocity.x - horizontal_velocity) < 0.1:
+                    file.write("        kHorizontalVelocityToRPM.put(new InterpolatingDouble(%.1f), new InterpolatingDouble(%.3f));\n"%(horizontal_velocity, rpm))
+                    found = True
+                    break
+            if not found:
+                print("RPM not found for a horizontal velocity of %d inches/sec!"%(horizontal_velocity))
+        file.write("    }")
 
 if __name__ == "__main__":
     '''_, x_values, y_values, _ = findTimeToReachGoal(146.6875, 2400.0, kMaxExitAngleDegrees, 1.0)
     plt.plot(x_values, y_values)
     plt.show()
     '''
-    distance_to_vision_target = float(input("Enter a distance from the vision target: "))
+    '''distance_to_vision_target = float(input("Enter a distance from the vision target: "))
     rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, found_rpm = findMotorRPM(distance_to_vision_target, kMaxExitAngleDegrees)
     if found_rpm:
         print("Shooter RPM should be %f"%(rpm))
@@ -144,5 +161,7 @@ if __name__ == "__main__":
         plt.show()
     else:
         print("RPM not found!")
+    '''
 
-    # generateDistanceToHorizontalVelocityMap()
+    generateDistanceToHorizontalVelocityMap()
+    generateHorizontalVelocityToRPMMap()

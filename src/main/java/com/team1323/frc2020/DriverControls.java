@@ -185,13 +185,22 @@ public class DriverControls implements Loop {
         } else if(coDriver.aButton.wasReleased()) {
             s.postIntakeState();
         }
-       
+        if(coDriver.bButton.wasActivated()) {
+            s.autoEjectState(true);
+        } else if(coDriver.bButton.wasReleased()) {
+            s.autoEjectState(false);
+        }
         if(coDriver.rightTrigger.wasActivated()) {
             //shooter.setVelocity(3000);
-            s.visionShotState();            
+            s.visionShotState();
         } else if(coDriver.rightTrigger.wasReleased()) {
             //shooter.stop();
             s.postShotState();
+            turret.lockAngle();
+        }
+        if(coDriver.rightBumper.wasActivated()) {
+            turret.startRobotStateVision();
+        } else if(coDriver.rightBumper.wasReleased()) {
             turret.lockAngle();
         }
         if(coDriver.yButton.wasActivated()) {
@@ -208,9 +217,6 @@ public class DriverControls implements Loop {
             s.reverseAllSubsystems();
         } else if(coDriver.rightBumper.wasReleased()) {
             s.disableState();
-        }
-        if(coDriver.leftBumper.wasActivated()) {
-            ballSplitter.conformToState(BallSplitter.ControlState.LEFT_EJECT);
         }
         if(coDriver.backButton.wasActivated()) {
             s.disableState();

@@ -127,7 +127,7 @@ public class Shooter extends Subsystem {
                 case VISION:
                     Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
                     if (aim.isPresent()) {
-                        InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToBottomRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
+                        InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
                         setVelocity(visionRPM.value);
                     } else {
                         System.out.println("Vision target not visible in shooter loop!");
