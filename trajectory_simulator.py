@@ -94,6 +94,8 @@ def findTimeToReachGoal(distance_to_goal, motor_rpm, exit_angle_degrees, toleran
         bottom_y_values.append(ball_bottom_position.y)
         if ball_velocity_y < 0 and ball_position.distance(goal_position) <= tolerance:
             return t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, True
+        if ball_velocity_y < 0 and ball_bottom_position.x < distance_to_goal - kGoalRadius and ball_bottom_position.y < (104 + 10) - kInitialBallHeight:
+            break
         if ball_velocity_y < 0 and ball_y < goal_position.y:
             break
 
