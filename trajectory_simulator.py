@@ -3,10 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # TODO
-# 1. Aim for the back of the goal instead of the center
-# 2. Look for a trajectory that doesn't collide with the front of the goal
-# 3. Iterate over the possible hood angles to find a trajectory with (1) minimum RPM or (2) lowest peak height while still clearing the front of the goal by a good amount?
-# 4. Generate values for distance-to-velocity map and velocity-to-rpm map
+# 1. Look for a trajectory that doesn't collide with the front of the goal
+# 2. Iterate over the possible hood angles to find a trajectory with (1) minimum RPM or (2) lowest peak height while still clearing the front of the goal by a good amount?
+# 3. Instead of creating a distance -> horizontal velocity map, create a distance -> velocity vector map
+# 4. In robot code, calculate the hood angle that will get you the desired vertical velocity given the distance to the target, considering also the new horizontal velocity
+#       that you must achieve to compensate for the robot's movement.
 
 ### Shooter characteristics ###
 kBottomWheelRadius = 2.0 # inches
@@ -14,7 +15,7 @@ kTopWheelRadius = 1.0 # inches
 kBottomToMotorSpeedRatio = 1.0
 kTopToBottomSpeedRatio = 24.0 / 18.0
 kMotorMaxSpeedRPM = 6380.0
-kMinExitAngleDegrees = 90.0 - 42.5
+kMinExitAngleDegrees = 54.0172 # 90.0 - 42.5
 kMaxExitAngleDegrees = 69.5172 # 90.0 - 27.0
 kGoalRadius = 26.6875 # inches
 kGoalHeight = 78.0 # inches
@@ -98,13 +99,35 @@ def findTimeToReachGoal(distance_to_goal, motor_rpm, exit_angle_degrees, toleran
 
     return 0, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, False
 
-def findMotorRPM(distance_to_vision_target, exit_angle_degrees):
+def findMotorRPM(distance_to_vision_target, exit_angle_degrees=None):
     distance_to_goal = distance_to_vision_target + kGoalRadius
     rpm_values = np.arange(start=1000, stop=kMotorMaxSpeedRPM, step=1)
-    for rpm in rpm_values:
-        t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, exit_angle_degrees, 1.0)
-        if reached_goal:
-            return rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, True
+    if exit_angle_degrees == None:
+        angle_values = np.arange(start=kMinExitAngleDegrees, stop=kMaxExitAngleDegrees, step=1)
+        min_rpm = math.inf
+        best_angle = math.inf
+        xs, ys, top_xs, top_ys, bottom_xs, bottom_ys = [], [], [], [], [], []
+        for angle in angle_values:
+            for rpm in rpm_values:
+                t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, angle, 1.0)
+                if reached_goal:
+                    if rpm < min_rpm:
+                        min_rpm = rpm
+                        best_angle = angle
+                        xs = x_values
+                        ys = y_values
+                        top_xs = top_x_values
+                        top_ys = top_y_values
+                        bottom_xs = bottom_x_values
+                        bottom_ys = bottom_y_values
+                    break
+        if min_rpm != math.inf:
+            return min_rpm, xs, ys, top_xs, top_ys, bottom_xs, bottom_ys, True
+    else:
+        for rpm in rpm_values:
+            t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, exit_angle_degrees, 1.0)
+            if reached_goal:
+                return rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, True
     
     return 0, [], [], [], [], [], [], False
 
@@ -146,22 +169,30 @@ if __name__ == "__main__":
     plt.plot(x_values, y_values)
     plt.show()
     '''
-    '''distance_to_vision_target = float(input("Enter a distance from the vision target: "))
-    rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, found_rpm = findMotorRPM(distance_to_vision_target, kMaxExitAngleDegrees)
-    if found_rpm:
-        print("Shooter RPM should be %f"%(rpm))
-        distance_to_goal = distance_to_vision_target + kGoalRadius
-        goal_points = [(distance_to_goal - kGoalRadius, 104 - kInitialBallHeight), (distance_to_goal - kBallRadius - 2.6875, kGoalHeight - kInitialBallHeight), \
-            (distance_to_goal + kBallRadius + 2.6875, kGoalHeight - kInitialBallHeight), (distance_to_goal + kGoalRadius, 104 - kInitialBallHeight)]
-        plt.plot([x for (x, y) in goal_points], [y for (x, y) in goal_points], color="red")
-        plt.plot(x_values, y_values, color="blue")
-        plt.plot(top_x_values, top_y_values, linestyle="--", color="blue")
-        plt.plot(bottom_x_values, bottom_y_values, linestyle="--", color="blue")
-        plt.title("Ball Trajectory")
-        plt.show()
-    else:
-        print("RPM not found!")
-    '''
-
-    generateDistanceToHorizontalVelocityMap()
-    generateHorizontalVelocityToRPMMap()
+    prompt = '''What would you like to do?
+    (1) Visualize a specific trajectory
+    (2) Generate the distance -> horizontal velocity map
+    (3) Generate the horizontal velocity -> RPM map
+    (4) Generate both maps
+'''
+    choice = int(input(prompt))
+    if choice == 1:
+        distance_to_vision_target = float(input("Enter a distance from the vision target: "))
+        rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, found_rpm = findMotorRPM(distance_to_vision_target)
+        if found_rpm:
+            print("Shooter RPM should be %f"%(rpm))
+            distance_to_goal = distance_to_vision_target + kGoalRadius
+            goal_points = [(distance_to_goal - kGoalRadius, 104 - kInitialBallHeight), (distance_to_goal - kBallRadius - 2.6875, kGoalHeight - kInitialBallHeight), \
+                (distance_to_goal + kBallRadius + 2.6875, kGoalHeight - kInitialBallHeight), (distance_to_goal + kGoalRadius, 104 - kInitialBallHeight)]
+            plt.plot([x for (x, y) in goal_points], [y for (x, y) in goal_points], color="red")
+            plt.plot(x_values, y_values, color="blue")
+            plt.plot(top_x_values, top_y_values, linestyle="--", color="blue")
+            plt.plot(bottom_x_values, bottom_y_values, linestyle="--", color="blue")
+            plt.title("Ball Trajectory")
+            plt.show()
+        else:
+            print("RPM not found!")
+    if choice == 2 or choice == 4:
+        generateDistanceToHorizontalVelocityMap()
+    if choice == 3 or choice == 4:
+        generateHorizontalVelocityToRPMMap()
