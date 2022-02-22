@@ -154,6 +154,11 @@ public class DriverControls implements Loop {
             swerve.zeroSensors(new Pose2d());
             swerve.resetAveragedDirection();
         }
+        if(driver.rightBumper.wasActivated()) {
+            s.autoEjectState(true);
+        } else if(driver.rightBumper.wasReleased()) {
+            s.autoEjectState(false);
+        }
 
         if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
@@ -185,11 +190,19 @@ public class DriverControls implements Loop {
         } else if(coDriver.aButton.wasReleased()) {
             s.postIntakeState();
         }
+        /*
         if(coDriver.bButton.wasActivated()) {
             s.autoEjectState(true);
         } else if(coDriver.bButton.wasReleased()) {
             s.autoEjectState(false);
+        }*/
+       
+        if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
+            s.wristStowedState();
+        }else if(coDriver.bButton.shortReleased()) {
+            s.wristLowestState();
         }
+        
         if(coDriver.rightTrigger.wasActivated()) {
             //shooter.setVelocity(3000);
             s.visionShotState();

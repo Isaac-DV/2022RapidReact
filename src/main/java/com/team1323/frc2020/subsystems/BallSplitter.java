@@ -14,6 +14,7 @@ import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
@@ -30,7 +31,7 @@ public class BallSplitter extends Subsystem {
 
     private boolean autoRotateSwerve = false;
     double targetSwerveTheta = 0;
-
+    Translation2d translationVector = new Translation2d();
     private static BallSplitter instance = null;
     public static BallSplitter getInstance() {
         if(instance == null) 
@@ -145,12 +146,16 @@ public class BallSplitter extends Subsystem {
             if(autoRotateSwerve) {
                 Pose2d robotPose = swerve.pose;
                 Translation2d positionVector = bestEjectLocation.location;
-                Translation2d vectorFromRobot = positionVector.translateBy(robotPose.getTranslation().inverse());
-                double vectorTheta = vectorFromRobot.direction().getDegrees();
-                double leftEjectThetaDelta = robotPose.getRotation().getDegrees() - (vectorTheta) - 90;
-                double rightEjectThetaDelta = robotPose.getRotation().getDegrees() - (vectorTheta) + 90;
-                targetSwerveTheta = vectorTheta + ((rightEjectThetaDelta < leftEjectThetaDelta) ? 90.0 : -90.0);
-
+                double robotRotation = (robotPose.getRotation().getDegrees());
+                translationVector = positionVector.translateBy(robotPose.getTranslation().inverse());
+                double vectorTheta = translationVector.direction().getDegrees();
+                double vectorThetaDelta = Math.abs(vectorTheta) - Math.abs(robotRotation);
+                targetSwerveTheta = vectorThetaDelta;
+                if(targetSwerveTheta < 0) {
+                    targetSwerveTheta -= 90;
+                } else if(targetSwerveTheta > 0) {
+                    targetSwerveTheta += 90;
+                }
                 swerve.rotate(targetSwerveTheta);
             } else {
                 targetSwerveTheta = 0;
@@ -191,6 +196,7 @@ public class BallSplitter extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Swerve Rotation to BEL", targetSwerveTheta);
+        SmartDashboard.putNumber("Swerve Raw Theta",  Util.boundAngle0to360Degrees(translationVector.direction().getDegrees()));
         SmartDashboard.putString("Closest Oof Location", bestEjectLocation.toString());
         SmartDashboard.putNumber("Closest Oof Location magnitude", bestEjectLocation.location.translateBy(swerve.pose.getTranslation().inverse()).norm());
         SmartDashboard.putNumber("TopRight Magnitude", EjectLocations.OPPOSITE_HANGER.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());

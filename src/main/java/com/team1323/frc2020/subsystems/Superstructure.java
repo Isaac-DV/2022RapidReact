@@ -245,25 +245,12 @@ public class Superstructure extends Subsystem {
 		);
 	}
 	
-	public void intakeBallState() {
-		request(
-			new SequentialRequest(
-				wrist.setWristIntakeRequest(),
-				intake.stateRequest(Intake.ControlState.INTAKE)
-			),
-			new ParallelRequest(
-				ballEjector.stateRequest(BallEjector.ControlState.EJECT),
-				ballFeeder.stateRequest(BallFeeder.State.DETECT)
-			)
-		);
-	}
 	public void postIntakeState() {
 		request(
 			new ParallelRequest(
-				wrist.setWristStowedRequest(),
+				wrist.setWristAngleRequest(75.0),
 				intake.stateRequest(Intake.ControlState.OFF),
 				ballEjector.stateRequest(BallEjector.ControlState.OFF),
-				ballFeeder.stateRequest(BallFeeder.State.OFF),
 				ballSplitter.stateRequest(BallSplitter.ControlState.OFF)
 			)
 		);
@@ -284,8 +271,22 @@ public class Superstructure extends Subsystem {
 					wrist.setWristIntakeRequest()
 				),
 				new ParallelRequest(
-					ballFeeder.stateRequest(BallFeeder.State.DETECT)
+					ballFeeder.intakeFeedRequest()
 				)
+			)
+		);
+	}
+	public void wristStowedState() {
+		request(
+			new ParallelRequest(
+				wrist.setWristStowedRequest()
+			)
+		);
+	}
+	public void wristLowestState() {
+		request(
+			new ParallelRequest(
+				wrist.setWristAngleRequest(135.0)		
 			)
 		);
 	}
@@ -301,7 +302,7 @@ public class Superstructure extends Subsystem {
 			new SequentialRequest(
 				new ParallelRequest(
 					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-					//turret.robotStateVisionRequest(),
+					turret.robotStateVisionRequest(),
 					shooter.visionVelocityRequest()
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),

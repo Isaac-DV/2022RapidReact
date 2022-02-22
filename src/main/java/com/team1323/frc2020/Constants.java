@@ -246,7 +246,7 @@ public class Constants {
         public static final double kMinInitialAngle = -30.0;
 
 
-        public static final double kMaxWristAngle = 110.0;
+        public static final double kMaxWristAngle = 135.0;
         public static final double kMinWristAngle = -15.0;
         public static final double kWristHardStopAngle = -25.47;
 

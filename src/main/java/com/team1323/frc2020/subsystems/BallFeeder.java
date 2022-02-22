@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class BallFeeder extends Subsystem {
     BallEjector ballEjector;
     BallSplitter ballSplitter;
+    Intake intake;
     Shooter shooter;
     
     
@@ -35,7 +36,7 @@ public class BallFeeder extends Subsystem {
 
     double feederStartTimestamp = Double.POSITIVE_INFINITY;
     double ejectorStartTimestamp = Double.POSITIVE_INFINITY;
-
+    boolean intakeFeedEnabled = false;
 
     private static BallFeeder instance = null;
     public static BallFeeder getInstance() {
@@ -47,6 +48,8 @@ public class BallFeeder extends Subsystem {
     public BallFeeder() {
         ballEjector = BallEjector.getInstance();
         ballSplitter = BallSplitter.getInstance();
+        intake = Intake.getInstance();
+
         shooter = Shooter.getInstance();
 
         feeder = new LazyTalonFX(Ports.BALL_FEEDER, "main");
@@ -130,32 +133,27 @@ public class BallFeeder extends Subsystem {
                     setFeederOpenLoop(0.0);
                     break;
                 case DETECT:
-                    if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        ballEjector.conformToState(BallEjector.ControlState.OFF);
+                    if(intake.getState() == Intake.ControlState.OFF) {
+                        intakeFeedEnabled = false;
+                    }
+                    if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor  
+                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);       
                         setFeederOpenLoop(-0.25);
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
-                        //ballSplitter.fieldRelativeEject(timestamp);
                         setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
-                        ballSplitter.conformToState(BallSplitter.ControlState.LEFT_EJECT);
+                        intake.conformToState(Intake.ControlState.AUTO_INTAKE);
+                        ballSplitter.conformToState(BallSplitter.ControlState.RIGHT_EJECT);
                         if(ejectorStartTimestamp == Double.POSITIVE_INFINITY) {
                             ballEjector.conformToState(BallEjector.ControlState.EJECT);
                             ejectorStartTimestamp = timestamp;
                         }
                     } else if (DetectedBall == Ball.None) {
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
+                        if(intakeFeedEnabled)
+                            setFeederOpenLoop(1.0);
+                        else
+                            setFeederOpenLoop(0.0);
                     }
-                    break;
-                case HOLD:
-                    ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                    setFeederOpenLoop(1.0);
-                    break;
-                case HOLD_DETECT:
-                    /*if(DetectedBall != Ball.None) {//Detected opponents ball
-                        ballSplitter.fieldRelativeEject(timestamp);
-                    }
-                    */
-                    //setFeederOpenLoop(1.0);
                     break;
                 case FEED_BALLS:
                     if(shooter.hasReachedSetpoint()) {
@@ -169,8 +167,12 @@ public class BallFeeder extends Subsystem {
             }
             
         
-            if((timestamp - ejectorStartTimestamp) > 1.5) {
+            if((timestamp - ejectorStartTimestamp) > 3.5) {
                 ballEjector.conformToState(BallEjector.ControlState.OFF);
+                if(intake.getState() == Intake.ControlState.AUTO_INTAKE && !intakeFeedEnabled) {
+                    intake.conformToState(Intake.ControlState.OFF);
+                }
+                
                 ejectorStartTimestamp = Double.POSITIVE_INFINITY;
             }
             
@@ -182,7 +184,16 @@ public class BallFeeder extends Subsystem {
         }
         
     };
-
+    public Request intakeFeedRequest() {
+        return new Request() {
+            @Override
+            public void act() {
+                setState(State.DETECT);
+                intakeFeedEnabled = true;
+                setFeederOpenLoop(1.0);
+            }
+        };
+    }
     public Request stateRequest(State desiredState) {
         return new Request() {
             @Override
