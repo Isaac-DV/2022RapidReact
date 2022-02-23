@@ -40,6 +40,7 @@ public class BallEjector extends Subsystem {
             this.speed = speed;
         }
     }
+
     private ControlState currentState = ControlState.OFF;
     public ControlState getState() {
         return currentState;

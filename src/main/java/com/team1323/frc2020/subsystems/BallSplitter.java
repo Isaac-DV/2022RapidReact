@@ -17,6 +17,7 @@ import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -95,18 +96,10 @@ public class BallSplitter extends Subsystem {
     }
 
     public void conformToState(ControlState desiredState, double outputOverride) {
-        if ((!isShifted) || (desiredState == ControlState.POWER_SHIFED)) {
-            setState(desiredState);
-            setOpenLoop(outputOverride);
-        }
+        setState(desiredState);
+        setOpenLoop(outputOverride);
     }
     
-    private boolean isShifted = false;
-    public void shiftPower(boolean shiftedToElevator) {
-        isShifted = shiftedToElevator;
-        conformToState(ControlState.POWER_SHIFED);
-    }
-
     public DriverStation.Alliance DSAlliance;
     public void setDSAlliance(DriverStation.Alliance alliance) {
         DSAlliance = alliance;
@@ -142,24 +135,33 @@ public class BallSplitter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            updateBestEjectLocation();   
-            if(autoRotateSwerve) {
-                Pose2d robotPose = swerve.pose;
-                Translation2d positionVector = bestEjectLocation.location;
-                double robotRotation = (robotPose.getRotation().getDegrees());
-                translationVector = positionVector.translateBy(robotPose.getTranslation().inverse());
-                double vectorTheta = translationVector.direction().getDegrees();
-                double vectorThetaDelta = Math.abs(vectorTheta) - Math.abs(robotRotation);
-                targetSwerveTheta = vectorThetaDelta;
-                if(targetSwerveTheta < 0) {
-                    targetSwerveTheta -= 90;
-                } else if(targetSwerveTheta > 0) {
-                    targetSwerveTheta += 90;
-                }
-                swerve.rotate(targetSwerveTheta);
+            updateBestEjectLocation();
+            
+            Pose2d robotPose = swerve.pose;
+            Translation2d positionVector = bestEjectLocation.location;
+            Rotation2d robotToLocationTheta = positionVector.direction();
+            Rotation2d robotRotation = robotPose.getRotation();
+            Rotation2d leftSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
+                                            rotateBy(new Rotation2d().fromDegrees(90)).inverse());
+            Rotation2d rightSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
+                                            rotateBy(new Rotation2d().fromDegrees(-90)).inverse());
+            if(Math.abs(rightSideEjectDelta.getDegrees()) < Math.abs(leftSideEjectDelta.getDegrees())) { //The right side is closer
+                robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(90));
+            } else if(Math.abs(rightSideEjectDelta.getDegrees()) > Math.abs(leftSideEjectDelta.getDegrees())) {//The left side is closer
+                robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(-90));
+            }
+            robotToLocationTheta.inverse();
+            if(targetSwerveTheta < 0) {
+                targetSwerveTheta -= 90;
+            } else if(targetSwerveTheta > 0) {
+                targetSwerveTheta += 90;
+            }   
+            if(autoRotateSwerve) {           
+                //swerve.rotate(targetSwerveTheta);
             } else {
                 targetSwerveTheta = 0;
             }
+            
         }
 
         @Override

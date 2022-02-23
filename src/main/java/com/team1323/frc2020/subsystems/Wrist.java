@@ -15,6 +15,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.SensorCheck;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
@@ -29,8 +30,10 @@ public class Wrist extends Subsystem {
 
     LazyTalonFX wrist;
     DutyCycle encoder;
+    SensorCheck encoderCheck;
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
+    private boolean encoderDisconected = false;
     private boolean zeroedAbsolutely = true;
     private static Wrist instance = null;
     public static Wrist getInstance() {
@@ -41,7 +44,9 @@ public class Wrist extends Subsystem {
     public Wrist() {
         wrist = new LazyTalonFX(Ports.WRIST, "main");
         encoder = new DutyCycle(new DigitalInput(Ports.WRIST_ENCODER));
-
+        encoderCheck = new SensorCheck(encoder, ()->{
+            encoderDisconected = true;
+        });
         wrist.setInverted(TalonFXInvertType.CounterClockwise);
         wrist.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
         wrist.configForwardSoftLimitThreshold((int)degreesToEncUnits(Constants.Wrist.kMaxWristAngle), Constants.kCANTimeoutMs);

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.team1323.frc2020.Constants;
-import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.LimelightProcessor;
@@ -18,7 +17,6 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.Compressor;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Superstructure extends Subsystem {
@@ -165,7 +163,7 @@ public class Superstructure extends Subsystem {
 	@Override
 	public void outputTelemetry() {
 	}
-
+	
 	public Request waitRequest(double seconds){
 		return new Request(){
 			double startTime = 0.0;
@@ -256,13 +254,7 @@ public class Superstructure extends Subsystem {
 		);
 	}
 	
-	public SequentialRequest feedBallState() {
-		return new SequentialRequest(
-			new ParallelRequest(
-				column.stateRequest(Column.ControlState.ENGAGED)
-			)
-		);
-	}
+	
 	public void intakeState() {
 		request(
 			new SequentialRequest(
@@ -290,7 +282,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
-	public void autoEjectState(boolean enabled) {
+	public void autoRotateEjectState(boolean enabled) {
 		request(
 			new ParallelRequest(
 				ballSplitter.swerveAutoRotateRequest(enabled)
@@ -306,7 +298,7 @@ public class Superstructure extends Subsystem {
 					shooter.visionVelocityRequest()
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.ENGAGED),
+				column.stateRequest(Column.ControlState.FEED_BALLS),
 				ballFeeder.stateRequest(BallFeeder.State.FEED_BALLS)
 			)
 		);
@@ -314,10 +306,10 @@ public class Superstructure extends Subsystem {
 	public void postShotState() {
 		request(
 			new ParallelRequest(
-				column.stateRequest(Column.ControlState.DISENGAGED),
-				ballFeeder.stateRequest(BallFeeder.State.OFF),
+				column.stateRequest(Column.ControlState.OFF),
+				ballFeeder.stateRequest(BallFeeder.State.DETECT),
 				motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-				shooter.openLoopRequest(0.0),
+				shooter.openLoopRequest(0.25),
 				intake.stateRequest(Intake.ControlState.OFF)
 			)
 		);
@@ -326,7 +318,8 @@ public class Superstructure extends Subsystem {
 		request(
 			new ParallelRequest(
 				intake.stateRequest(Intake.ControlState.EJECT),
-				ballFeeder.openLoopRequest(-0.30)
+				ballFeeder.openLoopRequest(0.5),
+				column.stateRequest(Column.ControlState.EJECT)
 			)
 		);
 	}
@@ -336,7 +329,8 @@ public class Superstructure extends Subsystem {
 				intake.stateRequest(Intake.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.OFF),
 				ballEjector.stateRequest(BallEjector.ControlState.OFF),
-				ballSplitter.stateRequest(BallSplitter.ControlState.OFF)
+				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
+				column.stateRequest(Column.ControlState.OFF)
 			)
 		);
 	}

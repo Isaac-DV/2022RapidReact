@@ -20,11 +20,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Elevator extends Subsystem {
-    BallSplitter ballSplitter;
-    LazyTalonFX splitterMotor;
+    LazyTalonFX motor;
     DutyCycle absoluteEncoder;
 
-    Solenoid PTOShifter;
 
     double targetHeight = 0;
     boolean onTarget = false;
@@ -37,27 +35,25 @@ public class Elevator extends Subsystem {
 
 
     public Elevator() {
-        ballSplitter = BallSplitter.getInstance();
-        splitterMotor = ballSplitter.getTalon();
+        motor = new LazyTalonFX(Ports.ELEVATOR);
 
-        PTOShifter = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH, Ports.ELEVATOR_SHIFTER);
         absoluteEncoder = new DutyCycle(new DigitalInput(Ports.ELEVATOR_ENCODER));
 
-        splitterMotor.configForwardSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMaxControlHeight), Constants.kCANTimeoutMs);
-        splitterMotor.configReverseSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMinControlHeight), Constants.kCANTimeoutMs);
-        enableLimits(false);
+        motor.configForwardSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMaxControlHeight), Constants.kCANTimeoutMs);
+        motor.configReverseSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMinControlHeight), Constants.kCANTimeoutMs);
+        enableLimits(true);
 
-        splitterMotor.config_kP(0, Constants.Elevator.kP);
-        splitterMotor.config_kI(0, Constants.Elevator.kI);
-        splitterMotor.config_kD(0, Constants.Elevator.kD);
-        splitterMotor.config_kF(0, Constants.Elevator.kF);
+        motor.config_kP(0, Constants.Elevator.kP);
+        motor.config_kI(0, Constants.Elevator.kI);
+        motor.config_kD(0, Constants.Elevator.kD);
+        motor.config_kF(0, Constants.Elevator.kF);
 
-        splitterMotor.setSelectedSensorPosition(0);
+        motor.setSelectedSensorPosition(0);
     }
 
     public void enableLimits(boolean enable) {
-        splitterMotor.configForwardSoftLimitEnable(enable, Constants.kCANTimeoutMs);
-        splitterMotor.configReverseSoftLimitEnable(enable, Constants.kCANTimeoutMs);
+        motor.configForwardSoftLimitEnable(enable, Constants.kCANTimeoutMs);
+        motor.configReverseSoftLimitEnable(enable, Constants.kCANTimeoutMs);
     }
 
     public void configForAssent() {
@@ -66,11 +62,7 @@ public class Elevator extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
 
     public enum State {
-        OFF(false), POSITION(true), LOCKED(true), OPEN_LOOP(true);
-        boolean isEngaged;
-        State(boolean engagedStatus) {
-            this.isEngaged = engagedStatus;
-        } 
+        OFF, POSITION, LOCKED, OPEN_LOOP;
     }
 
     private State currentState = State.OFF;
@@ -112,24 +104,13 @@ public class Elevator extends Subsystem {
             DriverStation.reportError("Elevator height is out of bounds", false);
         }
 
-        splitterMotor.setSelectedSensorPosition(inchesToEncUnits(absoluteElevatorHeight), 0, Constants.kCANTimeoutMs);
+        motor.setSelectedSensorPosition(inchesToEncUnits(absoluteElevatorHeight), 0, Constants.kCANTimeoutMs);
     }
 
     private boolean elevatorPowered = false;
-    public void shiftPower(boolean shiftedToElevator) {
-        if (shiftedToElevator && !elevatorPowered) {
-            resetToAbsolutePosition();
-            enableLimits(true);
-        } else if (!shiftedToElevator && elevatorPowered) {
-            enableLimits(false);
-        }
-        elevatorPowered = shiftedToElevator;
-        PTOShifter.set(shiftedToElevator);
-        ballSplitter.shiftPower(shiftedToElevator);
-    }
+    
     public void setTargetHeight(double heightInches) {
         setState(State.POSITION);
-        shiftPower(State.POSITION.isEngaged);
         heightInches = Util.limit(heightInches, Constants.Elevator.kMinControlHeight, Constants.Elevator.kMaxControlHeight);
         periodicIO.demand = inchesToEncUnits(heightInches);
         onTarget = false;
@@ -137,13 +118,11 @@ public class Elevator extends Subsystem {
     }
     public void lockElevatorHeight() {
         setState(State.POSITION);
-        shiftPower(State.POSITION.isEngaged);
         targetHeight = encUnitsToInches(periodicIO.position);
         periodicIO.demand = periodicIO.position;
     }
     public void setOpenLoop(double demand) {
         setState(State.OPEN_LOOP);
-        shiftPower(State.OPEN_LOOP.isEngaged);
         periodicIO.demand = demand;
     }
 
@@ -165,25 +144,25 @@ public class Elevator extends Subsystem {
     }
     @Override
     public void readPeriodicInputs() {
-        periodicIO.position = splitterMotor.getSelectedSensorPosition(0);
-        periodicIO.current = splitterMotor.getOutputCurrent();
-        periodicIO.voltage = splitterMotor.getMotorOutputVoltage();
+        periodicIO.position = motor.getSelectedSensorPosition(0);
+        periodicIO.current = motor.getOutputCurrent();
+        periodicIO.voltage = motor.getMotorOutputVoltage();
     }
     @Override
     public void writePeriodicOutputs() {
         if(currentState == State.LOCKED || currentState == State.POSITION) {
-            splitterMotor.set(ControlMode.MotionMagic, periodicIO.demand);
+            motor.set(ControlMode.MotionMagic, periodicIO.demand);
         } else if(currentState == State.OPEN_LOOP) {
-            splitterMotor.set(ControlMode.PercentOutput, periodicIO.demand);
+            motor.set(ControlMode.PercentOutput, periodicIO.demand);
         }
     }
 
     public void resetToAbsolute() {
-        splitterMotor.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
+        motor.setSelectedSensorPosition(0, 0, Constants.kCANTimeoutMs);
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Elevator Current", splitterMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator Current", motor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
         SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));
         SmartDashboard.putNumber("Elevator Absolute Height", encUnitsToInches(inchesToEncUnits(absoluteEncoderRotationsToInches(getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition))));

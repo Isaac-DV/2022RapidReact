@@ -5,9 +5,13 @@
 package com.team1323.frc2020.subsystems;
 
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -15,10 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Column extends Subsystem {
-
-    BallFeeder ballFeeder;
-
-    Solenoid PTOShifter;
+    LazyTalonFX column;
     private static Column instance = null;
     public static Column getInstance() {
         if (instance == null)
@@ -26,34 +27,40 @@ public class Column extends Subsystem {
         return instance;
     }
     public Column() {
-        ballFeeder = BallFeeder.getInstance();
-
-        PTOShifter = new Solenoid(Ports.PCM, PneumaticsModuleType.REVPH , Ports.FEEDER_SHIFTER);
-        stop();
+        column = new LazyTalonFX(Ports.COLUMN);
+        column.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
+        column.enableVoltageCompensation(true);
+        column.setInverted(TalonFXInvertType.Clockwise);
+        column.setNeutralMode(NeutralMode.Brake);
+        
     }
 
     public enum ControlState {
-        DISENGAGED(true), ENGAGED(false);
-        boolean isColumnEngaged;
-        ControlState(boolean isEngaged) {
-            this.isColumnEngaged = isEngaged;
+        OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed);
+        double speed;
+        ControlState(double speed) {
+            this.speed = speed;
         }
     }
-    private ControlState currentState = ControlState.DISENGAGED;
+    private ControlState currentState = ControlState.OFF;
     public ControlState getState() {
         return currentState;
     }
-    public void conformToState(ControlState desiredState) {
+    private void setState(ControlState desiredState) {
         currentState = desiredState;
-        shiftPower(!desiredState.isColumnEngaged);
+    }
+    public void setOpenLoop(double demand) {
+        column.set(ControlMode.PercentOutput, demand);
+    }
+    public void conformToState(ControlState desiredState, double demand) {
+        setState(desiredState);
+        setOpenLoop(demand);
+    }
+    public void conformToState(ControlState desiredState) {
+        conformToState(desiredState, desiredState.speed);
     }
 
-    private boolean rollersPowered = false;
-    private void shiftPower(boolean shiftToRollers) {
-        rollersPowered = shiftToRollers;
-        ballFeeder.shiftPower(shiftToRollers);
-        PTOShifter.set(!shiftToRollers);
-    }
+   
 
     public Request stateRequest(ControlState desiredState) {
         return new Request() {
@@ -67,12 +74,12 @@ public class Column extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putBoolean("Column Shifter Status", rollersPowered);
+        
     }
 
     @Override
     public void stop() {
-        conformToState(ControlState.DISENGAGED);
+        conformToState(ControlState.OFF);
     }
 
 }

@@ -267,7 +267,10 @@ public class Constants {
         
         public static final double kRamp = 0.125;
     }
-    
+    public static class Column {
+        public static final double kFeedBallSpeed = 0.75;
+        public static final double kReverseSpeed = -0.5;
+    }    
 
 
     public static class Hanger {
