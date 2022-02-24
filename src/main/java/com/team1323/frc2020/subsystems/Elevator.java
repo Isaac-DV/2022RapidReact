@@ -5,6 +5,7 @@
 package com.team1323.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -21,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Add your docs here. */
 public class Elevator extends Subsystem {
     LazyTalonFX motor;
-    DutyCycle absoluteEncoder;
+    //DutyCycle absoluteEncoder;
 
 
     double targetHeight = 0;
@@ -35,20 +36,21 @@ public class Elevator extends Subsystem {
 
 
     public Elevator() {
-        motor = new LazyTalonFX(Ports.ELEVATOR);
+        motor = new LazyTalonFX(Ports.ELEVATOR, "main");
 
-        absoluteEncoder = new DutyCycle(new DigitalInput(Ports.ELEVATOR_ENCODER));
+        //absoluteEncoder = new DutyCycle(new DigitalInput(Ports.ELEVATOR_ENCODER));
 
         motor.configForwardSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMaxControlHeight), Constants.kCANTimeoutMs);
         motor.configReverseSoftLimitThreshold(inchesToEncUnits(Constants.Elevator.kMinControlHeight), Constants.kCANTimeoutMs);
-        enableLimits(true);
+        enableLimits(false);
 
         motor.config_kP(0, Constants.Elevator.kP);
         motor.config_kI(0, Constants.Elevator.kI);
         motor.config_kD(0, Constants.Elevator.kD);
         motor.config_kF(0, Constants.Elevator.kF);
 
-        motor.setSelectedSensorPosition(0);
+        motor.setSelectedSensorPosition(inchesToEncUnits(Constants.Elevator.kStartingHeight));
+        motor.setNeutralMode(NeutralMode.Coast);
     }
 
     public void enableLimits(boolean enable) {
@@ -74,7 +76,7 @@ public class Elevator extends Subsystem {
     }
 
     public double getAbsoluteEncoderPosition() {
-        return -absoluteEncoder.getOutput();
+        return 0;//-absoluteEncoder.getOutput();
     }
 
     public double encUnitsToInches(double encUnits) {
@@ -90,6 +92,7 @@ public class Elevator extends Subsystem {
     }
 
     public void resetToAbsolutePosition() {
+        /*
         double cancoderOffset = getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition;
         double absoluteElevatorHeight = Constants.Elevator.kStartingHeight + absoluteEncoderRotationsToInches(cancoderOffset);
         if (absoluteElevatorHeight > Constants.Elevator.kMaxInitialHeight) {
@@ -105,6 +108,8 @@ public class Elevator extends Subsystem {
         }
 
         motor.setSelectedSensorPosition(inchesToEncUnits(absoluteElevatorHeight), 0, Constants.kCANTimeoutMs);
+        */
+        //resetToAbsolute();
     }
 
     private boolean elevatorPowered = false;
@@ -153,6 +158,7 @@ public class Elevator extends Subsystem {
         if(currentState == State.LOCKED || currentState == State.POSITION) {
             motor.set(ControlMode.MotionMagic, periodicIO.demand);
         } else if(currentState == State.OPEN_LOOP) {
+            System.out.println("setting open loop to " + periodicIO.demand);
             motor.set(ControlMode.PercentOutput, periodicIO.demand);
         }
     }
@@ -162,6 +168,8 @@ public class Elevator extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber("Elevator Demand", periodicIO.demand);
+        SmartDashboard.putString("Elevator State", currentState.toString());
         SmartDashboard.putNumber("Elevator Current", motor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
         SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));

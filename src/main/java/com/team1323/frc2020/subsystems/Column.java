@@ -27,7 +27,7 @@ public class Column extends Subsystem {
         return instance;
     }
     public Column() {
-        column = new LazyTalonFX(Ports.COLUMN);
+        column = new LazyTalonFX(Ports.COLUMN, "main");
         column.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         column.enableVoltageCompensation(true);
         column.setInverted(TalonFXInvertType.Clockwise);

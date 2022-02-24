@@ -21,13 +21,13 @@ public class Ports {
     public static final int INTAKE = 2;
     public static final int WRIST = 3;
     public static final int BALL_SPLITTER = 12;
-    public static final int BALL_EJECTOR = 16;
+    public static final int BALL_EJECTOR = 39;
     public static final int BALL_FEEDER = 13;
-    public static final int COLUMN = 40;
+    public static final int COLUMN = 5;
     public static final int TURRET = 14;    
     //public static final int SHOOTER_TOP = 7;
     public static final int SHOOTER_BOTTOM = 7;
-    public static final int ELEVATOR = 41;
+    public static final int ELEVATOR = 16;
 
 
 

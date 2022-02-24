@@ -235,7 +235,6 @@ public class DriverControls implements Loop {
 
         
         double testControllerLeftY = -testController.getLeftY();
-        double testControllerRightY = testController.getRightY();
         if(testControllerLeftY != 0) {
             elevator.setOpenLoop(testControllerLeftY);
             turret.setAngle(0.0);

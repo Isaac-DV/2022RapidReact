@@ -31,8 +31,10 @@ public class BallSplitter extends Subsystem {
     Swerve swerve;
 
     private boolean autoRotateSwerve = false;
-    double targetSwerveTheta = 0;
+    private double targetSwerveTheta = 0;
+    
     Translation2d translationVector = new Translation2d();
+
     private static BallSplitter instance = null;
     public static BallSplitter getInstance() {
         if(instance == null) 
@@ -52,14 +54,15 @@ public class BallSplitter extends Subsystem {
         splitter.enableVoltageCompensation(true);
         splitter.setNeutralMode(NeutralMode.Brake);
         splitter.setInverted(TalonFXInvertType.CounterClockwise);
+        splitter.configPeakOutputReverse(1);
+        splitter.configPeakOutputForward(1);
     }
 
 
     public enum EjectLocations {
         TEAM_HANGER(1, Constants.kBottomLeftQuadrantPose.getTranslation()), 
         TEAM_TERMINAL(2, Constants.kBottomRightQuadrantPose.getTranslation()), 
-        OPPOSITE_HANGER(3, Constants.kTopRightQuadrantPose.getTranslation()),
-        OPPOSITE_TERMINAL(4, Constants.kTopLeftQuadrantPose.getTranslation());
+        OPPOSITE_HANGER(3, Constants.kTopRightQuadrantPose.getTranslation());
         int priority;//The lower the number, the higher the priority
         Translation2d location;
         EjectLocations(int priority, Translation2d location) {
@@ -67,7 +70,7 @@ public class BallSplitter extends Subsystem {
             this.location = location;
         }
     }
-    EjectLocations[] ejectLocationsArray = {EjectLocations.TEAM_HANGER, EjectLocations.TEAM_TERMINAL, EjectLocations.OPPOSITE_HANGER, EjectLocations.OPPOSITE_TERMINAL};
+    EjectLocations[] ejectLocationsArray = {EjectLocations.TEAM_HANGER, EjectLocations.TEAM_TERMINAL, EjectLocations.OPPOSITE_HANGER};
     private EjectLocations bestEjectLocation = EjectLocations.TEAM_HANGER;
     public EjectLocations getBestEjectLocation() {
         return bestEjectLocation;
@@ -86,6 +89,9 @@ public class BallSplitter extends Subsystem {
     private void setState(ControlState desiredState) {
         currentState = desiredState;
     }
+
+    ControlState bestSplitterState = ControlState.OFF; //Determines the best direction for the splitter motor to go in
+                                                      //based on the robots position on the field
 
     public void setOpenLoop(double demand) {
         splitter.set(ControlMode.PercentOutput, demand);
@@ -125,6 +131,34 @@ public class BallSplitter extends Subsystem {
             bestEjectLocation = closestLocation;//If the locations cannot be reached, set the closest
         }
     }
+    public void updateRobotToClosestCorner() {
+        Pose2d robotPose = swerve.pose;
+        Translation2d positionVector = bestEjectLocation.location;
+        Rotation2d robotToLocationTheta = positionVector.direction();
+        Rotation2d robotRotation = robotPose.getRotation();
+        Rotation2d leftSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
+                                        rotateBy(new Rotation2d().fromDegrees(90)).inverse());
+        Rotation2d rightSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
+                                        rotateBy(new Rotation2d().fromDegrees(-90)).inverse());
+        if(Math.abs(rightSideEjectDelta.getDegrees()) < Math.abs(leftSideEjectDelta.getDegrees())) { //The right side is closer
+            robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(90));
+        } else if(Math.abs(rightSideEjectDelta.getDegrees()) > Math.abs(leftSideEjectDelta.getDegrees())) {//The left side is closer
+            robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(-90));
+        }
+        robotToLocationTheta.inverse();
+        if(targetSwerveTheta < 0) {
+            targetSwerveTheta -= 90;
+        } else if(targetSwerveTheta > 0) {
+            targetSwerveTheta += 90;
+        }
+
+        double swerveNeg180to180Rotation = Util.boundAngleNeg180to180Degrees(robotRotation.getDegrees());
+        if((-180 < swerveNeg180to180Rotation) && (swerveNeg180to180Rotation < 0)) {
+            bestSplitterState = ControlState.LEFT_EJECT;
+        } else if((0 < swerveNeg180to180Rotation) && (swerveNeg180to180Rotation < 180)) {
+            bestSplitterState = ControlState.RIGHT_EJECT;
+        }
+    }
 
     Loop loop = new Loop() {
 
@@ -135,39 +169,14 @@ public class BallSplitter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            updateBestEjectLocation();
-            
-            Pose2d robotPose = swerve.pose;
-            Translation2d positionVector = bestEjectLocation.location;
-            Rotation2d robotToLocationTheta = positionVector.direction();
-            Rotation2d robotRotation = robotPose.getRotation();
-            Rotation2d leftSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
-                                            rotateBy(new Rotation2d().fromDegrees(90)).inverse());
-            Rotation2d rightSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
-                                            rotateBy(new Rotation2d().fromDegrees(-90)).inverse());
-            if(Math.abs(rightSideEjectDelta.getDegrees()) < Math.abs(leftSideEjectDelta.getDegrees())) { //The right side is closer
-                robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(90));
-            } else if(Math.abs(rightSideEjectDelta.getDegrees()) > Math.abs(leftSideEjectDelta.getDegrees())) {//The left side is closer
-                robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(-90));
-            }
-            robotToLocationTheta.inverse();
-            if(targetSwerveTheta < 0) {
-                targetSwerveTheta -= 90;
-            } else if(targetSwerveTheta > 0) {
-                targetSwerveTheta += 90;
-            }   
-            if(autoRotateSwerve) {           
-                //swerve.rotate(targetSwerveTheta);
-            } else {
-                targetSwerveTheta = 0;
-            }
+           //updateBestEjectLocation();
+           //updateRobotToClosestCorner();
             
         }
 
         @Override
         public void onStop(double timestamp) {
-            // TODO Auto-generated method stub
-            
+
         }
         
     };
@@ -202,7 +211,6 @@ public class BallSplitter extends Subsystem {
         SmartDashboard.putString("Closest Oof Location", bestEjectLocation.toString());
         SmartDashboard.putNumber("Closest Oof Location magnitude", bestEjectLocation.location.translateBy(swerve.pose.getTranslation().inverse()).norm());
         SmartDashboard.putNumber("TopRight Magnitude", EjectLocations.OPPOSITE_HANGER.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());
-        SmartDashboard.putNumber("TopLeft Magnitude", EjectLocations.OPPOSITE_TERMINAL.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());
         SmartDashboard.putNumber("BotLeft Magnitude", EjectLocations.TEAM_HANGER.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());
         SmartDashboard.putNumber("BotRight Magnitude", EjectLocations.TEAM_TERMINAL.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());
 

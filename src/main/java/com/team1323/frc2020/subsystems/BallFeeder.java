@@ -148,7 +148,7 @@ public class BallFeeder extends Subsystem {
                             ejectorStartTimestamp = timestamp;
                         }
                     } else if (DetectedBall == Ball.None) {
-                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                        //ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         if(intakeFeedEnabled)
                             setFeederOpenLoop(1.0);
                         else
@@ -167,8 +167,9 @@ public class BallFeeder extends Subsystem {
             }
             
         
-            if((timestamp - ejectorStartTimestamp) > 3.5) {
+            if((timestamp - ejectorStartTimestamp) > 0.33) {
                 ballEjector.conformToState(BallEjector.ControlState.OFF);
+                ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                 if(intake.getState() == Intake.ControlState.AUTO_INTAKE && !intakeFeedEnabled) {
                     intake.conformToState(Intake.ControlState.OFF);
                 }

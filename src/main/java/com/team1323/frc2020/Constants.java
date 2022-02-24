@@ -143,7 +143,7 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = 43.4;
+        public static final double kTurretStartingEncoderPosition = 301.28;
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
@@ -315,12 +315,12 @@ public class Constants {
         public static final double kFalconTicksPerInch = 150355.0 / 10.25;
         public static final double kFalconToMagEncoderRatio = 45.0;
         public static final double kMagEncoderStartingPosition = -0.319385;
-        public static final double kStartingHeight = 0.0;
+        public static final double kStartingHeight = 6.25;
         public static final double kMinInitialHeight = -1.0; // 6.5 inches before encoder wrap
         public static final double kMaxInitialHeight = 5.5;
 
         public static final double kMinControlHeight = 0.5;
-        public static final double kMaxControlHeight = 37.0;
+        public static final double kMaxControlHeight = 56.0;
         public static final double kHeightTolerance = 0.2;
 
         public static final double kP = 0.01;
