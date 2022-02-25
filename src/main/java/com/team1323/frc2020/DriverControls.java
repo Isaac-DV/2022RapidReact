@@ -183,31 +183,30 @@ public class DriverControls implements Loop {
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
         }
-        if(coDriver.aButton.wasActivated()) {
-            s.intakeState();
-        } else if(coDriver.aButton.wasReleased()) {
-            s.postIntakeState();
-        }
-        /*
-        if(coDriver.bButton.wasActivated()) {
-            s.autoEjectState(true);
-        } else if(coDriver.bButton.wasReleased()) {
-            s.autoEjectState(false);
-        }*/
-       
+
         if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
             s.wristStowedState();
         }else if(coDriver.bButton.shortReleased()) {
             s.wristLowestState();
         }
+        if(coDriver.aButton.wasActivated()) {
+            s.intakeState();
+        } else if(coDriver.aButton.wasReleased()) {
+            s.postIntakeState();
+        }
+        if(coDriver.leftBumper.wasActivated()) {
+            s.reverseAllSubsystems();
+        } else if(coDriver.leftBumper.wasReleased()) {
+            s.disableState();
+        }
         
+        
+
+       
+       
         if(coDriver.rightTrigger.wasActivated()) {
-            //shooter.setVelocity(3000);
-            //s.visionShotState();
             turret.startRobotStateVision();
         } else if(coDriver.rightTrigger.wasReleased()) {
-            //shooter.stop();
-            s.postShotState();
             turret.lockAngle();
         }
         
@@ -219,26 +218,25 @@ public class DriverControls implements Loop {
         if(coDriver.xButton.wasActivated()) {
             motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
         }*/
-        if(coDriver.xButton.wasActivated()) {
-            s.visionShotState(2200.0, 0.0);
-        } else if(coDriver.xButton.wasReleased()) {
-            s.postShotState();
-        }
-        if(coDriver.yButton.wasActivated()) {
-            s.visionShotState(3200.0, 15.0); //2400, 6.0
-        } else if(coDriver.yButton.wasReleased()) {
-            s.postShotState();
+        if(coDriver.rightTrigger.isBeingPressed()) {
+            if(coDriver.xButton.wasActivated()) {
+                s.manualShotState(2200.0, 0.0);
+            }
+            if(coDriver.yButton.wasActivated()) {
+                s.manualShotState(3200.0, 15.0); //2400, 6.0
+            }
+
+            if (coDriver.xButton.wasReleased() || coDriver.yButton.wasReleased()) {
+                s.postShotState();
+            }
         }
 
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
+        
 
-        if(coDriver.leftBumper.wasActivated()) {
-            s.reverseAllSubsystems();
-        } else if(coDriver.leftBumper.wasReleased()) {
-            s.disableState();
-        }
+        
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
         }

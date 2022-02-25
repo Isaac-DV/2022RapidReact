@@ -257,7 +257,7 @@ public class Constants {
 
         public static final double kIntakeAngle = 98.0;
         public static final double kStowedAngle = -10.0;
-        public static final double kBallDebouncerAngle = 25.0;
+        public static final double kBallDebouncerAngle = 85.0;
 
     }
     public static class Feeder {

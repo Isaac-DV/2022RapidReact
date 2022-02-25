@@ -50,7 +50,7 @@ public class Column extends Subsystem {
 
     public enum ControlState {
         OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
-        INDEX_BALLS(Constants.Column.kFeedBallSpeed);
+        INDEX_BALLS(Constants.Column.kFeedBallSpeed), INTAKE(Constants.Column.kFeedBallSpeed);
         double speed;
         ControlState(double speed) {
             this.speed = speed;

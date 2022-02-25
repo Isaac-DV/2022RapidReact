@@ -53,8 +53,8 @@ public class BallSplitter extends Subsystem {
         splitter.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs); 
         splitter.enableVoltageCompensation(true);
         splitter.setNeutralMode(NeutralMode.Brake);
-        splitter.setInverted(TalonFXInvertType.CounterClockwise);
-        splitter.configPeakOutputReverse(1);
+        splitter.setInverted(TalonFXInvertType.Clockwise);
+        splitter.configPeakOutputReverse(-1);
         splitter.configPeakOutputForward(1);
     }
 
@@ -78,7 +78,7 @@ public class BallSplitter extends Subsystem {
 
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0), POWER_SHIFED(0);//Power Shifted to the Elevator
+        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0);//Power Shifted to the Elevator
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -137,7 +137,7 @@ public class BallSplitter extends Subsystem {
         Rotation2d robotToLocationTheta = positionVector.direction();
         Rotation2d robotRotation = robotPose.getRotation();
         Rotation2d leftSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
-                                        rotateBy(new Rotation2d().fromDegrees(90)).inverse());
+                                        rotateBy(new Rotation2d(90).fromDegrees(90)).inverse());
         Rotation2d rightSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
                                         rotateBy(new Rotation2d().fromDegrees(-90)).inverse());
         if(Math.abs(rightSideEjectDelta.getDegrees()) < Math.abs(leftSideEjectDelta.getDegrees())) { //The right side is closer

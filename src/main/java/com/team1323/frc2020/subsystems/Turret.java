@@ -179,7 +179,7 @@ public class Turret extends Subsystem {
     }
     
     public void setOpenLoop(double output) {
-        periodicIO.demand = output * 0.1;
+        periodicIO.demand = output * 0.5;
         currentState = ControlState.OPEN_LOOP;
     }
     
