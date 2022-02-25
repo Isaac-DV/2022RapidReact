@@ -44,6 +44,9 @@ class Vector2d:
 
     def angle_degrees(self):
         return math.degrees(self.angle_radians())
+    
+    def magnitude(self):
+        return math.sqrt(self.x**2 + self.y**2)
 
 def getInitialBallVelocity(motor_rpm):
     bottom_wheel_angular_velocity = motor_rpm * kBottomToMotorSpeedRatio / 60.0 * 2.0 * math.pi # radians/sec
@@ -63,6 +66,17 @@ def getInitialVelocityVector(motor_rpm, exit_angle_degrees):
     #print("Initial ball velocity: %f"%(velocity_magnitude))
 
     return Vector2d.from_polar(exit_angle_radians, velocity_magnitude)
+
+def calculateRPM(distance_to_goal, exit_angle_degrees):
+    goal_position = Vector2d(distance_to_goal + 0.25 * kGoalRadius, (kGoalHeight - kInitialBallHeight) + 0.25 * (104 - kGoalHeight))
+    time_to_reach_goal = math.sqrt((goal_position.y - math.tan(math.radians(exit_angle_degrees)) * goal_position.x) / (-kGravitationalAcceleration / 2.0))
+    initial_horizontal_velocity = goal_position.x / time_to_reach_goal
+    initial_ball_velocity = Vector2d(initial_horizontal_velocity, math.tan(math.radians(exit_angle_degrees)) * initial_horizontal_velocity)
+
+    rpm_numerator = 120.0 * initial_ball_velocity.magnitude()
+    rpm_denominator = kScrubFactor * kBottomToMotorSpeedRatio * (kBottomWheelRadius + kTopToBottomSpeedRatio * kTopWheelRadius) * 2.0 * math.pi
+
+    return rpm_numerator / rpm_denominator
 
 def findTimeToReachGoal(distance_to_goal, motor_rpm, exit_angle_degrees, tolerance):
     initial_ball_velocity = getInitialVelocityVector(motor_rpm, exit_angle_degrees)
@@ -110,26 +124,25 @@ def findMotorRPM(distance_to_vision_target, exit_angle_degrees=None):
         best_angle = math.inf
         xs, ys, top_xs, top_ys, bottom_xs, bottom_ys = [], [], [], [], [], []
         for angle in angle_values:
-            for rpm in rpm_values:
-                t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, angle, 1.0)
-                if reached_goal:
-                    if rpm < min_rpm:
-                        min_rpm = rpm
-                        best_angle = angle
-                        xs = x_values
-                        ys = y_values
-                        top_xs = top_x_values
-                        top_ys = top_y_values
-                        bottom_xs = bottom_x_values
-                        bottom_ys = bottom_y_values
-                    break
+            rpm = calculateRPM(distance_to_goal, angle)
+            t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, angle, 1.0)
+            if reached_goal:
+                if rpm < min_rpm:
+                    min_rpm = rpm
+                    best_angle = angle
+                    xs = x_values
+                    ys = y_values
+                    top_xs = top_x_values
+                    top_ys = top_y_values
+                    bottom_xs = bottom_x_values
+                    bottom_ys = bottom_y_values
         if min_rpm != math.inf:
             return min_rpm, xs, ys, top_xs, top_ys, bottom_xs, bottom_ys, True
     else:
-        for rpm in rpm_values:
-            t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, exit_angle_degrees, 1.0)
-            if reached_goal:
-                return rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, True
+        rpm = calculateRPM(distance_to_goal, exit_angle_degrees)
+        t, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, reached_goal = findTimeToReachGoal(distance_to_goal, rpm, exit_angle_degrees, 1.0)
+        if reached_goal:
+            return rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, True
     
     return 0, [], [], [], [], [], [], False
 
@@ -180,7 +193,7 @@ if __name__ == "__main__":
     choice = int(input(prompt))
     if choice == 1:
         distance_to_vision_target = float(input("Enter a distance from the vision target: "))
-        rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, found_rpm = findMotorRPM(distance_to_vision_target)
+        rpm, x_values, y_values, top_x_values, top_y_values, bottom_x_values, bottom_y_values, found_rpm = findMotorRPM(distance_to_vision_target, kMaxExitAngleDegrees)
         if found_rpm:
             print("Shooter RPM should be %f"%(rpm))
             distance_to_goal = distance_to_vision_target + kGoalRadius
