@@ -50,6 +50,7 @@ public class Ports {
     //CANCoders
     public static final int TURRET_ENCODER = 2;
     public static final int FEEDER_BANNER = 4;
+    public static final int COLUMN_BANNER = 6;
     public static final int COLOR_SENSOR = 5;
     public static final int WRIST_ENCODER = 1;
     public static final int HANGER_WRIST_ENCODER = 0;
