@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Column extends Subsystem {
+    Shooter shooter;
+
     LazyTalonFX column;
     DigitalInput banner;
     private static Column instance = null;
@@ -31,6 +33,8 @@ public class Column extends Subsystem {
         return instance;
     }
     public Column() {
+        shooter = Shooter.getInstance();
+
         column = new LazyTalonFX(Ports.COLUMN, "main");
         banner = new DigitalInput(Ports.COLUMN_BANNER);
 
@@ -83,6 +87,18 @@ public class Column extends Subsystem {
             } else if(!getBanner() && getState() == ControlState.INDEX_BALLS) {
                 conformToState(ControlState.INDEX_BALLS);
             }
+            switch(currentState) {
+                case FEED_BALLS:
+                    if(shooter.hasReachedSetpoint()) {
+                        setOpenLoop(Constants.Column.kFeedBallSpeed);
+                    } else {
+                        setOpenLoop(0.0);
+                    }
+                    break;
+                default:
+                break;
+            }
+
         }
 
         @Override
@@ -104,7 +120,7 @@ public class Column extends Subsystem {
             }  
         };
     }
-
+    
     @Override
     public void outputTelemetry() {
         SmartDashboard.putBoolean("Column Banner Sensor", getBanner());

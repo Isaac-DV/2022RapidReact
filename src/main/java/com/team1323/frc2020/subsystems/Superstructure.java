@@ -289,14 +289,15 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
-	public void visionShotState() {
+	public void visionShotState(double shooterRPM, double rawHoodAngle) {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-					//turret.robotStateVisionRequest(),
+					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle + rawHoodAngle),
+					turret.robotStateVisionRequest(),
+					shooter.velocityRequest(shooterRPM) //2200 - Mid //2100 - Close //2400
+					
 					//shooter.visionVelocityRequest()
-					shooter.velocityRequest(2800.0)
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
 				column.stateRequest(Column.ControlState.FEED_BALLS),
@@ -309,7 +310,7 @@ public class Superstructure extends Subsystem {
 			new ParallelRequest(
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
-				motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 				shooter.openLoopRequest(0.25),
 				intake.stateRequest(Intake.ControlState.OFF)
 			)
@@ -331,7 +332,8 @@ public class Superstructure extends Subsystem {
 				ballFeeder.stateRequest(BallFeeder.State.OFF),
 				ballEjector.stateRequest(BallEjector.ControlState.OFF),
 				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
-				column.stateRequest(Column.ControlState.OFF)
+				column.stateRequest(Column.ControlState.OFF),
+				shooter.openLoopRequest(0.0)
 			)
 		);
 	}

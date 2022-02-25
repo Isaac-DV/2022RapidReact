@@ -34,7 +34,7 @@ public class Wrist extends Subsystem {
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
     private boolean encoderDisconected = false;
-    private boolean zeroedAbsolutely = true;
+    private boolean zeroedAbsolutely = false;
     private static Wrist instance = null;
     public static Wrist getInstance() {
         if (instance==null)
@@ -152,7 +152,7 @@ public class Wrist extends Subsystem {
 
             wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, Constants.kCANTimeoutMs);
         }
-        wrist.setSelectedSensorPosition((int)degreesToEncUnits(-26.7), 0, Constants.kCANTimeoutMs);
+        
     }
 
 

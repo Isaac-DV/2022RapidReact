@@ -203,30 +203,40 @@ public class DriverControls implements Loop {
         
         if(coDriver.rightTrigger.wasActivated()) {
             //shooter.setVelocity(3000);
-            s.visionShotState();
+            //s.visionShotState();
+            turret.startRobotStateVision();
         } else if(coDriver.rightTrigger.wasReleased()) {
             //shooter.stop();
             s.postShotState();
             turret.lockAngle();
         }
-        if(coDriver.rightBumper.wasActivated()) {
-            s.reverseAllSubsystems();
-        } else if(coDriver.rightBumper.wasReleased()) {
-            s.disableState();
-        }
+        
+        
+        /*
         if(coDriver.yButton.wasActivated()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMaxControlAngle);
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle + 6.0);
         }
         if(coDriver.xButton.wasActivated()) {
             motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
+        }*/
+        if(coDriver.xButton.wasActivated()) {
+            s.visionShotState(2200.0, 0.0);
+        } else if(coDriver.xButton.wasReleased()) {
+            s.postShotState();
         }
+        if(coDriver.yButton.wasActivated()) {
+            s.visionShotState(3200.0, 15.0); //2400, 6.0
+        } else if(coDriver.yButton.wasReleased()) {
+            s.postShotState();
+        }
+
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
 
-        if(coDriver.rightBumper.wasActivated()) {
+        if(coDriver.leftBumper.wasActivated()) {
             s.reverseAllSubsystems();
-        } else if(coDriver.rightBumper.wasReleased()) {
+        } else if(coDriver.leftBumper.wasReleased()) {
             s.disableState();
         }
         if(coDriver.backButton.wasActivated()) {

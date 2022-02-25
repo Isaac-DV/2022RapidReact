@@ -35,7 +35,7 @@ public class Intake extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), INTAKE(Constants.Intake.kIntakeSpeed), AUTO_INTAKE(Constants.Intake.kIntakeSpeed), EJECT(-0.25);
+        OFF(0.0), INTAKE(Constants.Intake.kIntakeSpeed), AUTO_INTAKE(Constants.Intake.kIntakeSpeed), EJECT(-1.0);
         double speed;
         ControlState(double speed){
             this.speed = speed;

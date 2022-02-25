@@ -237,7 +237,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -25.47;
-        public static final double kWristStartingEncoderPosition = 358.2;
+        public static final double kWristStartingEncoderPosition = 27.965035;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -269,7 +269,7 @@ public class Constants {
     }
     public static class Column {
         public static final double kFeedBallSpeed = 0.75;
-        public static final double kReverseSpeed = -0.5;
+        public static final double kReverseSpeed = -1.0;
     }    
 
 
