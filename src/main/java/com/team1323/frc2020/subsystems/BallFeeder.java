@@ -24,19 +24,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Controls the ball ejector and feeder motor*/
 public class BallFeeder extends Subsystem {
-    BallEjector ballEjector;
     BallSplitter ballSplitter;
     Intake intake;
     Shooter shooter;
-    
+    Column column;
     
     LazyTalonFX feeder;
 
     DigitalInput banner, colorSensor;
 
-    double feederStartTimestamp = Double.POSITIVE_INFINITY;
-    double ejectorStartTimestamp = Double.POSITIVE_INFINITY;
+    double seenBallStartTimestamp = Double.POSITIVE_INFINITY;
+    double splitterStartTimestamp = Double.POSITIVE_INFINITY;
     boolean intakeFeedEnabled = false;
+    boolean isIntakeOpenLoop = false;
+
+    private int ballCounter = 0; //The amount of balls that are in the robot
 
     private static BallFeeder instance = null;
     public static BallFeeder getInstance() {
@@ -46,8 +48,8 @@ public class BallFeeder extends Subsystem {
     }
 
     public BallFeeder() {
-        ballEjector = BallEjector.getInstance();
         ballSplitter = BallSplitter.getInstance();
+        column = Column.getInstance();
         intake = Intake.getInstance();
 
         shooter = Shooter.getInstance();
@@ -135,48 +137,49 @@ public class BallFeeder extends Subsystem {
                 case DETECT:
                     if(intake.getState() == Intake.ControlState.OFF) {
                         intakeFeedEnabled = false;
+                        isIntakeOpenLoop = false;
+                    } else if(intake.getState() != Intake.ControlState.EJECT) {
+                        isIntakeOpenLoop = true;
                     }
-                    if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor  
-                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);       
+                    if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
+                        if(!isIntakeOpenLoop) {
+                            intake.conformToState(Intake.ControlState.AUTO_INTAKE);
+                        }
+                        if(seenBallStartTimestamp == Double.POSITIVE_INFINITY) {
+                            column.conformToState(Column.ControlState.INDEX_BALLS);
+                            seenBallStartTimestamp = timestamp;
+                        }  
+                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         setFeederOpenLoop(-0.25);
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
-                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
                         intake.conformToState(Intake.ControlState.AUTO_INTAKE);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
-                        if(ejectorStartTimestamp == Double.POSITIVE_INFINITY) {
-                            ballEjector.conformToState(BallEjector.ControlState.EJECT);
-                            ejectorStartTimestamp = timestamp;
+                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
+                        if(splitterStartTimestamp == Double.POSITIVE_INFINITY) {
+                            splitterStartTimestamp = timestamp;
                         }
                     } else if (DetectedBall == Ball.None) {
-                        //ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         if(intakeFeedEnabled)
-                            setFeederOpenLoop(1.0);
+                            setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
                         else
                             setFeederOpenLoop(0.0);
                     }
-                    break;
-                case FEED_BALLS:
-                    if(shooter.hasReachedSetpoint()) {
-                        setFeederOpenLoop(1.0);
-                    } else {
-                        setFeederOpenLoop(0.0);
-                    }
-                    break;
+                    break;               
                 default:
                     break;
-            }
-            
-        
-            if((timestamp - ejectorStartTimestamp) > 2.0) { //0.33
-                ballEjector.conformToState(BallEjector.ControlState.OFF);
+            }    
+            if((timestamp - splitterStartTimestamp) > 3.0) { //0.33
                 ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                 if(intake.getState() == Intake.ControlState.AUTO_INTAKE && !intakeFeedEnabled) {
                     intake.conformToState(Intake.ControlState.OFF);
-                }
-                
-                ejectorStartTimestamp = Double.POSITIVE_INFINITY;
+                }        
+                splitterStartTimestamp = Double.POSITIVE_INFINITY;
             }
-            
+            if((timestamp - seenBallStartTimestamp) > 1.5) {
+                column.conformToState(Column.ControlState.OFF);
+                intake.conformToState(Intake.ControlState.OFF);
+                timestamp = Double.POSITIVE_INFINITY;
+            }
         }
 
         @Override

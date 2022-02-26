@@ -50,7 +50,7 @@ public class Elevator extends Subsystem {
         motor.config_kF(0, Constants.Elevator.kF);
 
         motor.setSelectedSensorPosition(inchesToEncUnits(Constants.Elevator.kStartingHeight));
-        motor.setNeutralMode(NeutralMode.Coast);
+        motor.setNeutralMode(NeutralMode.Brake);
     }
 
     public void enableLimits(boolean enable) {
@@ -178,7 +178,7 @@ public class Elevator extends Subsystem {
 
     @Override
     public void stop() {
-
+        motor.setNeutralMode(NeutralMode.Coast);
     }
     public static class PeriodicIO {
         public double position = 0;

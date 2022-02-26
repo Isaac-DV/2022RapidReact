@@ -25,6 +25,8 @@ import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
+import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -43,7 +45,10 @@ public class Turret extends Subsystem {
     DutyCycle encoder;
 
     RobotState robotState;
+    Swerve swerve;
     
+    private Translation2d turretManualVector = new Translation2d();
+    public Rotation2d fieldCentricRotation = new Rotation2d();
     private double targetAngle = 0.0;
     private double maxAllowableAngle = Constants.Turret.kMaxControlAngle;
     public void setMaxAllowableAngle(double angle) {
@@ -69,7 +74,7 @@ public class Turret extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
     
     public enum ControlState {
-        OPEN_LOOP, VISION, POSITION, ROBOT_STATE_VISION, VISION_OFFSET;
+        OPEN_LOOP, FIELD_RELATIVE, VISION, POSITION, ROBOT_STATE_VISION, VISION_OFFSET;
     }
     private ControlState currentState = ControlState.OPEN_LOOP;
     public ControlState getState() {
@@ -80,6 +85,7 @@ public class Turret extends Subsystem {
     
     private Turret() {
         robotState = RobotState.getInstance();
+        swerve = Swerve.getInstance();
         
         turret = new LazyTalonFX(Ports.TURRET, "main");
         encoder = new DutyCycle(new DigitalInput(Ports.TURRET_ENCODER));
@@ -177,7 +183,13 @@ public class Turret extends Subsystem {
     public boolean isEncoderConnected() {
         return encoder.getFrequency() != 0.0;
     }
-    
+    public void fieldRelativeManual(double x, double y) {
+        currentState = ControlState.FIELD_RELATIVE;
+        turretManualVector = new Translation2d(x,y);
+
+        
+    }
+
     public void setOpenLoop(double output) {
         periodicIO.demand = output * 0.5;
         currentState = ControlState.OPEN_LOOP;
@@ -354,6 +366,7 @@ public class Turret extends Subsystem {
         };
     }
 
+    
     
     
     @Override

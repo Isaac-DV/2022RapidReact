@@ -56,6 +56,7 @@ public class BallSplitter extends Subsystem {
         splitter.setInverted(TalonFXInvertType.Clockwise);
         splitter.configPeakOutputReverse(-1);
         splitter.configPeakOutputForward(1);
+        splitter.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
     }
 
 

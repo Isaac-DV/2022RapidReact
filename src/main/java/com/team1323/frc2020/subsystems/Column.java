@@ -42,7 +42,8 @@ public class Column extends Subsystem {
         column.enableVoltageCompensation(true);
         column.setInverted(TalonFXInvertType.Clockwise);
         column.setNeutralMode(NeutralMode.Brake);
-        
+        column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
+    
     }
     public boolean getBanner() {
         return banner.get();
@@ -83,8 +84,10 @@ public class Column extends Subsystem {
         @Override
         public void onLoop(double timestamp) {
             if(getBanner() && getState() == ControlState.INDEX_BALLS) {
+                column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                 conformToState(ControlState.OFF);
             } else if(!getBanner() && getState() == ControlState.INDEX_BALLS) {
+                column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
                 conformToState(ControlState.INDEX_BALLS);
             }
             switch(currentState) {
@@ -124,6 +127,7 @@ public class Column extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
+        SmartDashboard.putString("Column State", getState().toString());
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

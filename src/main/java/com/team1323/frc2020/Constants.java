@@ -53,7 +53,7 @@ public class Constants {
     public static final double kCameraXOffset = 9.586; //8.5
     public static final double kCameraZOffset = 42.095; //26.776 24.524
     public static final double kCameraYawAngleDegrees = 0.0;//-12.7
-    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.0 : 39.0; //21.75 for bottom 34.3 37.0604
+    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 37.0 : 37.0; //21.75 for bottom 34.3 37.0604 //39.0
 
     //Limelight
     public static final double kHorizontalFOV = 59.6; // degrees
@@ -237,7 +237,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -25.47;
-        public static final double kWristStartingEncoderPosition = 27.965035;
+        public static final double kWristStartingEncoderPosition = 178.654306;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -257,7 +257,7 @@ public class Constants {
 
         public static final double kIntakeAngle = 98.0;
         public static final double kStowedAngle = -10.0;
-        public static final double kBallDebouncerAngle = 85.0;
+        public static final double kBallDebouncerAngle = 65.0;
 
     }
     public static class Feeder {

@@ -166,6 +166,7 @@ public class DriverControls implements Loop {
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
         double coDriverLeftY = coDriver.getLeftY();
+        double coDriverRightY = coDriver.getRightX();
 
         /*if (coDriver.backButton.wasActivated()){
             s.neutralState();
@@ -184,46 +185,37 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
 
-        if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
-            s.wristStowedState();
-        }else if(coDriver.bButton.shortReleased()) {
-            s.wristLowestState();
-        }
+        
         if(coDriver.aButton.wasActivated()) {
             s.intakeState();
         } else if(coDriver.aButton.wasReleased()) {
             s.postIntakeState();
         }
+
+        if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
+            s.wristStowedState();
+        }else if(coDriver.bButton.shortReleased()) {
+            s.wristLowestState();
+        }
+        
+
         if(coDriver.leftBumper.wasActivated()) {
             s.reverseAllSubsystems();
         } else if(coDriver.leftBumper.wasReleased()) {
             s.disableState();
         }
-        
-        
-
-       
-       
+           
         if(coDriver.rightTrigger.wasActivated()) {
             turret.startRobotStateVision();
         } else if(coDriver.rightTrigger.wasReleased()) {
             turret.lockAngle();
-        }
-        
-        
-        /*
-        if(coDriver.yButton.wasActivated()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle + 6.0);
-        }
-        if(coDriver.xButton.wasActivated()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
-        }*/
+        }       
         if(coDriver.rightTrigger.isBeingPressed()) {
             if(coDriver.xButton.wasActivated()) {
                 s.manualShotState(2200.0, 0.0);
             }
             if(coDriver.yButton.wasActivated()) {
-                s.manualShotState(3200.0, 15.0); //2400, 6.0
+                s.visionShotState(); //2400, 6.0
             }
 
             if (coDriver.xButton.wasReleased() || coDriver.yButton.wasReleased()) {
@@ -231,10 +223,16 @@ public class DriverControls implements Loop {
             }
         }
 
+        if(coDriver.rightBumper.wasActivated()) {
+            column.conformToState(Column.ControlState.FEED_BALLS);
+        } else if(coDriver.rightBumper.wasReleased()) {
+            column.conformToState(Column.ControlState.OFF);
+        }
+
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
-        
+
 
         
         if(coDriver.backButton.wasActivated()) {

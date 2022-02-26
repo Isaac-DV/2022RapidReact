@@ -226,8 +226,9 @@ public class Shooter extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter RPM", getRPM());
-        /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
+
+        /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);
         SmartDashboard.putBoolean("Shooter On Target", hasReachedSetpoint());*/
     }
     

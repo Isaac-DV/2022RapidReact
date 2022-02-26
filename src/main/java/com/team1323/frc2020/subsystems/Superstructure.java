@@ -247,11 +247,11 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
+					ballFeeder.intakeFeedRequest(),
 					intake.stateRequest(Intake.ControlState.INTAKE),
 					wrist.setWristIntakeRequest()
 				),
 				new ParallelRequest(
-					ballFeeder.intakeFeedRequest(),
 					column.stateRequest(Column.ControlState.INDEX_BALLS)
 				)
 			)
@@ -314,7 +314,7 @@ public class Superstructure extends Subsystem {
 					shooter.visionVelocityRequest() 
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.FEED_BALLS),
+				//column.stateRequest(Column.ControlState.FEED_BALLS),
 				ballFeeder.stateRequest(BallFeeder.State.FEED_BALLS)
 			)
 		);
