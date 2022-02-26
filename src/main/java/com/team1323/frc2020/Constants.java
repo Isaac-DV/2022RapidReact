@@ -350,6 +350,10 @@ public class Constants {
 
         // Measured upward from the ground; corresponds to kMinControlAngle
         public static final double kMaxEmpiricalAngle = 69.5172;
+
+        public static final double kServoSpeed = 0.5; // Stroke percentage / second
+
+        public static final double kAngleTolerance = 1.0; // degrees
     }
     public static class BallSplitter {
         public static final double kEjectorLength = 64; //The length in which the ball is fired from the ejectors, in inches

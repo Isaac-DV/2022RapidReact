@@ -250,20 +250,21 @@ public class Turret extends Subsystem {
             
             switch(currentState) {
                 case VISION:
-                    if (targetInfo.get(3).getDouble(0) == 1.0 && hasReachedAngle()) {
-                        setAngle(getAngle() + targetInfo.get(0).getDouble(0));
-                    } else {
-                        System.out.println("Target not visible");
+                    Optional<ShooterAimingParameters> params = robotState.getAimingParameters();
+                    if (params.isPresent()) {
+                        // Aim directly at the vision target
+                        double turretAngle = params.get().getTurretToGoal().direction().getDegrees();
+                        turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        setAngle(turretAngle);
                     }
                     break;
                 case ROBOT_STATE_VISION:
                     Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
                     if (aim.isPresent()) {
-                        
-                        double targetPosition = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, aim.get().getTurretAngle().getDegrees());
-                        setAngle(targetPosition);
-                    } else {
-                        //System.out.println("Aiming parameters not present");
+                        // Compensate for the robot's velocity when aiming
+                        double turretAngle = aim.get().getTurretAngle().getDegrees();
+                        turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        setAngle(turretAngle);
                     }
                     break;
                 default:

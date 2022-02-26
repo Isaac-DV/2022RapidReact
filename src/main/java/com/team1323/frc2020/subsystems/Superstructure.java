@@ -326,7 +326,14 @@ public class Superstructure extends Subsystem {
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 				shooter.openLoopRequest(0.25),
-				intake.stateRequest(Intake.ControlState.OFF)
+				intake.stateRequest(Intake.ControlState.OFF),
+				new LambdaRequest(() -> {
+					if (turret.getState() == Turret.ControlState.ROBOT_STATE_VISION) {
+						turret.startVision();
+					} else {
+						turret.lockAngle();
+					}
+				})
 			)
 		);
 	}

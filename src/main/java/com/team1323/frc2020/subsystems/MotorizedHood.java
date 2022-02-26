@@ -18,7 +18,9 @@ public class MotorizedHood extends Subsystem {
     Servo rightServo;
     Servo leftServo;
     double servoTargetAngle;
-    double targetPosition;
+    double targetPosition = Constants.MotorizedHood.kMinControlAngle;
+    boolean travelingUp = false;
+    double finishTimestamp = 0.0; // timestamp when the hood is predicted to reach its target position
     private static MotorizedHood instance = null;
     
     public static MotorizedHood getInstance() {
@@ -45,41 +47,66 @@ public class MotorizedHood extends Subsystem {
         double offsetAngle = angle - Constants.MotorizedHood.kMinControlAngle;
         double adjacentSideLength = 1.0 / Math.tan(Math.toRadians(angleRange));
         double oppositeSideLength = Math.tan(Math.toRadians(offsetAngle)) * adjacentSideLength;
-        targetPosition = oppositeSideLength;
         setServoPercentage(oppositeSideLength);
     }
+
     public void setServoPercentage(double percent) {
         rightServo.set(percent);
         leftServo.set(percent);
+
+        double travelDistance = percent - getPosition();
+        travelingUp = travelDistance >= 0.0;
+        finishTimestamp = Timer.getFPGATimestamp() + (Math.abs(travelDistance) / Constants.MotorizedHood.kServoSpeed);
+        targetPosition = percent;
     }
-    public double getRightServoPosition() {
+
+    public double getPosition() {
+        double timestamp = Timer.getFPGATimestamp();
+        if (timestamp >= finishTimestamp) {
+            return targetPosition;
+        }
+
+        double remainingDistance = (finishTimestamp - timestamp) * Constants.MotorizedHood.kServoSpeed;
+        if (!travelingUp)
+            remainingDistance *= -1.0;
+
+        return targetPosition - remainingDistance;
+    }
+
+    public double getAngle() {
+        double angleRange = Constants.MotorizedHood.kMaxControlAngle - Constants.MotorizedHood.kMinControlAngle;
+        double oppositeSideLength = getPosition();
+        double adjacentSideLength = 1.0 / Math.tan(Math.toRadians(angleRange));
+
+        return Constants.MotorizedHood.kMinControlAngle + Math.toDegrees(Math.atan(oppositeSideLength / adjacentSideLength));
+    }
+
+    public double getRightServoTargetPosition() {
         return rightServo.getPosition();
     }
-    public double getLeftServoPosition() {
+
+    public double getLeftServoTargetPosition() {
         return leftServo.getPosition();
     }
 
     public Request setAngleRequest(double desiredAngle) {
         return new Request() {
 
-            double startTimestamp = 0.0;
-
             @Override
             public void act() {
-                startTimestamp = Timer.getFPGATimestamp();
                 setServoAngle(desiredAngle);
             }
             @Override
             public boolean isFinished() {
-                return Timer.getFPGATimestamp() - startTimestamp >= 0.5;
+                return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
             }
         };
     }
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Servo Right Position", getRightServoPosition());
-        SmartDashboard.putNumber("Servo Left Position", getLeftServoPosition());
+        SmartDashboard.putNumber("Servo Right Position", getRightServoTargetPosition());
+        SmartDashboard.putNumber("Servo Left Position", getLeftServoTargetPosition());
         SmartDashboard.putNumber("Servo Target Angle", servoTargetAngle);
     }
 

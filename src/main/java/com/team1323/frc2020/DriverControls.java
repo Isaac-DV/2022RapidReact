@@ -206,7 +206,7 @@ public class DriverControls implements Loop {
         }
            
         if(coDriver.rightTrigger.wasActivated()) {
-            turret.startRobotStateVision();
+            turret.startVision();
         } else if(coDriver.rightTrigger.wasReleased()) {
             turret.lockAngle();
         }       
