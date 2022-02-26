@@ -106,12 +106,31 @@ public class Shooter extends Subsystem {
         return encVelocity / 2048.0 * 600.0 / Constants.Shooter.kEncToOutputRatio;
     }
     
-    public double rpmToEncVelocity(double RPM) {
-        return RPM * 2048.0 / 600.0 * Constants.Shooter.kEncToOutputRatio;
+    public double rpmToEncVelocity(double rpm) {
+        return rpm * 2048.0 / 600.0 * Constants.Shooter.kEncToOutputRatio;
     }
     
-    public  boolean hasReachedSetpoint() {
+    public boolean hasReachedSetpoint() {
         return getState() == State.VELOCITY && Math.abs(targetRPM - getRPM()) < Constants.Shooter.kShooterRPMTolerance;
+    }
+
+    public static double rpmToInitialBallVelocity(double rpm) {
+        double bottomWheelAngularVelocity = rpm * Constants.Shooter.kBottomToMotorRatio / 60.0 * 2.0 * Math.PI; // radians/sec
+        double bottomWheelEdgeVelocity = bottomWheelAngularVelocity * Constants.Shooter.kBottomWheelRadius; // inches/sec
+
+        double topWheelAngularVelocity = rpm * Constants.Shooter.kBottomToMotorRatio * Constants.Shooter.kTopToBottomRatio / 60.0 * 2.0 * Math.PI; // radians/sec
+        double topWheelEdgeVelocity = topWheelAngularVelocity * Constants.Shooter.kTopWheelRadius; // inches/sec
+
+        return Constants.Shooter.kBallVelocityScrubFactor * (bottomWheelEdgeVelocity + topWheelEdgeVelocity) / 2.0;
+    }
+
+    // Inverse of the above
+    public static double initialBallVelocityToRPM(double initial_velocity) {
+        double rpm_numerator = 120.0 * initial_velocity;
+        double rpm_denominator = Constants.Shooter.kBallVelocityScrubFactor * Constants.Shooter.kBottomToMotorRatio * 
+                (Constants.Shooter.kBottomWheelRadius + Constants.Shooter.kTopToBottomRatio * Constants.Shooter.kTopWheelRadius) * 2.0 * Math.PI;
+
+        return rpm_numerator / rpm_denominator;
     }
 
     public Loop loop = new Loop() {
@@ -127,8 +146,9 @@ public class Shooter extends Subsystem {
                 case VISION:
                     Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
                     if (aim.isPresent()) {
-                        InterpolatingDouble visionRPM = Constants.kHorizontalVelocityToRPM.getInterpolated(new InterpolatingDouble(aim.get().getHorizontalVelocity()));
-                        setVelocity(visionRPM.value);
+                        setVelocity(aim.get().getShooterRPM());
+                        // Should probably move this into MotorizedHood in the future
+                        MotorizedHood.getInstance().setServoAngle(aim.get().getHoodAngle().getDegrees());
                     } else {
                         System.out.println("Vision target not visible in shooter loop!");
                     }

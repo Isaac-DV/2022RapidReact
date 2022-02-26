@@ -89,6 +89,18 @@ public class MotorizedHood extends Subsystem {
         return leftServo.getPosition();
     }
 
+    public static double physicalAngleToEmpiricalAngle(double physicalAngle) {
+        double physicalAngleOffset = physicalAngle - Constants.MotorizedHood.kMinControlAngle;
+
+        return Constants.MotorizedHood.kMaxEmpiricalAngle - physicalAngleOffset;
+    }
+
+    public static double empiricalAngleToPhysicalAngle(double empiricalAngle) {
+        double empiricalAngleOffset = Constants.MotorizedHood.kMaxEmpiricalAngle - empiricalAngle;
+
+        return Constants.MotorizedHood.kMinControlAngle + empiricalAngleOffset;
+    }
+
     public Request setAngleRequest(double desiredAngle) {
         return new Request() {
 

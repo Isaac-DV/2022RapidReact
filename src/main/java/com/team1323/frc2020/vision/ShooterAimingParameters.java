@@ -10,17 +10,19 @@ public class ShooterAimingParameters {
     double range;
     double last_seen_timestamp;
     double stability;
-    double horizontal_velocity;
     Rotation2d turret_angle;
     Translation2d turret_to_goal;
+    Rotation2d hood_angle;
+    double shooter_rpm;
     Rotation2d targetOrientation;
 
-    public ShooterAimingParameters(double range, Rotation2d turret_angle, Translation2d turret_to_goal, double horizontal_velocity,
+    public ShooterAimingParameters(double range, Rotation2d turret_angle, Translation2d turret_to_goal, Rotation2d hood_angle, double shooter_rpm,
             double last_seen_timestamp, double stability) {
         this.range = range;
         this.turret_angle = turret_angle;
         this.turret_to_goal = turret_to_goal;
-        this.horizontal_velocity = horizontal_velocity;
+        this.hood_angle = hood_angle;
+        this.shooter_rpm = shooter_rpm;
         this.last_seen_timestamp = last_seen_timestamp;
         this.stability = stability;
     }
@@ -37,8 +39,12 @@ public class ShooterAimingParameters {
         return turret_to_goal;
     }
 
-    public double getHorizontalVelocity() {
-        return horizontal_velocity;
+    public Rotation2d getHoodAngle() {
+        return hood_angle;
+    }
+
+    public double getShooterRPM() {
+        return shooter_rpm;
     }
 
     public double getLastSeenTimestamp() {

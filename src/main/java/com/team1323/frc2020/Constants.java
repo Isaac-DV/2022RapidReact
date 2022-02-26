@@ -182,26 +182,15 @@ public class Constants {
         
     }
     
-    
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kBottomShooterTreeMap = new InterpolatingTreeMap<>();
-    static {
-        // Key: Distance (inches), Value: RPM
-        kBottomShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.0));
-        kBottomShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(0.0));
-        kBottomShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(0.0));
-    }
-
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kTopShooterTreeMap = new InterpolatingTreeMap<>();
-    static {
-        // Key: Distance (inches), Value: RPM
-        kTopShooterTreeMap.put(new InterpolatingDouble(100.0), new InterpolatingDouble(0.0));
-        kTopShooterTreeMap.put(new InterpolatingDouble(160.0), new InterpolatingDouble(0.0));
-        kTopShooterTreeMap.put(new InterpolatingDouble(200.0), new InterpolatingDouble(0.0));
-    }
-    
     public static class Shooter{
         public static final double kEncToOutputRatio = 1.0;
         public static final double kBottomEncToOutputRatio = 18.0 / 24.0;
+
+        public static final double kBottomToMotorRatio = 1.0;
+        public static final double kTopToBottomRatio = 24.0 / 18.0;
+
+        public static final double kBottomWheelRadius = 2.0; // inches
+        public static final double kTopWheelRadius = 1.0; // inches
 
         //Shooter RPM 
         public static final double kCloseTopRPM = 875.0;
@@ -350,6 +339,7 @@ public class Constants {
 
         // Measured upward from the ground; corresponds to kMinControlAngle
         public static final double kMaxEmpiricalAngle = 69.5172;
+        public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
 
         public static final double kServoSpeed = 0.5; // Stroke percentage / second
 
@@ -360,157 +350,14 @@ public class Constants {
         
     }
 
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kDistanceToHorizontalVelocity = new InterpolatingTreeMap<>();
+    public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
     static {
-        // Key: Distance (inches), Value: Horizontal Velocity (inches/sec)
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(45.0), new InterpolatingDouble(83.802));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(47.0), new InterpolatingDouble(84.526));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(49.0), new InterpolatingDouble(85.432));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(51.0), new InterpolatingDouble(86.156));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(53.0), new InterpolatingDouble(87.107));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(55.0), new InterpolatingDouble(87.741));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(57.0), new InterpolatingDouble(88.511));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(59.0), new InterpolatingDouble(89.371));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(61.0), new InterpolatingDouble(90.050));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(63.0), new InterpolatingDouble(90.865));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(65.0), new InterpolatingDouble(91.725));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(67.0), new InterpolatingDouble(92.359));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(69.0), new InterpolatingDouble(93.083));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(71.0), new InterpolatingDouble(94.079));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(73.0), new InterpolatingDouble(94.668));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(75.0), new InterpolatingDouble(95.347));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(77.0), new InterpolatingDouble(96.026));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(79.0), new InterpolatingDouble(97.067));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(81.0), new InterpolatingDouble(97.656));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(83.0), new InterpolatingDouble(98.290));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(85.0), new InterpolatingDouble(98.969));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(87.0), new InterpolatingDouble(99.648));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(89.0), new InterpolatingDouble(100.327));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(91.0), new InterpolatingDouble(101.368));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(93.0), new InterpolatingDouble(101.957));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(95.0), new InterpolatingDouble(102.591));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(97.0), new InterpolatingDouble(103.225));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(99.0), new InterpolatingDouble(103.858));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(101.0), new InterpolatingDouble(104.538));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(103.0), new InterpolatingDouble(105.171));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(105.0), new InterpolatingDouble(105.850));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(107.0), new InterpolatingDouble(106.484));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(109.0), new InterpolatingDouble(107.163));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(111.0), new InterpolatingDouble(107.843));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(113.0), new InterpolatingDouble(108.522));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(115.0), new InterpolatingDouble(109.201));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(117.0), new InterpolatingDouble(109.880));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(119.0), new InterpolatingDouble(110.876));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(121.0), new InterpolatingDouble(111.510));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(123.0), new InterpolatingDouble(112.144));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(125.0), new InterpolatingDouble(112.777));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(127.0), new InterpolatingDouble(113.456));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(129.0), new InterpolatingDouble(113.638));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(131.0), new InterpolatingDouble(114.271));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(133.0), new InterpolatingDouble(114.860));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(135.0), new InterpolatingDouble(115.494));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(137.0), new InterpolatingDouble(116.082));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(139.0), new InterpolatingDouble(116.716));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(141.0), new InterpolatingDouble(117.350));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(143.0), new InterpolatingDouble(117.984));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(145.0), new InterpolatingDouble(118.572));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(147.0), new InterpolatingDouble(119.206));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(149.0), new InterpolatingDouble(119.885));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(151.0), new InterpolatingDouble(120.519));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(153.0), new InterpolatingDouble(121.198));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(155.0), new InterpolatingDouble(121.877));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(159.0), new InterpolatingDouble(122.692));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(161.0), new InterpolatingDouble(123.281));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(163.0), new InterpolatingDouble(123.869));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(165.0), new InterpolatingDouble(124.503));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(167.0), new InterpolatingDouble(125.137));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(169.0), new InterpolatingDouble(125.771));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(171.0), new InterpolatingDouble(126.495));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(175.0), new InterpolatingDouble(127.265));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(177.0), new InterpolatingDouble(127.854));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(179.0), new InterpolatingDouble(128.442));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(181.0), new InterpolatingDouble(129.121));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(183.0), new InterpolatingDouble(129.800));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(187.0), new InterpolatingDouble(130.615));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(189.0), new InterpolatingDouble(131.159));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(191.0), new InterpolatingDouble(131.792));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(193.0), new InterpolatingDouble(132.426));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(195.0), new InterpolatingDouble(133.151));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(199.0), new InterpolatingDouble(133.875));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(201.0), new InterpolatingDouble(134.464));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(203.0), new InterpolatingDouble(135.097));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(205.0), new InterpolatingDouble(135.867));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(207.0), new InterpolatingDouble(136.048));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(209.0), new InterpolatingDouble(136.546));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(211.0), new InterpolatingDouble(137.135));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(213.0), new InterpolatingDouble(137.814));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(217.0), new InterpolatingDouble(138.584));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(219.0), new InterpolatingDouble(139.172));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(221.0), new InterpolatingDouble(139.806));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(225.0), new InterpolatingDouble(140.666));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(227.0), new InterpolatingDouble(141.209));
-        kDistanceToHorizontalVelocity.put(new InterpolatingDouble(229.0), new InterpolatingDouble(141.843));
+        // Key: distance from the vision target, in inches
+        // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
+        // TODO: update these values
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle), 2200.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(140.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 6.0), 2400.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(230.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMaxControlAngle), 2400.0));
     }
 
-    public static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> kHorizontalVelocityToRPM = new InterpolatingTreeMap<>();
-    static {
-        // Key: Horizontal Velocity (inches/sec), Value: Shooter RPM
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(88.0), new InterpolatingDouble(1942.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(89.0), new InterpolatingDouble(1964.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(90.0), new InterpolatingDouble(1986.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(91.0), new InterpolatingDouble(2008.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(92.0), new InterpolatingDouble(2030.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(93.0), new InterpolatingDouble(2052.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(94.0), new InterpolatingDouble(2075.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(95.0), new InterpolatingDouble(2097.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(96.0), new InterpolatingDouble(2119.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(97.0), new InterpolatingDouble(2141.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(98.0), new InterpolatingDouble(2163.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(99.0), new InterpolatingDouble(2185.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(100.0), new InterpolatingDouble(2207.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(101.0), new InterpolatingDouble(2229.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(102.0), new InterpolatingDouble(2251.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(103.0), new InterpolatingDouble(2273.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(104.0), new InterpolatingDouble(2295.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(105.0), new InterpolatingDouble(2318.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(106.0), new InterpolatingDouble(2340.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(107.0), new InterpolatingDouble(2362.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(108.0), new InterpolatingDouble(2384.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(109.0), new InterpolatingDouble(2406.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(110.0), new InterpolatingDouble(2428.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(111.0), new InterpolatingDouble(2450.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(112.0), new InterpolatingDouble(2472.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(113.0), new InterpolatingDouble(2494.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(114.0), new InterpolatingDouble(2516.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(115.0), new InterpolatingDouble(2538.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(116.0), new InterpolatingDouble(2560.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(117.0), new InterpolatingDouble(2583.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(118.0), new InterpolatingDouble(2605.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(119.0), new InterpolatingDouble(2627.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(120.0), new InterpolatingDouble(2649.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(121.0), new InterpolatingDouble(2671.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(122.0), new InterpolatingDouble(2693.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(123.0), new InterpolatingDouble(2715.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(124.0), new InterpolatingDouble(2737.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(125.0), new InterpolatingDouble(2759.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(126.0), new InterpolatingDouble(2781.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(127.0), new InterpolatingDouble(2803.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(128.0), new InterpolatingDouble(2826.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(129.0), new InterpolatingDouble(2848.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(130.0), new InterpolatingDouble(2870.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(131.0), new InterpolatingDouble(2892.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(132.0), new InterpolatingDouble(2914.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(133.0), new InterpolatingDouble(2936.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(134.0), new InterpolatingDouble(2958.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(135.0), new InterpolatingDouble(2980.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(136.0), new InterpolatingDouble(3002.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(137.0), new InterpolatingDouble(3024.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(138.0), new InterpolatingDouble(3046.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(139.0), new InterpolatingDouble(3068.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(140.0), new InterpolatingDouble(3091.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(141.0), new InterpolatingDouble(3113.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(142.0), new InterpolatingDouble(3135.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(143.0), new InterpolatingDouble(3157.000));
-        kHorizontalVelocityToRPM.put(new InterpolatingDouble(144.0), new InterpolatingDouble(3179.000));
-    }
 }
