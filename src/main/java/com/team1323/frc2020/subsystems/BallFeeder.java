@@ -142,13 +142,13 @@ public class BallFeeder extends Subsystem {
                         isIntakeOpenLoop = true;
                     }
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        if(!isIntakeOpenLoop) {
+                        if(!isIntakeOpenLoop && !intakeFeedEnabled) {
                             intake.conformToState(Intake.ControlState.AUTO_INTAKE);
                         }
                         if(seenBallStartTimestamp == Double.POSITIVE_INFINITY) {
-                            column.conformToState(Column.ControlState.INDEX_BALLS);
+                            column.setState(Column.ControlState.INDEX_BALLS);
                             seenBallStartTimestamp = timestamp;
-                        }  
+                        }
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         setFeederOpenLoop(-0.25);
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
@@ -159,7 +159,7 @@ public class BallFeeder extends Subsystem {
                             splitterStartTimestamp = timestamp;
                         }
                     } else if (DetectedBall == Ball.None) {
-                        if(intakeFeedEnabled)
+                        if(intakeFeedEnabled) //Ensures that the intake does disable when the Intake state is enabled
                             setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
                         else
                             setFeederOpenLoop(0.0);
@@ -177,8 +177,10 @@ public class BallFeeder extends Subsystem {
             }
             if((timestamp - seenBallStartTimestamp) > 1.5) {
                 column.conformToState(Column.ControlState.OFF);
-                intake.conformToState(Intake.ControlState.OFF);
-                timestamp = Double.POSITIVE_INFINITY;
+                seenBallStartTimestamp = Double.POSITIVE_INFINITY;
+                if(!intakeFeedEnabled) {
+                    intake.conformToState(Intake.ControlState.OFF);
+                }
             }
         }
 

@@ -165,24 +165,36 @@ public class DriverControls implements Loop {
 
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
-        double coDriverLeftY = coDriver.getLeftY();
         double coDriverRightY = coDriver.getRightX();
+        double coDriverLeftY = -coDriver.getLeftY();
+        double coDriverLeftX = coDriver.getLeftX();
 
         /*if (coDriver.backButton.wasActivated()){
             s.neutralState();
             swerve.setState(Swerve.ControlState.NEUTRAL);
         }
         */
-
+        
+        if(coDriverLeftY != 0 || coDriverLeftX != 0) {
+            turret.fieldRelativeManual(coDriverLeftX, coDriverLeftY);
+        } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
+            turret.lockAngle();
+        }
+        /*
         if(coDriverLeftY != 0) {
             wrist.setOpenLoop(coDriverLeftY);
         } else if(wrist.getState() == Wrist.State.OPEN_LOOP) {
             wrist.setWristLockedAtCurrentAngle();
-        }
+        }*/
         if(coDriverRightX != 0) {
             turret.setOpenLoop(coDriverRightX);
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
+        }
+        if(coDriver.POV0.wasActivated()) {
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMaxControlAngle);
+        } else if(coDriver.POV0.wasReleased()) {
+            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
         }
 
         
@@ -208,20 +220,20 @@ public class DriverControls implements Loop {
         if(coDriver.rightTrigger.wasActivated()) {
             turret.startVision();
         } else if(coDriver.rightTrigger.wasReleased()) {
-            turret.lockAngle();
+            s.postShotState();
         }       
         if(coDriver.rightTrigger.isBeingPressed()) {
-            if(coDriver.xButton.wasActivated()) {
-                s.manualShotState(2200.0, 0.0);
-            }
             if(coDriver.yButton.wasActivated()) {
+                s.manualShotState(3150.0, 13.5);
+            }
+            if(coDriver.xButton.wasActivated()) {
                 s.visionShotState(); //2400, 6.0
             }
 
             if (coDriver.xButton.wasReleased() || coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
-        }
+        } 
 
         if(coDriver.rightBumper.wasActivated()) {
             column.conformToState(Column.ControlState.FEED_BALLS);
@@ -239,14 +251,14 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
-        
+        /*
         double testControllerLeftY = -testController.getLeftY();
         if(testControllerLeftY != 0) {
             elevator.setOpenLoop(testControllerLeftY);
             turret.setAngle(0.0);
         } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
             elevator.lockElevatorHeight();
-        }
+        }*/
     }
 
     private void oneControllerMode() {

@@ -18,7 +18,7 @@ public class MotorizedHood extends Subsystem {
     Servo rightServo;
     Servo leftServo;
     double servoTargetAngle;
-    double targetPosition = Constants.MotorizedHood.kMinControlAngle;
+    double targetPosition = 0.0;
     boolean travelingUp = false;
     double finishTimestamp = 0.0; // timestamp when the hood is predicted to reach its target position
     private static MotorizedHood instance = null;
@@ -54,7 +54,8 @@ public class MotorizedHood extends Subsystem {
         rightServo.set(percent);
         leftServo.set(percent);
 
-        double travelDistance = percent - getPosition();
+        double currentPosition = getPosition();
+        double travelDistance = percent - currentPosition;
         travelingUp = travelDistance >= 0.0;
         finishTimestamp = Timer.getFPGATimestamp() + (Math.abs(travelDistance) / Constants.MotorizedHood.kServoSpeed);
         targetPosition = percent;

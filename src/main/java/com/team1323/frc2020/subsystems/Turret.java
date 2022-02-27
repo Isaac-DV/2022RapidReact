@@ -136,7 +136,7 @@ public class Turret extends Subsystem {
             targetAngle = angle;
         
         periodicIO.demand = degreesToEncUnits(targetAngle);
-        if (currentState != ControlState.VISION && currentState != ControlState.ROBOT_STATE_VISION && currentState != ControlState.VISION_OFFSET)
+        if (currentState != ControlState.VISION && currentState != ControlState.ROBOT_STATE_VISION && currentState != ControlState.VISION_OFFSET && currentState != ControlState.FIELD_RELATIVE)
             currentState = ControlState.POSITION;
     }
     
@@ -183,11 +183,14 @@ public class Turret extends Subsystem {
     public boolean isEncoderConnected() {
         return encoder.getFrequency() != 0.0;
     }
-    public void fieldRelativeManual(double x, double y) {
+    public void fieldRelativeManual(double xInput, double yInput) {
         currentState = ControlState.FIELD_RELATIVE;
-        turretManualVector = new Translation2d(x,y);
-
-        
+        turretManualVector = new Translation2d(-xInput,yInput);
+        Rotation2d swerveRotation = swerve.pose.getRotation();
+        Rotation2d manualVectorRotation = turretManualVector.direction().rotateBy(Rotation2d.fromDegrees(-90));
+        fieldCentricRotation = swerveRotation.rotateBy(manualVectorRotation.inverse()).inverse();
+        double turretFieldRelativeAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, fieldCentricRotation.getDegrees());
+        setAngle(turretFieldRelativeAngle);
     }
 
     public void setOpenLoop(double output) {
@@ -264,8 +267,23 @@ public class Turret extends Subsystem {
                         // Compensate for the robot's velocity when aiming
                         double turretAngle = aim.get().getTurretAngle().getDegrees();
                         turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        double offsetAngle = 0;
+                        /*if (turretAngle < Constants.Turret.kMinControlAngle || turretAngle > Constants.Turret.kMaxControlAngle) {
+                            if (Math.hypot(swerve.getVelocity().dx, swerve.getVelocity().dy) < 0.01) {
+                                double offsetAngle = 0.0;
+                                if (Math.abs(getAngle() - Constants.Turret.kMaxControlAngle) < Math.abs(getAngle() - Constants.Turret.kMinControlAngle)) {
+                                    offsetAngle = Math.toDegrees(Rotation2d.fromDegrees(turretAngle).distance(Rotation2d.fromDegrees(Constants.Turret.kMaxControlAngle - 5.0)));
+                                } else {
+                                    offsetAngle = Math.toDegrees(Rotation2d.fromDegrees(turretAngle).distance(Rotation2d.fromDegrees(Constants.Turret.kMinControlAngle + 5.0)));
+                                }
+                                swerve.rotate(swerve.getPose().getRotation().getUnboundedDegrees() + offsetAngle);
+                                System.out.println("Turret vision angle = " + turretAngle + "; offsetAngle = " + offsetAngle);
+                            }
+                        }*/
+         
                         setAngle(turretAngle);
                     }
+
                     break;
                 default:
                 break;

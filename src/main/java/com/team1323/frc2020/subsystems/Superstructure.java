@@ -3,6 +3,7 @@ package com.team1323.frc2020.subsystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.RobotState;
@@ -13,6 +14,7 @@ import com.team1323.frc2020.subsystems.requests.LambdaRequest;
 import com.team1323.frc2020.subsystems.requests.ParallelRequest;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.subsystems.requests.SequentialRequest;
+import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 
@@ -251,9 +253,10 @@ public class Superstructure extends Subsystem {
 					intake.stateRequest(Intake.ControlState.INTAKE),
 					wrist.setWristIntakeRequest()
 				),
-				new ParallelRequest(
-					column.stateRequest(Column.ControlState.INDEX_BALLS)
-				)
+				new LambdaRequest(()-> {
+					column.setState(Column.ControlState.INDEX_BALLS);
+				})
+				
 			)
 		);
 	}
@@ -262,7 +265,6 @@ public class Superstructure extends Subsystem {
 			new ParallelRequest(
 				wrist.setWristAngleRequest(Constants.Wrist.kBallDebouncerAngle),
 				intake.stateRequest(Intake.ControlState.OFF),
-				ballEjector.stateRequest(BallEjector.ControlState.OFF),
 				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
 				column.stateRequest(Column.ControlState.OFF)
 			)
@@ -300,8 +302,7 @@ public class Superstructure extends Subsystem {
 					//shooter.visionVelocityRequest()
 				),
 				intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.FEED_BALLS),
-				ballFeeder.stateRequest(BallFeeder.State.FEED_BALLS)
+				column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
 	}
@@ -310,12 +311,20 @@ public class Superstructure extends Subsystem {
 			new SequentialRequest(
 				new ParallelRequest(
 					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+					swerve.setDriveMaxPowerRequest(0.75),
 					turret.robotStateVisionRequest(),
 					shooter.visionVelocityRequest() 
 				),
+				new LambdaRequest(()-> {
+					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
+					if (newRobotPose.isPresent()) {
+						swerve.resetPosition(newRobotPose.get());
+					} else {
+						System.out.println("Vision target not present when trying to update robot position!");
+					}
+				}),
 				intake.stateRequest(Intake.ControlState.INTAKE),
-				//column.stateRequest(Column.ControlState.FEED_BALLS),
-				ballFeeder.stateRequest(BallFeeder.State.FEED_BALLS)
+				column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
 	}
@@ -324,6 +333,7 @@ public class Superstructure extends Subsystem {
 			new ParallelRequest(
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
+				swerve.setDriveMaxPowerRequest(1.0),
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 				shooter.openLoopRequest(0.25),
 				intake.stateRequest(Intake.ControlState.OFF),

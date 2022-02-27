@@ -18,6 +18,7 @@ import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.InterpolatingDouble;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
@@ -48,6 +49,7 @@ public class Shooter extends Subsystem {
     }
     
     private double targetRPM = 0.0;
+    private double onTargetTimestamp = Double.POSITIVE_INFINITY;
 
     PeriodicIO periodicIO = new PeriodicIO();
     
@@ -111,7 +113,7 @@ public class Shooter extends Subsystem {
     }
     
     public boolean hasReachedSetpoint() {
-        return getState() == State.VELOCITY && Math.abs(targetRPM - getRPM()) < Constants.Shooter.kShooterRPMTolerance;
+        return !Double.isInfinite(onTargetTimestamp) && (Timer.getFPGATimestamp() - onTargetTimestamp) >= Constants.Shooter.kOnTargetDuration;
     }
 
     public static double rpmToInitialBallVelocity(double rpm) {
@@ -142,11 +144,19 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
+            boolean onTarget = getState() != State.OPEN_LOOP && Math.abs(targetRPM - getRPM()) < Constants.Shooter.kShooterRPMTolerance;
+            if (onTarget && Double.isInfinite(onTargetTimestamp)) {
+                onTargetTimestamp = timestamp;
+            } else if (!onTarget) {
+                onTargetTimestamp = Double.POSITIVE_INFINITY;
+            }
             switch (currentState) {
                 case VISION:
                     Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
                     if (aim.isPresent()) {
-                        setVelocity(aim.get().getShooterRPM());
+                        double rpm = aim.get().getShooterRPM();
+                        periodicIO.demand = rpmToEncVelocity(rpm);
+                        targetRPM = rpm;
                         // Should probably move this into MotorizedHood in the future
                         MotorizedHood.getInstance().setServoAngle(aim.get().getHoodAngle().getDegrees());
                     } else {
@@ -247,7 +257,7 @@ public class Shooter extends Subsystem {
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter RPM", getRPM());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
-
+        SmartDashboard.putString("Shooter State", getState().toString());
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);
         SmartDashboard.putBoolean("Shooter On Target", hasReachedSetpoint());*/
     }

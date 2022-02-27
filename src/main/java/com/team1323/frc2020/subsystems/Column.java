@@ -5,6 +5,8 @@
 package com.team1323.frc2020.subsystems;
 
 
+import java.util.function.BiConsumer;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -15,6 +17,7 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.AsynchronousInterrupt;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -26,6 +29,8 @@ public class Column extends Subsystem {
 
     LazyTalonFX column;
     DigitalInput banner;
+
+    boolean detectedBall = false;
     private static Column instance = null;
     public static Column getInstance() {
         if (instance == null)
@@ -43,7 +48,25 @@ public class Column extends Subsystem {
         column.setInverted(TalonFXInvertType.Clockwise);
         column.setNeutralMode(NeutralMode.Brake);
         column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
-    
+
+        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
+
+            @Override
+            public void accept(Boolean arg0, Boolean arg1) {
+                if(getState() == ControlState.INDEX_BALLS) {
+                    if(getBanner()) {
+                        column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
+                        conformToState(ControlState.OFF);
+                        detectedBall = true;
+                    } else {
+                        detectedBall = false;
+                    }
+                }
+            }
+            
+        });
+        interrupt.setInterruptEdges(true, true);
+        interrupt.enable();
     }
     public boolean getBanner() {
         return banner.get();
@@ -51,7 +74,7 @@ public class Column extends Subsystem {
 
     public enum ControlState {
         OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
-        INDEX_BALLS(Constants.Column.kFeedBallSpeed), INTAKE(Constants.Column.kFeedBallSpeed);
+        INDEX_BALLS(0.5), INTAKE(Constants.Column.kFeedBallSpeed);
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -61,7 +84,7 @@ public class Column extends Subsystem {
     public ControlState getState() {
         return currentState;
     }
-    private void setState(ControlState desiredState) {
+    public void setState(ControlState desiredState) {
         currentState = desiredState;
     }
     public void setOpenLoop(double demand) {
@@ -83,19 +106,24 @@ public class Column extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            if(getBanner() && getState() == ControlState.INDEX_BALLS) {
-                column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
-                conformToState(ControlState.OFF);
-            } else if(!getBanner() && getState() == ControlState.INDEX_BALLS) {
-                column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
-                conformToState(ControlState.INDEX_BALLS);
-            }
             switch(currentState) {
                 case FEED_BALLS:
                     if(shooter.hasReachedSetpoint()) {
+                        if(!detectedBall) {
+                            setState(ControlState.INDEX_BALLS);
+                        }
                         setOpenLoop(Constants.Column.kFeedBallSpeed);
                     } else {
                         setOpenLoop(0.0);
+                    }
+                    break;
+                case INDEX_BALLS:
+                    if(!getBanner()){
+                        detectedBall = false;
+                    }
+                    if(!getBanner() && !detectedBall) {
+                        column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
+                        conformToState(ControlState.INDEX_BALLS);
                     }
                     break;
                 default:
