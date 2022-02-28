@@ -249,27 +249,25 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					ballFeeder.intakeFeedRequest(),
+					ballFeeder.stateRequest(BallFeeder.State.DETECT),
 					intake.stateRequest(Intake.ControlState.INTAKE),
-					wrist.setWristIntakeRequest()
-				),
-				new LambdaRequest(()-> {
-					column.setState(Column.ControlState.INDEX_BALLS);
-				})
-				
+					wrist.setWristIntakeRequest(),
+					column.stateRequest(Column.ControlState.INDEX_BALLS)
+				)		
 			)
 		);
 	}
+
 	public void postIntakeState() {
 		request(
 			new ParallelRequest(
 				wrist.setWristAngleRequest(Constants.Wrist.kBallDebouncerAngle),
 				intake.stateRequest(Intake.ControlState.OFF),
-				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
-				column.stateRequest(Column.ControlState.OFF)
+				ballFeeder.stateRequest(BallFeeder.State.OFF)
 			)
 		);
 	}
+
 	public void wristStowedState() {
 		request(
 			new ParallelRequest(
@@ -277,6 +275,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+
 	public void wristLowestState() {
 		request(
 			new ParallelRequest(
@@ -284,6 +283,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+
 	public void autoRotateEjectState(boolean enabled) {
 		request(
 			new ParallelRequest(
@@ -291,6 +291,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+
 	public void manualShotState(double shooterRPM, double rawHoodAngle) {
 		request(
 			new SequentialRequest(
@@ -306,28 +307,33 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+
+	public void visionTrackState() {
+		request(
+			new ParallelRequest(
+				motorizedHood.visionRequest(),
+				turret.startVisionRequest(),
+				shooter.visionVelocityRequest()
+			)
+		);
+	}
+
 	public void visionShotState() {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
+					motorizedHood.visionRequest(),
 					swerve.setDriveMaxPowerRequest(0.75),
 					turret.robotStateVisionRequest(),
-					shooter.visionVelocityRequest() 
+					shooter.visionVelocityRequest()
 				),
-				new LambdaRequest(()-> {
-					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
-					if (newRobotPose.isPresent()) {
-						swerve.resetPosition(newRobotPose.get());
-					} else {
-						System.out.println("Vision target not present when trying to update robot position!");
-					}
-				}),
+				turret.robotStateVisionRequest(),
 				intake.stateRequest(Intake.ControlState.INTAKE),
 				column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
 	}
+
 	public void postShotState() {
 		request(
 			new ParallelRequest(
@@ -337,6 +343,14 @@ public class Superstructure extends Subsystem {
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 				shooter.openLoopRequest(0.25),
 				intake.stateRequest(Intake.ControlState.OFF),
+				new LambdaRequest(()-> {
+					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
+					if (newRobotPose.isPresent()) {
+						swerve.resetPosition(newRobotPose.get());
+					} else {
+						System.out.println("Vision target not present when trying to update robot position!");
+					}
+				}),
 				new LambdaRequest(() -> {
 					if (turret.getState() == Turret.ControlState.ROBOT_STATE_VISION) {
 						turret.startVision();
@@ -344,6 +358,25 @@ public class Superstructure extends Subsystem {
 						turret.lockAngle();
 					}
 				})
+			)
+		);
+	}
+	public void intakeAndTrackState() {
+		request(
+			new ParallelRequest(
+				new SequentialRequest(
+					new ParallelRequest(
+						motorizedHood.visionRequest(),
+						turret.startVisionRequest(),
+						shooter.visionVelocityRequest()
+					)
+				),
+				new SequentialRequest(
+					ballFeeder.intakeFeedRequest(),
+					wrist.setWristIntakeRequest(),
+					intake.stateRequest(Intake.ControlState.INTAKE),
+					new LambdaRequest(()-> column.setState(Column.ControlState.INDEX_BALLS))
+				)
 			)
 		);
 	}

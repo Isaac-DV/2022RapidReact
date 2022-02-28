@@ -4,9 +4,15 @@
 
 package com.team1323.frc2020.subsystems;
 
+import java.util.Optional;
+
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.loops.ILooper;
+import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.Util;
 
 import edu.wpi.first.wpilibj.Servo;
@@ -29,6 +35,17 @@ public class MotorizedHood extends Subsystem {
         return instance;
     }
 
+    public enum State {
+        POSITION, VISION
+    }
+    private State currentState = State.POSITION;
+    public State getState() {
+        return currentState;
+    }
+    public void setState(State newState) {
+        currentState = newState;
+    }
+
     public MotorizedHood() {
         rightServo = new Servo(Ports.HOOD_RIGHT_SERVO);
         leftServo = new Servo(Ports.HOOD_LEFT_SERVO);
@@ -36,10 +53,10 @@ public class MotorizedHood extends Subsystem {
         rightServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         leftServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
-        setServoAngle(Constants.MotorizedHood.kMinControlAngle);
+        setAngle(Constants.MotorizedHood.kMinControlAngle);
     }
     
-    public void setServoAngle(double angle) {
+    private void setServoAngle(double angle) {
         angle = Util.limit(angle, Constants.MotorizedHood.kMinControlAngle, Constants.MotorizedHood.kMaxControlAngle);
         servoTargetAngle = angle;
 
@@ -50,7 +67,7 @@ public class MotorizedHood extends Subsystem {
         setServoPercentage(oppositeSideLength);
     }
 
-    public void setServoPercentage(double percent) {
+    private void setServoPercentage(double percent) {
         rightServo.set(percent);
         leftServo.set(percent);
 
@@ -59,6 +76,11 @@ public class MotorizedHood extends Subsystem {
         travelingUp = travelDistance >= 0.0;
         finishTimestamp = Timer.getFPGATimestamp() + (Math.abs(travelDistance) / Constants.MotorizedHood.kServoSpeed);
         targetPosition = percent;
+    }
+
+    public void setAngle(double angle) {
+        setState(State.POSITION);
+        setServoAngle(angle);
     }
 
     public double getPosition() {
@@ -101,14 +123,65 @@ public class MotorizedHood extends Subsystem {
 
         return Constants.MotorizedHood.kMinControlAngle + empiricalAngleOffset;
     }
+    public boolean hasReachedAngle() {
+        return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
+    }
+
+    private Loop loop = new Loop() {
+
+        @Override
+        public void onStart(double timestamp) {
+            
+        }
+
+        @Override
+        public void onLoop(double timestamp) {
+            switch (currentState) {
+                case VISION:
+                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+                    if (aim.isPresent()) {
+                        setServoAngle(aim.get().getHoodAngle().getDegrees());
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        @Override
+        public void onStop(double timestamp) {
+            
+        }
+
+    };
+
+    @Override
+    public void registerEnabledLoops(ILooper enabledLooper) {
+        enabledLooper.register(loop);
+    }
 
     public Request setAngleRequest(double desiredAngle) {
         return new Request() {
 
             @Override
             public void act() {
-                setServoAngle(desiredAngle);
+                setAngle(desiredAngle);
             }
+            @Override
+            public boolean isFinished() {
+                return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
+            }
+        };
+    }
+
+    public Request visionRequest() {
+        return new Request() {
+
+            @Override
+            public void act() {
+                setState(State.VISION);
+            }
+
             @Override
             public boolean isFinished() {
                 return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;

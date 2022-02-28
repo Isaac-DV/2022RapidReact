@@ -111,6 +111,8 @@ public class TrajectoryGenerator {
         // Auto Paths
         public final Trajectory<TimedState<Pose2dWithCurvature>> firstBallBackup;
         public final Trajectory<TimedState<Pose2dWithCurvature>> firstBallToHumanPlayer;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> firstBallToSecondBall;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> secondBallToHumanPlayer;
         public final Trajectory<TimedState<Pose2dWithCurvature>> humanPlayerToSecondBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> firstBallToOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> opponentBallToHumanPlayer;
@@ -124,6 +126,8 @@ public class TrajectoryGenerator {
             // Auto Paths
             firstBallBackup = getFirstBallBackup();
             firstBallToHumanPlayer = getFirstBallToHumanPlayer();
+            firstBallToSecondBall = getFirstBallToSecondBall();
+            secondBallToHumanPlayer = getSecondBallToHumanPlayer();
             humanPlayerToSecondBall = getHumanPlayerToSecondBall();
             firstBallToOpponentBall = getFirstBallToOpponentBall();
             opponentBallToHumanPlayer = getOpponentBallToHumanPlayer();
@@ -143,6 +147,22 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(autoStartingPose);
             waypoints.add(firstBallPickupPose);
+            
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFirstBallToSecondBall(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(firstBallPickupPose.getTranslation(), Rotation2d.fromDegrees(-90.0)));
+            waypoints.add(secondBallPickupPose);
+            
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getSecondBallToHumanPlayer(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(secondBallPickupPose);
+            waypoints.add(humanPlayerPickupPose);
             
             return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
         }

@@ -26,6 +26,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Add your docs here. */
 public class Column extends Subsystem {
     Shooter shooter;
+    Turret turret;
+    MotorizedHood motorizedHood;
+
 
     LazyTalonFX column;
     DigitalInput banner;
@@ -39,6 +42,8 @@ public class Column extends Subsystem {
     }
     public Column() {
         shooter = Shooter.getInstance();
+        turret = Turret.getInstance();
+        motorizedHood = MotorizedHood.getInstance();
 
         column = new LazyTalonFX(Ports.COLUMN, "main");
         banner = new DigitalInput(Ports.COLUMN_BANNER);
@@ -56,14 +61,10 @@ public class Column extends Subsystem {
                 if(getState() == ControlState.INDEX_BALLS) {
                     if(getBanner()) {
                         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
-                        conformToState(ControlState.OFF);
-                        detectedBall = true;
-                    } else {
-                        detectedBall = false;
+                        setOpenLoop(0.0);
                     }
                 }
-            }
-            
+            }        
         });
         interrupt.setInterruptEdges(true, true);
         interrupt.enable();
@@ -108,22 +109,18 @@ public class Column extends Subsystem {
         public void onLoop(double timestamp) {
             switch(currentState) {
                 case FEED_BALLS:
-                    if(shooter.hasReachedSetpoint()) {
-                        if(!detectedBall) {
-                            setState(ControlState.INDEX_BALLS);
-                        }
+                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()) {
                         setOpenLoop(Constants.Column.kFeedBallSpeed);
                     } else {
                         setOpenLoop(0.0);
                     }
                     break;
                 case INDEX_BALLS:
-                    if(!getBanner()){
-                        detectedBall = false;
-                    }
-                    if(!getBanner() && !detectedBall) {
+                    if(!getBanner()) {
                         column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
-                        conformToState(ControlState.INDEX_BALLS);
+                        setOpenLoop(1.0);
+                    } else if(getBanner()) {
+                        setOpenLoop(0.0);
                     }
                     break;
                 default:

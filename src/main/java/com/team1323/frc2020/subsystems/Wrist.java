@@ -106,11 +106,6 @@ public class Wrist extends Subsystem {
         setAngle(angle);
     }
     public void setWristLocked() {
-        System.out.println("Wrist Target at " + wristTargetAngle);
-        setState(State.LOCK);
-        setAngle(wristTargetAngle);
-    }
-    public void setWristLockedAtCurrentAngle() {
         setState(State.LOCK);
         setAngle(encUnitsToDegrees(periodicIO.position));
     }

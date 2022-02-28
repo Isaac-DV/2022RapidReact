@@ -119,7 +119,7 @@ public class BallSplitter extends Subsystem {
         EjectLocations closestLocation = EjectLocations.TEAM_HANGER;
         for(EjectLocations ejectLocation : ejectLocationsArray) {
             double locationMagnitude = ejectLocation.location.translateBy(swerve.pose.getTranslation().inverse()).norm();
-            if(locationMagnitude < Constants.BallSplitter.kEjectorLength && !locationFound) {
+            if(locationMagnitude < Constants.BallSplitter.kD2F && !locationFound) {
                 bestEjectLocation = ejectLocation;
                 locationFound = true;
             }

@@ -157,9 +157,9 @@ public class Constants {
         public static final double kMaxInitialAngle = 60.0;
         public static final double kTrackingOffset = 2.0; //3.0 = Close
         
-        public static final double kP = 0.25;
+        public static final double kP = 0.25; // 0.25
         public static final double kI = 0.0;
-        public static final double kD = 0.0;
+        public static final double kD = 2.5; //2.5
         public static final double kF = 1023.0 / kMaxSpeed;
         
         // Turret pose with respect to the robot's center
@@ -210,8 +210,8 @@ public class Constants {
         public static final double kShooterD = 2.0;
         public static final double kShooterF = 0.051; //0.051
 
-        public static final double kShooterRPMTolerance = 50.0;
-        public static final double kOnTargetDuration = 0.15;//Theoretical min is 0.1
+        public static final double kShooterRPMTolerance = 150.0; //50
+        public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
         public static final double kBallVelocityScrubFactor = 310.5153 / 418.879;
     }
@@ -350,7 +350,7 @@ public class Constants {
         public static final double kAngleTolerance = 1.0; // degrees
     }
     public static class BallSplitter {
-        public static final double kEjectorLength = 64; //The length in which the ball is fired from the ejectors, in inches
+        public static final double kD2F = 64; //Distance to Target : The length in which the ball is fired from the ejectors, in inches
         
     }
 
@@ -360,6 +360,7 @@ public class Constants {
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
         kDistanceToShotVectorMap.put(new InterpolatingDouble(80.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle), 2200.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(100.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 5.0), 2275.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(108.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 5.5), 2225.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(120.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 6.0), 2350.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(140.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 5.5), 2450.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(160.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 6.0), 2575.0));

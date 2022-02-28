@@ -106,8 +106,8 @@ public class SwerveDriveModule extends Subsystem{
 	
 	private void configureMotors(){
 
-		rotationMotor.configFactoryDefault();
-		driveMotor.configFactoryDefault();
+		//rotationMotor.configFactoryDefault();
+		//driveMotor.configFactoryDefault();
 
 		rotationMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
 		/*

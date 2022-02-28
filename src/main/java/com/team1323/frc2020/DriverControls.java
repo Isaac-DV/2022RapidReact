@@ -108,6 +108,8 @@ public class DriverControls implements Loop {
             swerve.setNominalDriveOutput(0.0);
             swerve.set10VoltRotationMode(false);
         }
+        motorizedHood.setState(MotorizedHood.State.VISION);
+        wrist.setWristLocked();
     }
 
     @Override
@@ -192,16 +194,23 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
         if(coDriver.POV0.wasActivated()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMaxControlAngle);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMaxControlAngle);
         } else if(coDriver.POV0.wasReleased()) {
-            motorizedHood.setServoAngle(Constants.MotorizedHood.kMinControlAngle);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
         }
 
         
         if(coDriver.aButton.wasActivated()) {
-            s.intakeState();
+            intake.conformToState(Intake.ControlState.INTAKE);
+            wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+            ballFeeder.setState(BallFeeder.State.DETECT);
+            if(column.getState() != Column.ControlState.FEED_BALLS) {
+                column.setState(Column.ControlState.INDEX_BALLS);
+            }
         } else if(coDriver.aButton.wasReleased()) {
-            s.postIntakeState();
+            intake.conformToState(Intake.ControlState.OFF);
+            wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+            ballFeeder.queueShutdown(true);
         }
 
         if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
@@ -217,23 +226,26 @@ public class DriverControls implements Loop {
             s.disableState();
         }
            
-        if(coDriver.rightTrigger.wasActivated()) {
+        if(coDriver.leftTrigger.wasActivated()) {
             turret.startVision();
+        }
+
+        if(coDriver.rightTrigger.wasActivated()) {
+            s.visionShotState();
         } else if(coDriver.rightTrigger.wasReleased()) {
             s.postShotState();
-        }       
-        if(coDriver.rightTrigger.isBeingPressed()) {
-            if(coDriver.yButton.wasActivated()) {
-                s.manualShotState(3150.0, 13.5);
-            }
-            if(coDriver.xButton.wasActivated()) {
-                s.visionShotState(); //2400, 6.0
-            }
-
-            if (coDriver.xButton.wasReleased() || coDriver.yButton.wasReleased()) {
-                s.postShotState();
-            }
-        } 
+        }
+        if(coDriver.yButton.wasActivated()) {
+            s.manualShotState(2950.0, 12.5);
+        } else if(coDriver.yButton.wasReleased()) {
+            s.postShotState();
+        }
+        
+        if(coDriver.xButton.wasActivated()) {
+            s.manualShotState(2250, 5.5); //2400, 6.0
+        } else if (coDriver.xButton.wasReleased()) {
+            s.postShotState();
+        }
 
         if(coDriver.rightBumper.wasActivated()) {
             column.conformToState(Column.ControlState.FEED_BALLS);
@@ -249,6 +261,9 @@ public class DriverControls implements Loop {
         
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
+        }
+        if(coDriver.startButton.wasActivated()) {
+            turret.lockAngle();
         }
 
         /*

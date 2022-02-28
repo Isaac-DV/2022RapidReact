@@ -157,8 +157,6 @@ public class Shooter extends Subsystem {
                         double rpm = aim.get().getShooterRPM();
                         periodicIO.demand = rpmToEncVelocity(rpm);
                         targetRPM = rpm;
-                        // Should probably move this into MotorizedHood in the future
-                        MotorizedHood.getInstance().setServoAngle(aim.get().getHoodAngle().getDegrees());
                     } else {
                         System.out.println("Vision target not visible in shooter loop!");
                     }

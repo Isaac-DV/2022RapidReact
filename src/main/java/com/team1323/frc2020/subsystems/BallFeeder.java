@@ -95,6 +95,9 @@ public class BallFeeder extends Subsystem {
         return currentState;
     }
     public void setState(State desiredState) {
+        if (desiredState == State.DETECT) {
+            pendingShutdown = false;
+        }
         currentState = desiredState;
     }
 
@@ -110,6 +113,11 @@ public class BallFeeder extends Subsystem {
     }
     public boolean isColorSensorRed() {
         return !colorSensor.get();
+    }
+
+    private boolean pendingShutdown = false;
+    public void queueShutdown(boolean shutdown) {
+        pendingShutdown = shutdown;
     }
     
 
@@ -135,53 +143,33 @@ public class BallFeeder extends Subsystem {
                     setFeederOpenLoop(0.0);
                     break;
                 case DETECT:
-                    if(intake.getState() == Intake.ControlState.OFF) {
-                        intakeFeedEnabled = false;
-                        isIntakeOpenLoop = false;
-                    } else if(intake.getState() != Intake.ControlState.EJECT) {
-                        isIntakeOpenLoop = true;
-                    }
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        if(!isIntakeOpenLoop && !intakeFeedEnabled) {
-                            intake.conformToState(Intake.ControlState.AUTO_INTAKE);
-                        }
-                        if(seenBallStartTimestamp == Double.POSITIVE_INFINITY) {
-                            column.setState(Column.ControlState.INDEX_BALLS);
-                            seenBallStartTimestamp = timestamp;
-                        }
-                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         setFeederOpenLoop(-0.25);
+                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
-                        intake.conformToState(Intake.ControlState.AUTO_INTAKE);
+                        setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
-                        setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
-                        if(splitterStartTimestamp == Double.POSITIVE_INFINITY) {
+                        if (Double.isInfinite(splitterStartTimestamp)) {
                             splitterStartTimestamp = timestamp;
                         }
                     } else if (DetectedBall == Ball.None) {
-                        if(intakeFeedEnabled) //Ensures that the intake does disable when the Intake state is enabled
-                            setFeederOpenLoop(Constants.Intake.kIntakeSpeed);
-                        else
-                            setFeederOpenLoop(0.0);
+                        setFeederOpenLoop(1.0);
                     }
+                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > 1.5) {
+                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                        splitterStartTimestamp = Double.POSITIVE_INFINITY;
+                    }
+
+                    if (pendingShutdown && DetectedBall == Ball.None && Double.isInfinite(splitterStartTimestamp)) {
+                        setState(State.OFF);
+                        pendingShutdown = false;
+                    }
+
                     break;               
                 default:
                     break;
             }    
-            if((timestamp - splitterStartTimestamp) > 3.0) { //0.33
-                ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                if(intake.getState() == Intake.ControlState.AUTO_INTAKE && !intakeFeedEnabled) {
-                    intake.conformToState(Intake.ControlState.OFF);
-                }        
-                splitterStartTimestamp = Double.POSITIVE_INFINITY;
-            }
-            if((timestamp - seenBallStartTimestamp) > 1.5) {
-                column.conformToState(Column.ControlState.OFF);
-                seenBallStartTimestamp = Double.POSITIVE_INFINITY;
-                if(!intakeFeedEnabled) {
-                    intake.conformToState(Intake.ControlState.OFF);
-                }
-            }
+            
         }
 
         @Override
@@ -195,8 +183,6 @@ public class BallFeeder extends Subsystem {
             @Override
             public void act() {
                 setState(State.DETECT);
-                intakeFeedEnabled = true;
-                setFeederOpenLoop(1.0);
             }
         };
     }

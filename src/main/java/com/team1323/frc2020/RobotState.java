@@ -182,9 +182,6 @@ public class RobotState {
 				Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
 				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy));
 
-				//double compensation_angle_degrees = Math.toDegrees(moving_shot_vector.direction().distance(stationary_shot_vector.direction()));
-				//if (Math.abs(moving_shot_vector.direction().distance(stationary_shot_vector.direction())) >= )
-				//System.out.println("Translation compensation angle: " + compensation_angle_degrees);
 				Rotation2d hood_angle = Rotation2d.fromDegrees(MotorizedHood.empiricalAngleToPhysicalAngle(Math.toDegrees(Math.atan(initial_ball_velocity.y() / moving_shot_vector.norm()))));
 				double shooter_rpm = Shooter.initialBallVelocityToRPM(Math.hypot(moving_shot_vector.norm(), initial_ball_velocity.y()));
 				/*ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
@@ -215,6 +212,15 @@ public class RobotState {
 			} else {
 				return Optional.empty();
 			}
+		}
+
+		public synchronized Translation2d getTurretToCenterOfField() {
+			Pose2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime)
+						.transformBy(kVehicleToTurretFixed).inverse();
+			Pose2d latest_turret_fixed_to_cof = latest_turret_fixed_to_field
+						.transformBy(Pose2d.fromTranslation(Constants.kCenterOfField));
+			
+			return latest_turret_fixed_to_cof.getTranslation();
 		}
 		
 		public synchronized Optional<Pose2d> getRobotScoringPosition(Optional<ShooterAimingParameters> aimingParameters, Rotation2d orientation, Translation2d endTranslation){
