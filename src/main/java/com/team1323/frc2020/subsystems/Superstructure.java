@@ -296,7 +296,7 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle + rawHoodAngle),
+					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMaxControlAngle + rawHoodAngle),
 					turret.robotStateVisionRequest(),
 					shooter.velocityRequest(shooterRPM) //2200 - Mid //2100 - Close //2400
 					

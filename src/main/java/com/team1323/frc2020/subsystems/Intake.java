@@ -5,6 +5,7 @@
 package com.team1323.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
@@ -32,10 +33,11 @@ public class Intake extends Subsystem {
         intake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 1000);
         intake.setInverted(TalonFXInvertType.Clockwise);
         intake.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
+        intake.setNeutralMode(NeutralMode.Coast);
     }
 
     public enum ControlState {
-        OFF(0.0), INTAKE(Constants.Intake.kIntakeSpeed), AUTO_INTAKE(Constants.Intake.kIntakeSpeed), EJECT(-1.0);
+        OFF(0.0), INTAKE(Constants.Intake.kIntakeSpeed), EJECT(-1.0), AUTO_FEED_INTAKE(Constants.Intake.kIntakeSpeed);
         double speed;
         ControlState(double speed){
             this.speed = speed;

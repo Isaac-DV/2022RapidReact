@@ -26,7 +26,8 @@ public class Ports {
     public static final int COLUMN = 5;
     public static final int TURRET = 14;    
     //public static final int SHOOTER_TOP = 7;
-    public static final int SHOOTER_BOTTOM = 7;
+    public static final int SHOOTER_LEFT = 20;
+    public static final int SHOOTER_RIGHT = 7;
     public static final int ELEVATOR = 16;
 
 

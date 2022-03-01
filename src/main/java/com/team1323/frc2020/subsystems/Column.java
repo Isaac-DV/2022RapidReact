@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.AsynchronousInterrupt;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
@@ -34,6 +35,8 @@ public class Column extends Subsystem {
     DigitalInput banner;
 
     boolean detectedBall = false;
+    double ballDetectedTimestamp = Double.POSITIVE_INFINITY;
+
     private static Column instance = null;
     public static Column getInstance() {
         if (instance == null)
@@ -62,7 +65,11 @@ public class Column extends Subsystem {
                     if(getBanner()) {
                         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                         setOpenLoop(0.0);
+                        ballDetectedTimestamp = Timer.getFPGATimestamp();
                     }
+                }
+                if(getBanner()) {
+                    ballDetectedTimestamp = Timer.getFPGATimestamp();
                 }
             }        
         });
@@ -109,8 +116,10 @@ public class Column extends Subsystem {
         public void onLoop(double timestamp) {
             switch(currentState) {
                 case FEED_BALLS:
-                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()) {
+                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()
+                            && (timestamp - ballDetectedTimestamp) > 0.125 && !Double.isInfinite(ballDetectedTimestamp)) {
                         setOpenLoop(Constants.Column.kFeedBallSpeed);
+                        ballDetectedTimestamp = Double.POSITIVE_INFINITY;
                     } else {
                         setOpenLoop(0.0);
                     }

@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
     
-    LazyTalonFX master;
+    LazyTalonFX master, slave;
     List<LazyTalonFX> motors;
     
     private static Shooter instance = null;
@@ -54,9 +54,10 @@ public class Shooter extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
     
     private Shooter() {
-        master = new LazyTalonFX(Ports.SHOOTER_BOTTOM, "main");
+        master = new LazyTalonFX(Ports.SHOOTER_LEFT, "main"); //The leftMotor(Looking from the back of the turret)
+        slave = new LazyTalonFX(Ports.SHOOTER_RIGHT, "main"); //The rightMotor(Looking from the back of the turret)
 
-        motors = Arrays.asList(master);
+        motors = Arrays.asList(master, slave);
         
         for (LazyTalonFX motor : motors) {
             motor.setNeutralMode(NeutralMode.Coast);
@@ -64,27 +65,43 @@ public class Shooter extends Subsystem {
             motor.enableVoltageCompensation(true);
             motor.configClosedloopRamp(0.0, Constants.kCANTimeoutMs);
             motor.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
+            motor.configForwardSoftLimitThreshold(9999999);
+            motor.configForwardSoftLimitEnable(false);
         }
         
         master.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
         master.selectProfileSlot(0, 0);
         master.config_IntegralZone(0, rpmToEncVelocity(200.0));
-        //PID Needs to be tuned
         master.config_kP(0, Constants.Shooter.kShooterP);
         master.config_kI(0, Constants.Shooter.kShooterI);
         master.config_kD(0, Constants.Shooter.kShooterD);
-        master.config_kF(0, Constants.Shooter.kShooterF);
-        
+        master.config_kF(0, Constants.Shooter.kShooterF);  
         master.config_kP(1, 0.15);
         master.config_kI(1, 0.0);
         master.config_kD(1, 0.0);
         master.config_kF(1, Constants.Shooter.kShooterF);
-
         master.setInverted(TalonFXInvertType.CounterClockwise);
-
         master.configPeakOutputReverse(0.0, 10);
         master.setNeutralMode(NeutralMode.Coast);
 
+
+
+        slave.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
+        slave.selectProfileSlot(0, 0);
+        slave.config_IntegralZone(0, rpmToEncVelocity(200.0));
+        slave.config_kP(0, Constants.Shooter.kShooterP);
+        slave.config_kI(0, Constants.Shooter.kShooterI);
+        slave.config_kD(0, Constants.Shooter.kShooterD);
+        slave.config_kF(0, Constants.Shooter.kShooterF); 
+        slave.config_kP(1, 0.15);
+        slave.config_kI(1, 0.0);
+        slave.config_kD(1, 0.0);
+        slave.config_kF(1, Constants.Shooter.kShooterF);
+        slave.setInverted(TalonFXInvertType.Clockwise);
+        slave.configPeakOutputReverse(0.0, 10);
+        slave.setNeutralMode(NeutralMode.Coast);
+
+        slave.set(ControlMode.Follower, Ports.SHOOTER_LEFT);
         setOpenLoop(0.0);
     }
 
@@ -100,8 +117,11 @@ public class Shooter extends Subsystem {
         targetRPM = rpm;
     }
     
-    public double getRPM() {
-        return encVelocityToRPM(periodicIO.velocity);
+    public double getLeftRPM() {
+        return encVelocityToRPM(periodicIO.leftVelocity);
+    }
+    public double getRightRPM() {
+        return encVelocityToRPM(periodicIO.rightVelocity);
     }
     
     public double encVelocityToRPM(double encVelocity) {
@@ -144,7 +164,7 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            boolean onTarget = getState() != State.OPEN_LOOP && Math.abs(targetRPM - getRPM()) < Constants.Shooter.kShooterRPMTolerance;
+            boolean onTarget = getState() != State.OPEN_LOOP && Math.abs(targetRPM - getLeftRPM()) < Constants.Shooter.kShooterRPMTolerance;
             if (onTarget && Double.isInfinite(onTargetTimestamp)) {
                 onTargetTimestamp = timestamp;
             } else if (!onTarget) {
@@ -189,7 +209,7 @@ public class Shooter extends Subsystem {
 
             @Override
             public boolean isFinished() {
-                return hasReachedSetpoint();
+                return true/*hasReachedSetpoint()*/;
             }
 
         };
@@ -238,7 +258,8 @@ public class Shooter extends Subsystem {
 
     @Override
     public void readPeriodicInputs() {
-        periodicIO.velocity = master.getSelectedSensorVelocity();
+        periodicIO.leftVelocity = master.getSelectedSensorVelocity();
+        periodicIO.rightVelocity = slave.getSelectedSensorVelocity();
         periodicIO.current = master.getStatorCurrent();
     }
 
@@ -253,9 +274,15 @@ public class Shooter extends Subsystem {
     
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Shooter RPM", getRPM());
+        SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
+        SmartDashboard.putNumber("Shooter Right RPM", getRightRPM());
+
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
         SmartDashboard.putString("Shooter State", getState().toString());
+
+        SmartDashboard.putNumber("Shooter Left Commanded Input", master.getMotorOutputPercent());
+        SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
+        SmartDashboard.putString("Shooter State", currentState.toString());
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);
         SmartDashboard.putBoolean("Shooter On Target", hasReachedSetpoint());*/
     }
@@ -267,7 +294,8 @@ public class Shooter extends Subsystem {
 
     private static class PeriodicIO {
         // Inputs
-        public double velocity = 0.0;
+        public double rightVelocity = 0.0;
+        public double leftVelocity = 0.0;
         public double voltage = 0.0;
         public double current = 0.0;
 

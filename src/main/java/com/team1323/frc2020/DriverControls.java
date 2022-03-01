@@ -218,6 +218,13 @@ public class DriverControls implements Loop {
         }else if(coDriver.bButton.shortReleased()) {
             s.wristLowestState();
         }
+
+        if(coDriver.xButton.wasActivated()) {
+            s.manualShotState(1600.0, 0);
+            //shooter.setOpenLoop(1.0);
+        } else if(coDriver.xButton.wasReleased()) {
+            s.postShotState();
+        }
         
 
         if(coDriver.leftBumper.wasActivated()) {
@@ -241,14 +248,9 @@ public class DriverControls implements Loop {
             s.postShotState();
         }
         
-        if(coDriver.xButton.wasActivated()) {
-            s.manualShotState(2250, 5.5); //2400, 6.0
-        } else if (coDriver.xButton.wasReleased()) {
-            s.postShotState();
-        }
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.conformToState(Column.ControlState.FEED_BALLS);
+            column.conformToState(Column.ControlState.INTAKE);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
         }

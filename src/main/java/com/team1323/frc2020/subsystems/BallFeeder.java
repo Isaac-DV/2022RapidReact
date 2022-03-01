@@ -33,7 +33,7 @@ public class BallFeeder extends Subsystem {
 
     DigitalInput banner, colorSensor;
 
-    double seenBallStartTimestamp = Double.POSITIVE_INFINITY;
+    double intakeStartTimestamp = Double.POSITIVE_INFINITY;
     double splitterStartTimestamp = Double.POSITIVE_INFINITY;
     boolean intakeFeedEnabled = false;
     boolean isIntakeOpenLoop = false;
@@ -146,6 +146,11 @@ public class BallFeeder extends Subsystem {
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
                         setFeederOpenLoop(-0.25);
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+
+                        if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
+                            intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
+                        }
+                        intakeStartTimestamp = timestamp;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
@@ -168,7 +173,14 @@ public class BallFeeder extends Subsystem {
                     break;               
                 default:
                     break;
-            }    
+            }
+            if((timestamp - intakeStartTimestamp) > 0.5) {
+                if(intake.getState() == Intake.ControlState.AUTO_FEED_INTAKE) { //If the intake is in any other state besides the autoFeedMode, it will not disable
+                    intake.conformToState(Intake.ControlState.OFF);
+                }
+                intakeStartTimestamp = Double.POSITIVE_INFINITY;
+            }
+
             
         }
 
