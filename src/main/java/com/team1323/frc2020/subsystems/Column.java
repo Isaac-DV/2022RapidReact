@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
@@ -36,6 +37,7 @@ public class Column extends Subsystem {
 
     boolean detectedBall = false;
     double ballDetectedTimestamp = Double.POSITIVE_INFINITY;
+    double targetRPM = 0.0;
 
     private static Column instance = null;
     public static Column getInstance() {
@@ -55,7 +57,14 @@ public class Column extends Subsystem {
         column.enableVoltageCompensation(true);
         column.setInverted(TalonFXInvertType.Clockwise);
         column.setNeutralMode(NeutralMode.Brake);
-        column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
+        column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
+        column.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
+
+        column.config_kP(0, 0.2, Constants.kCANTimeoutMs); //0.2
+        column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0
+        column.config_kD(0, 4.0, Constants.kCANTimeoutMs); //4.0
+        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
+        column.selectProfileSlot(0, 0);
 
         AsynchronousInterrupt interrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
 
@@ -63,13 +72,16 @@ public class Column extends Subsystem {
             public void accept(Boolean arg0, Boolean arg1) {
                 if(getState() == ControlState.INDEX_BALLS) {
                     if(getBanner()) {
-                        column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
+                        //column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                         setOpenLoop(0.0);
-                        ballDetectedTimestamp = Timer.getFPGATimestamp();
+                        detectedBall = true;
                     }
                 }
                 if(getBanner()) {
                     ballDetectedTimestamp = Timer.getFPGATimestamp();
+                } else {
+                    ballDetectedTimestamp = Double.POSITIVE_INFINITY;
+                    detectedBall = false;
                 }
             }        
         });
@@ -82,7 +94,7 @@ public class Column extends Subsystem {
 
     public enum ControlState {
         OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
-        INDEX_BALLS(0.5), INTAKE(Constants.Column.kFeedBallSpeed);
+        INDEX_BALLS(0.5), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -98,6 +110,18 @@ public class Column extends Subsystem {
     public void setOpenLoop(double demand) {
         column.set(ControlMode.PercentOutput, demand);
     }
+    public void setVelocity(double rpm) {
+        setState(ControlState.VELOCITY);
+        targetRPM = rpm;
+        column.set(ControlMode.Velocity, getRPMToEncVelocity(rpm));
+    }
+    public double getRPMToEncVelocity(double rpm) {
+        return rpm * 2048.0 / 600.0 * 1.0;
+    }
+    public synchronized double encVelocityToRPM(double encVelocity) {
+        return encVelocity / 2048.0 * 600.0 / 1.0;
+    }
+
     public void conformToState(ControlState desiredState, double demand) {
         setState(desiredState);
         setOpenLoop(demand);
@@ -119,18 +143,25 @@ public class Column extends Subsystem {
                     if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()
                             && (timestamp - ballDetectedTimestamp) > 0.125 && !Double.isInfinite(ballDetectedTimestamp)) {
                         setOpenLoop(Constants.Column.kFeedBallSpeed);
-                        ballDetectedTimestamp = Double.POSITIVE_INFINITY;
+                    } else if(!detectedBall) {
+                        setOpenLoop(1.0);
                     } else {
                         setOpenLoop(0.0);
                     }
                     break;
                 case INDEX_BALLS:
-                    if(!getBanner()) {
-                        column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
+                    if(!getBanner() && !detectedBall) {
+                        //column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
                         setOpenLoop(1.0);
-                    } else if(getBanner()) {
+                    } else if(getBanner() && detectedBall) {
+                        //column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                         setOpenLoop(0.0);
                     }
+                    
+                    if(getBanner() != detectedBall) {
+                        detectedBall = !detectedBall;
+                    }
+
                     break;
                 default:
                 break;
@@ -140,7 +171,6 @@ public class Column extends Subsystem {
 
         @Override
         public void onStop(double timestamp) {
-            // TODO Auto-generated method stub
             
         }
         
@@ -162,6 +192,9 @@ public class Column extends Subsystem {
     public void outputTelemetry() {
         SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
         SmartDashboard.putString("Column State", getState().toString());
+        SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
+        SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
+        SmartDashboard.putNumber("Column RPM Target", targetRPM);
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

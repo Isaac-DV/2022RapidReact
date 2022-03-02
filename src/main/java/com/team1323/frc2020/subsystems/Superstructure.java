@@ -268,22 +268,6 @@ public class Superstructure extends Subsystem {
 		);
 	}
 
-	public void wristStowedState() {
-		request(
-			new ParallelRequest(
-				wrist.setWristStowedRequest()
-			)
-		);
-	}
-
-	public void wristLowestState() {
-		request(
-			new ParallelRequest(
-				wrist.setWristAngleRequest(135.0)		
-			)
-		);
-	}
-
 	public void autoRotateEjectState(boolean enabled) {
 		request(
 			new ParallelRequest(
@@ -296,14 +280,12 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMaxControlAngle + rawHoodAngle),
+					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle + rawHoodAngle),
 					turret.robotStateVisionRequest(),
 					shooter.velocityRequest(shooterRPM) //2200 - Mid //2100 - Close //2400
-					
-					//shooter.visionVelocityRequest()
 				),
-				intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.FEED_BALLS)
+				intake.stateRequest(Intake.ControlState.INTAKE)
+				//column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
 	}
@@ -361,7 +343,8 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
-	public void intakeAndTrackState() {
+
+	public void intakeAndTrackState() {//Used for auto
 		request(
 			new ParallelRequest(
 				new SequentialRequest(
@@ -380,6 +363,7 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+	
 	public void reverseAllSubsystems() {
 		request(
 			new ParallelRequest(

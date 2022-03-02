@@ -212,47 +212,44 @@ public class DriverControls implements Loop {
             wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
             ballFeeder.queueShutdown(true);
         }
-
         if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
-            s.wristStowedState();
+            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         }else if(coDriver.bButton.shortReleased()) {
-            s.wristLowestState();
-        }
-
-        if(coDriver.xButton.wasActivated()) {
-            s.manualShotState(1600.0, 0);
-            //shooter.setOpenLoop(1.0);
-        } else if(coDriver.xButton.wasReleased()) {
-            s.postShotState();
-        }
-        
-
-        if(coDriver.leftBumper.wasActivated()) {
-            s.reverseAllSubsystems();
-        } else if(coDriver.leftBumper.wasReleased()) {
-            s.disableState();
-        }
-           
-        if(coDriver.leftTrigger.wasActivated()) {
-            turret.startVision();
-        }
-
-        if(coDriver.rightTrigger.wasActivated()) {
-            s.visionShotState();
-        } else if(coDriver.rightTrigger.wasReleased()) {
-            s.postShotState();
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
         }
         if(coDriver.yButton.wasActivated()) {
             s.manualShotState(2950.0, 12.5);
         } else if(coDriver.yButton.wasReleased()) {
             s.postShotState();
         }
+        if(coDriver.xButton.wasActivated()) {
+            //s.manualShotState(1600.0, 5.0);
+            //shooter.setOpenLoop(1.0);
+            shooter.setVelocity(2000.0);
+        } else if(coDriver.xButton.wasReleased()) {
+            s.postShotState();
+        }
         
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.conformToState(Column.ControlState.INTAKE);
+            column.setVelocity(6380.0 * 0.70);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
+        }
+        if(coDriver.leftBumper.wasActivated()) {
+            s.reverseAllSubsystems();
+        } else if(coDriver.leftBumper.wasReleased()) {
+            s.disableState();
+        }
+           
+
+        if(coDriver.rightTrigger.wasActivated()) {
+            s.visionShotState();
+        } else if(coDriver.rightTrigger.wasReleased()) {
+            s.postShotState();
+        }
+        if(coDriver.leftTrigger.wasActivated()) {
+            turret.startVision();
         }
 
         if(coDriver.rightCenterClick.wasActivated()) {

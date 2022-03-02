@@ -81,7 +81,7 @@ public class Shooter extends Subsystem {
         master.config_kD(1, 0.0);
         master.config_kF(1, Constants.Shooter.kShooterF);
         master.setInverted(TalonFXInvertType.CounterClockwise);
-        master.configPeakOutputReverse(0.0, 10);
+        master.configPeakOutputReverse(0.0, Constants.kCANTimeoutMs);
         master.setNeutralMode(NeutralMode.Coast);
 
 
@@ -98,7 +98,7 @@ public class Shooter extends Subsystem {
         slave.config_kD(1, 0.0);
         slave.config_kF(1, Constants.Shooter.kShooterF);
         slave.setInverted(TalonFXInvertType.Clockwise);
-        slave.configPeakOutputReverse(0.0, 10);
+        slave.configPeakOutputReverse(0.0, Constants.kCANTimeoutMs);
         slave.setNeutralMode(NeutralMode.Coast);
 
         slave.set(ControlMode.Follower, Ports.SHOOTER_LEFT);

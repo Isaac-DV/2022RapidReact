@@ -60,7 +60,7 @@ public class BallFeeder extends Subsystem {
         feeder.configVoltageCompSaturation(12, Constants.kCANTimeoutMs);
         feeder.enableVoltageCompensation(true);
         feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);
-        feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 50);
+        feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100);
         feeder.setInverted(TalonFXInvertType.Clockwise);
 
         banner = new DigitalInput(Ports.FEEDER_BANNER);
@@ -160,7 +160,7 @@ public class BallFeeder extends Subsystem {
                     } else if (DetectedBall == Ball.None) {
                         setFeederOpenLoop(1.0);
                     }
-                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > 1.5) {
+                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > 2.0) {
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         splitterStartTimestamp = Double.POSITIVE_INFINITY;
                     }
@@ -174,7 +174,7 @@ public class BallFeeder extends Subsystem {
                 default:
                     break;
             }
-            if((timestamp - intakeStartTimestamp) > 0.5) {
+            if((timestamp - intakeStartTimestamp) > 1.0 && !Double.isInfinite(intakeStartTimestamp)) {
                 if(intake.getState() == Intake.ControlState.AUTO_FEED_INTAKE) { //If the intake is in any other state besides the autoFeedMode, it will not disable
                     intake.conformToState(Intake.ControlState.OFF);
                 }
@@ -217,7 +217,7 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        //SmartDashboard.putString("Ball Feeder State", getState().toString()); 
+        SmartDashboard.putString("Ball Feeder State", getState().toString()); 
         SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
         SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
         SmartDashboard.putString("Detected Ball", DetectedBall.toString());   

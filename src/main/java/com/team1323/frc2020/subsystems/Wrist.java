@@ -53,6 +53,8 @@ public class Wrist extends Subsystem {
         wrist.configReverseSoftLimitThreshold((int)degreesToEncUnits(Constants.Wrist.kMinWristAngle),Constants.kCANTimeoutMs);
         wrist.configForwardSoftLimitEnable(true);
         wrist.configReverseSoftLimitEnable(true);
+        wrist.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
+        wrist.enableVoltageCompensation(true);
 
         wrist.setNeutralMode(NeutralMode.Coast);
 

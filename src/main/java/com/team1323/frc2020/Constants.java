@@ -205,9 +205,9 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.07; //0.25
-        public static final double kShooterI = 0.0; //0.0001
-        public static final double kShooterD = 0.7; //2.0;
+        public static final double kShooterP = 0.0575; //0.25 : 0.07 : 0.05
+        public static final double kShooterI = 0.0; //0.0001 : 0.0 : 0.0
+        public static final double kShooterD = 1.5; //2.0; : 0.7 : 1.5
         public static final double kShooterF = 0.051; //0.051
         
 
@@ -215,6 +215,10 @@ public class Constants {
         public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
         public static final double kBallVelocityScrubFactor = 310.5153 / 418.879;
+
+
+        public static final Translation2d closeShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 2), 2500.0);
+        public static final Translation2d farShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 10), 3500.0);
     }
     
     public static class Intake{
@@ -252,6 +256,7 @@ public class Constants {
         public static final double kIntakeAngle = 98.0;
         public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 65.0;
+        public static final double kLowestAngle = 135.0;
 
     }
     public static class Feeder {
