@@ -132,7 +132,6 @@ public class BallFeeder extends Subsystem {
         public void onStart(double timestamp) {
             setState(State.OFF);
             setDSAlliance(DriverStation.Alliance.Red/*DriverStation.getAlliance()*/);
-            ballSplitter.setDSAlliance(DriverStation.getAlliance());
         }
 
         @Override

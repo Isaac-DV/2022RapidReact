@@ -53,8 +53,8 @@ public class Constants {
     
     //Camera Constants (X and Y are with respect to the turret's center)
     public static final double kCameraYOffset = 0.0;//0.25
-    public static final double kCameraXOffset = 9.523; //8.5 //9.586
-    public static final double kCameraZOffset = 42.082; //26.776 24.524 //42.095
+    public static final double kCameraXOffset = 7.236; //8.5 //9.586
+    public static final double kCameraZOffset = 44.467; //26.776 24.524 //42.095
     public static final double kCameraYawAngleDegrees = 0.0;//-12.7
     public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.0 : 39.0; //21.75 for bottom 34.3 37.0604 //39.0 : 38.5
 
@@ -151,8 +151,8 @@ public class Constants {
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
         public static final double kAngleTolerance = 1.0;
-        public static final double kMinControlAngle = -250.0;
-        public static final double kMaxControlAngle = 60.0;
+        public static final double kMinControlAngle = -315.0; //-250
+        public static final double kMaxControlAngle = 190.0;
         public static final double kMinInitialAngle = -300.0;
         public static final double kMaxInitialAngle = 60.0;
         public static final double kTrackingOffset = 2.0; //3.0 = Close
@@ -190,7 +190,7 @@ public class Constants {
         public static final double kBottomEncToOutputRatio = 18.0 / 24.0;
 
         public static final double kBottomToMotorRatio = 18.0 / 12.0; //1 : Falcon = 12 -> Bottom = 18
-        public static final double kTopToBottomRatio = 24.0 / 18.0; //24/18 : 1 -> 1
+        public static final double kTopToBottomRatio = 24.0 / 18.0; //24/18 : 22 -> 30
 
         public static final double kBottomWheelRadius = 4.0; // inches //2
         public static final double kTopWheelRadius = 2.5; // inches //1
@@ -205,9 +205,9 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.0575; //0.25 : 0.07 : 0.05
-        public static final double kShooterI = 0.0; //0.0001 : 0.0 : 0.0
-        public static final double kShooterD = 1.5; //2.0; : 0.7 : 1.5
+        public static final double kShooterP = 0.0525; //0.25 : 0.07 : 0.05
+        public static final double kShooterI = 0.00005; //0.0001 : 0.0 : 0.0
+        public static final double kShooterD = 7.25; //2.0; : 0.7 : 1.5
         public static final double kShooterF = 0.051; //0.051
         
 
@@ -343,8 +343,8 @@ public class Constants {
         public static final double kF = 1023.0 / kMaxSpeed;
     }
     public static class MotorizedHood {
-        public static final double kMinControlAngle = 22.0; //Lowest Hood physical Angle = 27deg
-        public static final double kMaxControlAngle = 52.658; //Highest Hood physical angle = 42.5deg 28
+        public static final double kMinControlAngle = 15.0; //Lowest Hood physical Angle = 27deg
+        public static final double kMaxControlAngle = 45.0; //Highest Hood physical angle = 42.5deg 28
         public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
 
         // Measured upward from the ground; corresponds to kMinControlAngle
@@ -357,6 +357,8 @@ public class Constants {
     }
     public static class BallSplitter {
         public static final double kD2F = 64; //Distance to Flagpoint : The length in which the ball is fired from the ejectors, in inches
+        public static final double kWheelDiameter = 4.0;
+        public static final double kGameBallDiameter = 9.5;     
         
     }
     /*

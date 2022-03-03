@@ -29,7 +29,6 @@ public class Superstructure extends Subsystem {
 	public Intake intake;
     public Wrist wrist;
     public BallSplitter ballSplitter;
-    public BallEjector ballEjector;
     public BallFeeder ballFeeder;
     public Column column;
     public Turret turret;
@@ -44,7 +43,6 @@ public class Superstructure extends Subsystem {
 		intake = Intake.getInstance();
         wrist = Wrist.getInstance();
         ballSplitter = BallSplitter.getInstance();
-        ballEjector = BallEjector.getInstance();
         ballFeeder = BallFeeder.getInstance();
         column = Column.getInstance();
         turret = Turret.getInstance();
@@ -378,7 +376,6 @@ public class Superstructure extends Subsystem {
 			new ParallelRequest(
 				intake.stateRequest(Intake.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.OFF),
-				ballEjector.stateRequest(BallEjector.ControlState.OFF),
 				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
 				column.stateRequest(Column.ControlState.OFF),
 				shooter.openLoopRequest(0.0)

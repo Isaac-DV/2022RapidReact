@@ -10,7 +10,6 @@ package com.team1323.frc2020;
 import java.util.Arrays;
 
 import com.team1323.frc2020.loops.Loop;
-import com.team1323.frc2020.subsystems.BallEjector;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
 import com.team1323.frc2020.subsystems.Column;
@@ -45,7 +44,6 @@ public class DriverControls implements Loop {
     private Intake intake;
     private Wrist wrist;
     private BallSplitter ballSplitter;
-    private BallEjector ballEjector;
     private BallFeeder ballFeeder;
     private Column column;
     private Turret turret;
@@ -81,7 +79,6 @@ public class DriverControls implements Loop {
         intake = Intake.getInstance();
         wrist = Wrist.getInstance();
         ballSplitter = BallSplitter.getInstance();
-        ballEjector = BallEjector.getInstance();
         ballFeeder = BallFeeder.getInstance();
         column = Column.getInstance();
         turret = Turret.getInstance();
@@ -92,7 +89,7 @@ public class DriverControls implements Loop {
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, intake, wrist, ballSplitter, ballEjector, ballFeeder, column, turret,
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, column, turret,
                     motorizedHood, shooter, elevator, s));
     }
 
@@ -194,7 +191,7 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
         if(coDriver.POV0.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMaxControlAngle);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + (Constants.MotorizedHood.kMaxControlAngle - Constants.MotorizedHood.kMinControlAngle));
         } else if(coDriver.POV0.wasReleased()) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
         }
@@ -225,6 +222,7 @@ public class DriverControls implements Loop {
         if(coDriver.xButton.wasActivated()) {
             //s.manualShotState(1600.0, 5.0);
             //shooter.setOpenLoop(1.0);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + 10.0);
             shooter.setVelocity(2000.0);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
@@ -232,7 +230,7 @@ public class DriverControls implements Loop {
         
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.setVelocity(6380.0 * 0.70);
+            column.setVelocity(6380.0 * 0.50);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
         }
@@ -269,7 +267,8 @@ public class DriverControls implements Loop {
         double testControllerLeftY = -testController.getLeftY();
         if(testControllerLeftY != 0) {
             elevator.setOpenLoop(testControllerLeftY);
-            turret.setAngle(0.0);
+            turret.setAngle(-90.0);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
         } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
             elevator.lockElevatorHeight();
         }*/

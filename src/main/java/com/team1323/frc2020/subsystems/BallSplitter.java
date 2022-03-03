@@ -32,6 +32,7 @@ public class BallSplitter extends Subsystem {
 
     private boolean autoRotateSwerve = false;
     private double targetSwerveTheta = 0;
+    double targetVelocity = 0.0;
     
     Translation2d translationVector = new Translation2d();
 
@@ -57,6 +58,12 @@ public class BallSplitter extends Subsystem {
         splitter.configPeakOutputReverse(-1);
         splitter.configPeakOutputForward(1);
         splitter.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
+
+        splitter.selectProfileSlot(0, 0);
+        splitter.config_kP(0, 0.0, Constants.kCANTimeoutMs);
+        splitter.config_kI(0, 0.0, Constants.kCANTimeoutMs);
+        splitter.config_kD(0, 0.0, Constants.kCANTimeoutMs);
+        splitter.config_kF(0, 0.051, Constants.kCANTimeoutMs);
     }
 
 
@@ -79,7 +86,7 @@ public class BallSplitter extends Subsystem {
 
 
     public enum ControlState {
-        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0);//Power Shifted to the Elevator
+        OFF(0.0), LEFT_EJECT(-1.0), RIGHT_EJECT(1.0), VELOCITY(0.0);//Power Shifted to the Elevator
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -90,29 +97,50 @@ public class BallSplitter extends Subsystem {
     private void setState(ControlState desiredState) {
         currentState = desiredState;
     }
-
     ControlState bestSplitterState = ControlState.OFF; //Determines the best direction for the splitter motor to go in
                                                       //based on the robots position on the field
 
     public void setOpenLoop(double demand) {
         splitter.set(ControlMode.PercentOutput, demand);
     }
+    public void setVelocity(double rpm) {
+        setState(ControlState.VELOCITY);
+        splitter.set(ControlMode.Velocity, getRPMToEncVelocity(rpm));
+    }
 
     public void conformToState(ControlState desiredState) {
         conformToState(desiredState, desiredState.speed);
     }
-
     public void conformToState(ControlState desiredState, double outputOverride) {
         setState(desiredState);
         setOpenLoop(outputOverride);
     }
-    
-    public DriverStation.Alliance DSAlliance;
-    public void setDSAlliance(DriverStation.Alliance alliance) {
-        DSAlliance = alliance;
+
+    public double percentOutputToRPM(double percentOutput) {
+        return 6380.0 * percentOutput;
+    }
+    public double getRPMToEncVelocity(double rpm) {
+        return rpm * 2048.0 / 600.0 * 1.0;
+    }
+    public double calculateSurfaceVelocity() {
+        Translation2d robotPosition = swerve.getPose().getTranslation();
+        Rotation2d robotRotation = swerve.getPose().getRotation().rotateBy(Rotation2d.fromDegrees(-90)).inverse();
+        double distanceMagnitude = Math.cos(robotRotation.getRadians()) * robotPosition.x();
+        
+
+        return 0.0;
+    }
+    public double surfaceVelocityToRPM() {
+
+        return 0.0;
     }
 
+    public synchronized double encVelocityToRPM(double encVelocity) {
+        return encVelocity / 2048.0 * 600.0 / 1.0;
+    }
     
+    
+
     public void updateBestEjectLocation() {
         boolean locationFound = false;
         double lowestLocationsMagnitude = Double.POSITIVE_INFINITY;
@@ -138,13 +166,13 @@ public class BallSplitter extends Subsystem {
         Rotation2d robotToLocationTheta = positionVector.direction();
         Rotation2d robotRotation = robotPose.getRotation();
         Rotation2d leftSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
-                                        rotateBy(new Rotation2d(90).fromDegrees(90)).inverse());
+                                        rotateBy(Rotation2d.fromDegrees(90)).inverse());
         Rotation2d rightSideEjectDelta = robotToLocationTheta.rotateBy(robotRotation.inverse().
-                                        rotateBy(new Rotation2d().fromDegrees(-90)).inverse());
+                                        rotateBy(Rotation2d.fromDegrees(-90)).inverse());
         if(Math.abs(rightSideEjectDelta.getDegrees()) < Math.abs(leftSideEjectDelta.getDegrees())) { //The right side is closer
-            robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(90));
+            robotToLocationTheta.rotateBy(Rotation2d.fromDegrees(90));
         } else if(Math.abs(rightSideEjectDelta.getDegrees()) > Math.abs(leftSideEjectDelta.getDegrees())) {//The left side is closer
-            robotToLocationTheta.rotateBy(new Rotation2d().fromDegrees(-90));
+            robotToLocationTheta.rotateBy(Rotation2d.fromDegrees(-90));
         }
         robotToLocationTheta.inverse();
         if(targetSwerveTheta < 0) {
@@ -159,13 +187,15 @@ public class BallSplitter extends Subsystem {
         } else if((0 < swerveNeg180to180Rotation) && (swerveNeg180to180Rotation < 180)) {
             bestSplitterState = ControlState.RIGHT_EJECT;
         }
+
+
     }
 
     Loop loop = new Loop() {
 
         @Override
         public void onStart(double timestamp) {
-
+            bestSplitterState = ControlState.RIGHT_EJECT;
         }
 
         @Override

@@ -63,7 +63,7 @@ public class Column extends Subsystem {
         column.config_kP(0, 0.2, Constants.kCANTimeoutMs); //0.2
         column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0
         column.config_kD(0, 4.0, Constants.kCANTimeoutMs); //4.0
-        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
+        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.052
         column.selectProfileSlot(0, 0);
 
         AsynchronousInterrupt interrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
