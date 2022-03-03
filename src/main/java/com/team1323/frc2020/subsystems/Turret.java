@@ -211,6 +211,16 @@ public class Turret extends Subsystem {
     public boolean isReady() {
         return targetInfo.get(3).getDouble(0) == 1.0 && visionAngleInRange && hasReachedAngle();
     }
+
+    public double boundToTurretScope(double turretAngle) {
+        turretAngle = Util.placeInAppropriate0To360Scope(getAngle(), turretAngle);
+        if (turretAngle > Constants.Turret.kMaxControlAngle)
+            turretAngle -= 360.0;
+        if (turretAngle < Constants.Turret.kMinControlAngle)
+            turretAngle += 360.0;
+
+        return turretAngle;
+    }
     
     
     public void resetMotorEncoderPosition(double angle) {
@@ -265,17 +275,17 @@ public class Turret extends Subsystem {
                     if (params.isPresent()) {
                         // Aim directly at the vision target
                         double turretAngle = params.get().getTurretToGoal().direction().getDegrees();
-                        turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        turretAngle = boundToTurretScope(turretAngle);
                         if (Math.abs(turretAngle - getAngle()) <= Constants.Turret.kAngleTolerance && targetInfo.get(3).getDouble(0) != 1.0) {
                             turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
-                            turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                            turretAngle = boundToTurretScope(turretAngle);
                             
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
                     } else {
                         double turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
-                        turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
                     }
@@ -285,7 +295,7 @@ public class Turret extends Subsystem {
                     if (aim.isPresent()) {
                         // Compensate for the robot's velocity when aiming
                         double turretAngle = aim.get().getTurretAngle().getDegrees();
-                        turretAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, turretAngle);
+                        turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         double offsetAngle = 0;
                         /*if (turretAngle < Constants.Turret.kMinControlAngle || turretAngle > Constants.Turret.kMaxControlAngle) {

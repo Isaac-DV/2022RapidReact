@@ -36,6 +36,7 @@ public class Column extends Subsystem {
     DigitalInput banner;
 
     boolean detectedBall = false;
+    double columnStartTimestamp = Double.POSITIVE_INFINITY;
     double ballDetectedTimestamp = Double.POSITIVE_INFINITY;
     double targetRPM = 0.0;
 
@@ -111,7 +112,6 @@ public class Column extends Subsystem {
         column.set(ControlMode.PercentOutput, demand);
     }
     public void setVelocity(double rpm) {
-        setState(ControlState.VELOCITY);
         targetRPM = rpm;
         column.set(ControlMode.Velocity, getRPMToEncVelocity(rpm));
     }
@@ -142,10 +142,14 @@ public class Column extends Subsystem {
                 case FEED_BALLS:
                     if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()
                             && (timestamp - ballDetectedTimestamp) > 0.125 && !Double.isInfinite(ballDetectedTimestamp)) {
-                        setOpenLoop(Constants.Column.kFeedBallSpeed);
+                        //setOpenLoop(Constants.Column.kFeedBallSpeed);
+                        if (Double.isInfinite(columnStartTimestamp)) {
+                            columnStartTimestamp = timestamp;
+                        }
+                        setVelocity(6380.0 * 0.5);
                     } else if(!detectedBall) {
                         setOpenLoop(1.0);
-                    } else {
+                    } else if(Double.isInfinite(columnStartTimestamp)) {
                         setOpenLoop(0.0);
                     }
                     break;
@@ -166,7 +170,10 @@ public class Column extends Subsystem {
                 default:
                 break;
             }
-
+            if(Double.isFinite(columnStartTimestamp) && (timestamp - columnStartTimestamp) > 0.25) {
+                setOpenLoop(0.0);
+                columnStartTimestamp = Double.POSITIVE_INFINITY;
+            }
         }
 
         @Override

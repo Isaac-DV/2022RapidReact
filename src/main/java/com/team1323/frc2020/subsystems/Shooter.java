@@ -137,6 +137,9 @@ public class Shooter extends Subsystem {
     }
 
     public static double rpmToInitialBallVelocity(double rpm) {
+        // Convert from bottom wheel RPM to motor RPM
+        rpm /= Constants.Shooter.kBottomToMotorRatio;
+
         double bottomWheelAngularVelocity = rpm * Constants.Shooter.kBottomToMotorRatio / 60.0 * 2.0 * Math.PI; // radians/sec
         double bottomWheelEdgeVelocity = bottomWheelAngularVelocity * Constants.Shooter.kBottomWheelRadius; // inches/sec
 
@@ -151,8 +154,10 @@ public class Shooter extends Subsystem {
         double rpm_numerator = 120.0 * initial_velocity;
         double rpm_denominator = Constants.Shooter.kBallVelocityScrubFactor * Constants.Shooter.kBottomToMotorRatio * 
                 (Constants.Shooter.kBottomWheelRadius + Constants.Shooter.kTopToBottomRatio * Constants.Shooter.kTopWheelRadius) * 2.0 * Math.PI;
+        double motor_rpm = rpm_numerator / rpm_denominator;
+        double bottom_wheel_rpm = motor_rpm * Constants.Shooter.kBottomToMotorRatio;
 
-        return rpm_numerator / rpm_denominator;
+        return bottom_wheel_rpm;
     }
 
     public Loop loop = new Loop() {

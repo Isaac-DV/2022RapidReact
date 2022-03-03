@@ -166,6 +166,7 @@ public class BallFeeder extends Subsystem {
 
                     if (pendingShutdown && DetectedBall == Ball.None && Double.isInfinite(splitterStartTimestamp)) {
                         setState(State.OFF);
+                        
                         pendingShutdown = false;
                     }
 

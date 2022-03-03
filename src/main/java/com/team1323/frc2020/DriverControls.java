@@ -222,8 +222,9 @@ public class DriverControls implements Loop {
         if(coDriver.xButton.wasActivated()) {
             //s.manualShotState(1600.0, 5.0);
             //shooter.setOpenLoop(1.0);
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + 10.0);
-            shooter.setVelocity(2000.0);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + 25.0);
+            shooter.setVelocity(2100.0);
+            turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }
