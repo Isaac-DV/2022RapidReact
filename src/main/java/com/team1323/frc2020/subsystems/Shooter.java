@@ -16,6 +16,7 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.InterpolatingDouble;
+import com.team1323.lib.util.SmartTuning;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -25,6 +26,8 @@ public class Shooter extends Subsystem {
     
     LazyTalonFX master, slave;
     List<LazyTalonFX> motors;
+
+    SmartTuning smartTuner;
     
     private static Shooter instance = null;
     public static Shooter getInstance() {
@@ -49,6 +52,7 @@ public class Shooter extends Subsystem {
     }
     
     private double targetRPM = 0.0;
+    public double dashboardRPMInput = 0.0;
     private double onTargetTimestamp = Double.POSITIVE_INFINITY;
 
     PeriodicIO periodicIO = new PeriodicIO();
@@ -103,6 +107,12 @@ public class Shooter extends Subsystem {
 
         slave.set(ControlMode.Follower, Ports.SHOOTER_LEFT);
         setOpenLoop(0.0);
+
+        smartTuner = new SmartTuning(master, "shooter");
+        smartTuner.enabled(true);
+        /*
+        double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
+        SmartDashboard.putNumber("ShooterRPMInput", dsRPMInputValue);*/
     }
 
     public void setOpenLoop(double output) {
@@ -277,6 +287,11 @@ public class Shooter extends Subsystem {
         }
     }
     
+    public void updateRPM() {
+        /*double rpmValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
+        dashboardRPMInput = rpmValue;*/
+        dashboardRPMInput = smartTuner.getValue();
+    }
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
@@ -288,6 +303,9 @@ public class Shooter extends Subsystem {
         SmartDashboard.putNumber("Shooter Left Commanded Input", master.getMotorOutputPercent());
         SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
         SmartDashboard.putString("Shooter State", currentState.toString());
+
+        smartTuner.update();
+        updateRPM();
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);
         SmartDashboard.putBoolean("Shooter On Target", hasReachedSetpoint());*/
     }

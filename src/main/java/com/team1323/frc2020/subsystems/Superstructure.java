@@ -322,7 +322,6 @@ public class Superstructure extends Subsystem {
 				swerve.setDriveMaxPowerRequest(1.0),
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
 				shooter.openLoopRequest(0.25),
-				intake.stateRequest(Intake.ControlState.OFF),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
 					if (newRobotPose.isPresent()) {

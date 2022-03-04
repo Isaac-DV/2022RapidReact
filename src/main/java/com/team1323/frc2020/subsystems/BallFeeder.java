@@ -174,7 +174,7 @@ public class BallFeeder extends Subsystem {
                 default:
                     break;
             }
-            if((timestamp - intakeStartTimestamp) > 1.0 && !Double.isInfinite(intakeStartTimestamp)) {
+            if((timestamp - intakeStartTimestamp) > 1.0 && Double.isFinite(intakeStartTimestamp)) {
                 if(intake.getState() == Intake.ControlState.AUTO_FEED_INTAKE) { //If the intake is in any other state besides the autoFeedMode, it will not disable
                     intake.conformToState(Intake.ControlState.OFF);
                 }

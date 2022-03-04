@@ -13,6 +13,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
+import com.team1323.lib.util.SmartTuning;
 import com.team1323.lib.util.Util;
 
 import edu.wpi.first.wpilibj.Servo;
@@ -21,6 +22,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class MotorizedHood extends Subsystem {
+    SmartTuning smartTuner;
+    public double angleInput = 0;
+
     Servo rightServo;
     Servo leftServo;
     double servoTargetAngle;
@@ -52,6 +56,9 @@ public class MotorizedHood extends Subsystem {
 
         rightServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
         leftServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+
+        smartTuner = new SmartTuning("hood");
+        smartTuner.enabled(true);
 
         setAngle(Constants.MotorizedHood.kMinControlAngle);
     }
@@ -188,12 +195,18 @@ public class MotorizedHood extends Subsystem {
             }
         };
     }
-
+    public void updateAngleInput() {
+        smartTuner.update();
+        System.out.println(smartTuner.getValue());
+        angleInput = smartTuner.getValue();
+    }
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Servo Right Position", getRightServoTargetPosition());
         SmartDashboard.putNumber("Servo Left Position", getLeftServoTargetPosition());
         SmartDashboard.putNumber("Servo Target Angle", servoTargetAngle);
+        
+        updateAngleInput();
     }
 
     @Override

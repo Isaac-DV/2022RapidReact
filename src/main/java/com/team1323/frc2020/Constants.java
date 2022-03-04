@@ -204,9 +204,9 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.0525; //0.25 : 0.07 : 0.05
-        public static final double kShooterI = 0.00005; //0.0001 : 0.0 : 0.0
-        public static final double kShooterD = 7.25; //2.0; : 0.7 : 1.5
+        public static final double kShooterP = 0.06; //0.25 : 0.07 : 0.05 : 0.0525
+        public static final double kShooterI = 0.0005; //0.0001 : 0.0 : 0.0 : 0.00005
+        public static final double kShooterD = 6.0; //2.0; : 0.7 : 1.5 : 7.25
         public static final double kShooterF = 0.051; //0.051
         
 

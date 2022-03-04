@@ -141,7 +141,7 @@ public class Column extends Subsystem {
             switch(currentState) {
                 case FEED_BALLS:
                     if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()
-                            && (timestamp - ballDetectedTimestamp) > 0.125 && !Double.isInfinite(ballDetectedTimestamp)) {
+                            && (timestamp - ballDetectedTimestamp) > 0.25 && !Double.isInfinite(ballDetectedTimestamp)) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
                         if (Double.isInfinite(columnStartTimestamp)) {
                             columnStartTimestamp = timestamp;
