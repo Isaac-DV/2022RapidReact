@@ -148,28 +148,30 @@ public class BallFeeder extends Subsystem {
 
                         if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
                             intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
+                        } else if(intake.getState() == Intake.ControlState.INTAKE) {
+                            //column.setIndexBallState();
                         }
                         intakeStartTimestamp = timestamp;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
                         if (Double.isInfinite(splitterStartTimestamp)) {
+                            //column.conformToState(Column.ControlState.OFF);
                             splitterStartTimestamp = timestamp;
                         }
-                    } else if (DetectedBall == Ball.None) {
-                        setFeederOpenLoop(1.0);
+                    } else if (DetectedBall == Ball.None) { //There's no ball detected
+                        if(pendingShutdown) {
+                            setFeederOpenLoop(0.0);
+                            pendingShutdown = false;
+                        }
                     }
                     if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > 2.0) {
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                        if(intake.getState() == Intake.ControlState.INTAKE) {
+                            //column.setIndexBallState();
+                        }
                         splitterStartTimestamp = Double.POSITIVE_INFINITY;
                     }
-
-                    if (pendingShutdown && DetectedBall == Ball.None && Double.isInfinite(splitterStartTimestamp)) {
-                        setState(State.OFF);
-                        
-                        pendingShutdown = false;
-                    }
-
                     break;               
                 default:
                     break;
@@ -180,8 +182,6 @@ public class BallFeeder extends Subsystem {
                 }
                 intakeStartTimestamp = Double.POSITIVE_INFINITY;
             }
-
-            
         }
 
         @Override

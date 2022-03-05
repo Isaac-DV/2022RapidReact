@@ -23,6 +23,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
+import com.team1323.lib.util.SmartTuning;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Rotation2d;
@@ -40,7 +41,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 * Add your docs here.
 */
 public class Turret extends Subsystem {
-    
+    SmartTuning smartTuner;
+    double smartTunerValue = 0.0;
+
     LazyTalonFX turret;
     DutyCycle encoder;
 
@@ -124,6 +127,8 @@ public class Turret extends Subsystem {
         targetInfo = Arrays.asList(table.getEntry("tx"), table.getEntry("ty"),
         table.getEntry("ta"), table.getEntry("tv"));
         
+        smartTuner = new SmartTuning(turret, "turret");
+        smartTuner.enabled(true);
     }
 
     public double getAbsoluteEncoderPosition() {
@@ -243,12 +248,18 @@ public class Turret extends Subsystem {
             turret.set(ControlMode.MotionMagic, periodicIO.demand);
         }
     }
+
+    public void updateTurretTuning() {
+        smartTuner.update();
+        smartTunerValue = smartTuner.getValue();
+    }
     
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
         SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
         
+        updateTurretTuning();
         //SmartDashboard.putNumber("Turret Current", periodicIO.current);
         //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);
         //SmartDashboard.putNumber("Turret Velocity", periodicIO.velocity);

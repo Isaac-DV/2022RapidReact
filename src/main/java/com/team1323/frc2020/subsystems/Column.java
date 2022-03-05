@@ -16,6 +16,7 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.SmartTuning;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.AsynchronousInterrupt;
@@ -27,6 +28,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Column extends Subsystem {
+    SmartTuning smartTuner;
+
     Shooter shooter;
     Turret turret;
     MotorizedHood motorizedHood;
@@ -66,6 +69,7 @@ public class Column extends Subsystem {
         column.config_kD(0, 4.0, Constants.kCANTimeoutMs); //4.0
         column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.052
         column.selectProfileSlot(0, 0);
+        column.config_IntegralZone(0, getRPMToEncVelocity(100));
 
         AsynchronousInterrupt interrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
 
@@ -88,6 +92,9 @@ public class Column extends Subsystem {
         });
         interrupt.setInterruptEdges(true, true);
         interrupt.enable();
+
+        smartTuner = new SmartTuning(column, "column");
+        smartTuner.enabled(true);
     }
     public boolean getBanner() {
         return banner.get();
@@ -110,6 +117,10 @@ public class Column extends Subsystem {
     }
     public void setOpenLoop(double demand) {
         column.set(ControlMode.PercentOutput, demand);
+    }
+    public void setVelocityState(double rpm) {
+        setState(ControlState.VELOCITY);
+        setVelocity(rpm);
     }
     public void setVelocity(double rpm) {
         targetRPM = rpm;
@@ -140,15 +151,10 @@ public class Column extends Subsystem {
         public void onLoop(double timestamp) {
             switch(currentState) {
                 case FEED_BALLS:
-                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()
-                            && (timestamp - ballDetectedTimestamp) > 0.25 && !Double.isInfinite(ballDetectedTimestamp)) {
+                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
-                        if (Double.isInfinite(columnStartTimestamp)) {
-                            columnStartTimestamp = timestamp;
-                        }
-                        setVelocity(6380.0 * 0.5);
-                    } else if(!detectedBall) {
-                        setOpenLoop(1.0);
+                        columnStartTimestamp = timestamp;        
+                        setVelocity(6380.0 * 0.5);     
                     } else if(Double.isInfinite(columnStartTimestamp)) {
                         setOpenLoop(0.0);
                     }
@@ -202,6 +208,7 @@ public class Column extends Subsystem {
         SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
         SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
         SmartDashboard.putNumber("Column RPM Target", targetRPM);
+        smartTuner.update();
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

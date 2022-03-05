@@ -197,7 +197,6 @@ public class MotorizedHood extends Subsystem {
     }
     public void updateAngleInput() {
         smartTuner.update();
-        System.out.println(smartTuner.getValue());
         angleInput = smartTuner.getValue();
     }
     @Override

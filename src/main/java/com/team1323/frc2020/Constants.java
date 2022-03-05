@@ -254,7 +254,7 @@ public class Constants {
 
         public static final double kIntakeAngle = 98.0;
         public static final double kStowedAngle = -10.0;
-        public static final double kBallDebouncerAngle = 65.0;
+        public static final double kBallDebouncerAngle = 35.0; //65.0
         public static final double kLowestAngle = 135.0;
 
     }
@@ -354,6 +354,34 @@ public class Constants {
 
         public static final double kAngleTolerance = 1.0; // degrees
     }
+    public static class MotorHood {
+        public static final double kReduction = 80.89;
+
+        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
+
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 1023.0 / kMaxSpeed;
+
+        public static final double kHoodStartingAngle = 65.0;
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 0.0 : 0.0; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+
+        public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
+
+        public static final double kMinInitialAngle = 10.0;
+        public static final double kMaxInitialAngle = 70.0;
+
+        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 16.0 : 18.0;
+        public static final double kMaxControlAngle = 63.0;
+
+        public static final double kAngleTolerance = 2.0;
+
+        //Shooter Hood Angles
+        public static final double kCloseAngle = 32.25;
+        public static final double kMidAngle = 42.5; //55 deg
+        public static final double kFarAngle = 59.0;
+    }
     public static class BallSplitter {
         public static final double kD2F = 64; //Distance to Flagpoint : The length in which the ball is fired from the ejectors, in inches
         public static final double kWheelDiameter = 4.0;
@@ -378,7 +406,7 @@ public class Constants {
 
     }*/
 
-    public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
+    /*public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
     static {
         // Key: distance from the vision target, in inches
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
@@ -389,8 +417,16 @@ public class Constants {
         kDistanceToShotVectorMap.put(new InterpolatingDouble(168.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 30.0), 2550.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(192.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 30.0), 2700.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(216.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 30.0), 2900.0));
+    }*/
 
-
-
+    public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
+    static {
+        // Key: distance from the vision target, in inches
+        // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(50.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.0), 1900.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(56.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.25), 1925.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(62.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.0), 1900.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(68.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.75), 1975.0));
+        
     }
 }

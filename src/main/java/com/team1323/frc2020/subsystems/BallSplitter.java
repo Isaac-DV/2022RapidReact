@@ -190,6 +190,25 @@ public class BallSplitter extends Subsystem {
 
 
     }
+    public double getRotationToHanger() {
+        Translation2d hangerPosition = EjectLocations.TEAM_HANGER.location;
+        Translation2d robotPosition = swerve.getPose().getTranslation();
+        Translation2d robotToHangerVector = hangerPosition.translateBy(robotPosition.inverse());
+        Rotation2d robotToHangerRotation = robotToHangerVector.direction().rotateBy(Rotation2d.fromDegrees(90)).inverse();
+        if(bestSplitterState == ControlState.RIGHT_EJECT) {
+            robotToHangerRotation = robotToHangerRotation.rotateBy(Rotation2d.fromDegrees(90));
+        } else if(bestSplitterState == ControlState.LEFT_EJECT) {
+            robotToHangerRotation = robotToHangerRotation.rotateBy(Rotation2d.fromDegrees(-90));
+        }
+        return robotToHangerRotation.getDegrees();
+    }
+    public double getRotationToTerminal() {
+        Translation2d hangerPosition = EjectLocations.TEAM_TERMINAL.location;
+        Translation2d robotPosition = swerve.getPose().getTranslation();
+        Translation2d robotToHangerVector = hangerPosition.translateBy(robotPosition.inverse());
+        Rotation2d robotToHangerRotation = robotToHangerVector.direction().rotateBy(Rotation2d.fromDegrees(90)).inverse();
+        return robotToHangerRotation.getDegrees();
+    }
 
     Loop loop = new Loop() {
 

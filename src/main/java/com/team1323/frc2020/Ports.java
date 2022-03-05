@@ -64,6 +64,8 @@ public class Ports {
 
     //Canifier
     public static final int CANIFIER = 30;
+    public static final int HOOD_TALON = 0;
+    public static final int HOOD_ENCODER = 0;
         
     }
     

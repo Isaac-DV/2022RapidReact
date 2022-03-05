@@ -151,11 +151,11 @@ public class DriverControls implements Loop {
             swerve.zeroSensors(new Pose2d());
             swerve.resetAveragedDirection();
         }
-        if(driver.rightBumper.wasActivated()) {
-            s.autoRotateEjectState(true);
-        } else if(driver.rightBumper.wasReleased()) {
-            s.autoRotateEjectState(false);
-        }
+        if(driver.rightBumper.isBeingPressed())
+            swerve.rotate(ballSplitter.getRotationToTerminal());
+        else if(driver.leftBumper.isBeingPressed())
+            swerve.rotate(ballSplitter.getRotationToHanger());
+        
 
         if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
@@ -196,7 +196,11 @@ public class DriverControls implements Loop {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
         }
 
-        
+        if(coDriver.aButton.isBeingPressed()) {
+            if(column.getState() != Column.ControlState.FEED_BALLS) {
+                column.setState(Column.ControlState.INDEX_BALLS);
+            }
+        }
         if(coDriver.aButton.wasActivated()) {
             intake.conformToState(Intake.ControlState.INTAKE);
             wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
@@ -206,13 +210,13 @@ public class DriverControls implements Loop {
             }
         } else if(coDriver.aButton.wasReleased()) {
             intake.conformToState(Intake.ControlState.OFF);
-            wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             ballFeeder.queueShutdown(true);
         }
         if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
             wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         }else if(coDriver.bButton.shortReleased()) {
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
+            wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
         }
         if(coDriver.yButton.wasActivated()) {
             s.manualShotState(2950.0, 12.5);
@@ -224,14 +228,14 @@ public class DriverControls implements Loop {
             //shooter.setOpenLoop(1.0);
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
-            turret.startVision();
+            //turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }
         
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.setVelocity(6380.0 * 0.35);
+            column.setVelocity(6380.0 * 0.5);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
         }
