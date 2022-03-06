@@ -423,8 +423,8 @@ public class Constants {
     static {
         // Key: distance from the vision target, in inches
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(50.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.0), 1900.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(56.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.25), 1925.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.0), 1750.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.25), 1900.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(62.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.0), 1900.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(68.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.75), 1975.0));
         

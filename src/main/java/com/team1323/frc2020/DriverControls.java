@@ -134,13 +134,13 @@ public class DriverControls implements Loop {
         
         swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, robotCentric, driver.leftTrigger.isBeingPressed());
         
-        if (driver.bButton.isBeingPressed())
+        if (driver.bButton.wasActivated())
             swerve.rotate(90);
-        else if (driver.aButton.isBeingPressed()) 
+        else if (driver.aButton.wasActivated()) 
             swerve.rotate(180);
-        else if (driver.xButton.isBeingPressed())
+        else if (driver.xButton.wasActivated())
             swerve.rotate(270);
-        else if (driver.yButton.isBeingPressed())
+        else if (driver.yButton.wasActivated())
             swerve.rotate(0.0);
 
         if (driver.startButton.isBeingPressed()) 
@@ -235,7 +235,7 @@ public class DriverControls implements Loop {
         
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.setVelocity(6380.0 * 0.5);
+            column.setVelocityState(6380.0 * 0.5);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
         }
