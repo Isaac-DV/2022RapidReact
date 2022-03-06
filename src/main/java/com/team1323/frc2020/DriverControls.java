@@ -89,8 +89,8 @@ public class DriverControls implements Loop {
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, column, turret,
-                    motorizedHood, shooter, elevator, s));
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, turret,
+                    motorizedHood, shooter, elevator, column, s));
     }
 
     @Override
@@ -209,8 +209,12 @@ public class DriverControls implements Loop {
                 column.setState(Column.ControlState.INDEX_BALLS);
             }
         } else if(coDriver.aButton.wasReleased()) {
+            if(coDriver.leftTrigger.isBeingPressed()) {
+                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+            } else {
+                wrist.setWristAngle(Constants.Wrist.kLowestAngle);
+            }
             intake.conformToState(Intake.ControlState.OFF);
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             ballFeeder.queueShutdown(true);
         }
         if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
@@ -228,6 +232,8 @@ public class DriverControls implements Loop {
             //shooter.setOpenLoop(1.0);
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
+            turret.startVision();
+            column.setState(Column.ControlState.FEED_BALLS);
             //turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
@@ -235,7 +241,7 @@ public class DriverControls implements Loop {
         
 
         if(coDriver.rightBumper.wasActivated()) {
-            column.setVelocityState(6380.0 * 0.5);
+            column.setVelocityState(Constants.Column.kFeedVelocitySpeed);
         } else if(coDriver.rightBumper.wasReleased()) {
             column.conformToState(Column.ControlState.OFF);
         }
@@ -251,9 +257,7 @@ public class DriverControls implements Loop {
         } else if(coDriver.rightTrigger.wasReleased()) {
             s.postShotState();
         }
-        if(coDriver.leftTrigger.wasActivated()) {
-            turret.startVision();
-        }
+        
 
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
@@ -265,7 +269,8 @@ public class DriverControls implements Loop {
             s.disableState();
         }
         if(coDriver.startButton.wasActivated()) {
-            turret.lockAngle();
+            //turret.lockAngle();
+            turret.startVision();
         }
 
         /*

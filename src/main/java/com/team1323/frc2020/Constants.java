@@ -204,10 +204,13 @@ public class Constants {
         public static final double kFarTopRPM = 1135.0; //1400, 3600, 63 deg
         public static final double kFarBottomRPM = 4000.0; //1700, 3400, 61 deg
 
-        public static final double kShooterP = 0.06; //0.25 : 0.07 : 0.05 : 0.0525
-        public static final double kShooterI = 0.0005; //0.0001 : 0.0 : 0.0 : 0.00005
-        public static final double kShooterD = 6.0; //2.0; : 0.7 : 1.5 : 7.25
-        public static final double kShooterF = 0.051; //0.051
+        public static final double kPostShotPercentOutput = 0.5;
+        public static final double kPostShotRPM = 1500.0;
+
+        public static final double kShooterP = 0.01; //0.25 : 0.07 : 0.05 : 0.0525
+        public static final double kShooterI = 0.0; //0.0001 : 0.0 : 0.0 : 0.00005
+        public static final double kShooterD = 0.1; //2.0; : 0.7 : 1.5 : 7.25
+        public static final double kShooterF = 0.048; //0.051
         
 
         public static final double kShooterRPMTolerance = 150.0; //50 //150
@@ -266,8 +269,20 @@ public class Constants {
         public static final double kRamp = 0.125;
     }
     public static class Column {
-        public static final double kFeedBallSpeed = 0.75;
+        public static final double kMaxSpeed = 6380.0;
+
+        public static final double kFeedBallSpeed = 1.0;
         public static final double kReverseSpeed = -1.0;
+
+        public static final double kMinFeedDelay = 0.125;
+        public static final double kMaxFeedDelay = 0.5;
+
+        public static final double kMinDistance = 60.0;
+        public static final double kMaxDistance = 180.0;
+
+        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.6;
+        public static final double kBallDelay = 0.375;
     }    
 
 
@@ -423,10 +438,17 @@ public class Constants {
     static {
         // Key: distance from the vision target, in inches
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.0), 1750.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 7.25), 1900.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(62.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.0), 1900.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(68.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 8.75), 1975.0));
-        
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 10.0), 1650.0)); //
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 10.0), 1800.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(84.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 12.0), 1800.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(96.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1850.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(108.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1900.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(120.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 2000.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(132.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 20.0), 2250.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(144.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 22.0), 2250.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(156.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 23.0), 2350.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(168.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 24.0), 2350.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(180.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 2600.0));
+
     }
 }

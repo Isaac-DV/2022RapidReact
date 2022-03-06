@@ -5,6 +5,7 @@
 package com.team1323.frc2020.subsystems;
 
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -13,9 +14,11 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.SmartTuning;
 import com.team254.drivers.LazyTalonFX;
 
@@ -140,6 +143,30 @@ public class Column extends Subsystem {
     public void conformToState(ControlState desiredState) {
         conformToState(desiredState, desiredState.speed);
     }
+
+    private boolean allSubsystemsReady() {
+        return shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle();
+    }
+
+    private double getFeedingDelay() {
+        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+        if (aim.isPresent()) {
+            if (aim.get().getRange() > Constants.Column.kMaxDistance) {
+                return Constants.Column.kMinFeedDelay;
+            }
+            if (aim.get().getRange() < Constants.Column.kMinDistance) {
+                return Constants.Column.kMaxFeedDelay;
+            }
+            double scaledDelay = Constants.Column.kMinFeedDelay + 
+                    ((Constants.Column.kMaxFeedDelay - Constants.Column.kMinFeedDelay) * 
+                            (Constants.Column.kMaxDistance - aim.get().getRange()) / (Constants.Column.kMaxDistance - Constants.Column.kMinDistance));
+            
+            return scaledDelay;
+        }
+
+        return Constants.Column.kMaxFeedDelay;
+    }
+
     Loop loop = new Loop() {
 
         @Override
@@ -151,18 +178,21 @@ public class Column extends Subsystem {
         public void onLoop(double timestamp) {
             switch(currentState) {
                 case FEED_BALLS:
-                    if(shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle()) {
+                    if (!getBanner()) {
+                        setVelocity(Constants.Column.kQueueVelocitySpeed);
+                    } else if((getBanner() && Double.isFinite(ballDetectedTimestamp) && 
+                            (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay && allSubsystemsReady())) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
                         columnStartTimestamp = timestamp;        
-                        setVelocity(6380.0 * 0.5);     
-                    } else if(Double.isInfinite(columnStartTimestamp)) {
+                        setVelocity(Constants.Column.kFeedVelocitySpeed);     
+                    } else {
                         setOpenLoop(0.0);
                     }
                     break;
                 case INDEX_BALLS:
                     if(!getBanner() && !detectedBall) {
                         //column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
-                        setOpenLoop(1.0);
+                        setVelocity(Constants.Column.kQueueVelocitySpeed);
                     } else if(getBanner() && detectedBall) {
                         //column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                         setOpenLoop(0.0);
@@ -175,10 +205,6 @@ public class Column extends Subsystem {
                     break;
                 default:
                 break;
-            }
-            if(Double.isFinite(columnStartTimestamp) && (timestamp - columnStartTimestamp) > 0.25) {
-                setOpenLoop(0.0);
-                columnStartTimestamp = Double.POSITIVE_INFINITY;
             }
         }
 

@@ -308,7 +308,7 @@ public class Superstructure extends Subsystem {
 					shooter.visionVelocityRequest()
 				),
 				turret.robotStateVisionRequest(),
-				intake.stateRequest(Intake.ControlState.INTAKE),
+				//intake.stateRequest(Intake.ControlState.INTAKE),
 				column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
@@ -321,7 +321,8 @@ public class Superstructure extends Subsystem {
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
 				swerve.setDriveMaxPowerRequest(1.0),
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-				shooter.openLoopRequest(0.25),
+				//shooter.openLoopRequest(Constants.Shooter.kPostShotPercentOutput),
+				shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
 					if (newRobotPose.isPresent()) {
