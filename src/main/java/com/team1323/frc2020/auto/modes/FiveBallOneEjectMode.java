@@ -14,9 +14,12 @@ import com.team1323.frc2020.auto.actions.ResetPoseAction;
 import com.team1323.frc2020.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2020.auto.actions.WaitAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
+import com.team1323.frc2020.auto.actions.WaitForTwoBallsAction;
+import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
-import com.team1323.frc2020.auto.actions.WaitToPassXCoordinateAction;
-import com.team1323.frc2020.subsystems.Column;
+import com.team1323.frc2020.subsystems.Intake;
+import com.team1323.frc2020.subsystems.MotorizedHood;
+import com.team1323.frc2020.subsystems.Shooter;
 import com.team1323.frc2020.subsystems.Superstructure;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.trajectory.Trajectory;
@@ -25,50 +28,58 @@ import com.team254.lib.trajectory.timing.TimedState;
 import edu.wpi.first.wpilibj.Timer;
 
 /** Add your docs here. */
-public class SixBallOneEjectMode extends AutoModeBase {
-
+public class FiveBallOneEjectMode extends AutoModeBase {
     Superstructure s;
     @Override
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.firstBallBackup, trajectories.firstBallToSecondBall, 
                 trajectories.secondBallToHumanPlayer,
-                trajectories.humanPlayerToSecondOpponentBall, 
-                trajectories.secondOpponentBallToThirdBall);
+                trajectories.humanPlayerToSecondBall,
+                trajectories.secondBallToOpponentBall
+                );
     }
-    public SixBallOneEjectMode() {
+    public FiveBallOneEjectMode() {
         s = Superstructure.getInstance();
     }
+
     @Override
     protected void routine() throws AutoModeEndedException {
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoRightStartingPose));
-        s.intakeAndTrackState();
+        s.intake.conformToState(Intake.ControlState.EJECT);
+        s.turret.startVision();
+        s.motorizedHood.setState(MotorizedHood.State.VISION);
+        s.shooter.setState(Shooter.State.VISION); 
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));
-        runAction(new WaitToFinishPathAction(5));
-        runAction(new WaitForSuperstructureAction());
+        runAction(new WaitAction(0.5));
+        s.intakeState();
+        runAction(new WaitToFinishPathAction(7));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitAction(5.0));
+        runAction(new WaitForShotsAction(2.0));
+        s.turret.startVision();
         s.intakeState();
         runAction(new SetTrajectoryAction(trajectories.firstBallToSecondBall, 180, 1));
-        runAction(new WaitToFinishPathAction(5));
+        runAction(new WaitToFinishPathAction(7));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitAction(5.0));
-        s.postShotState();
+        runAction(new WaitForShotsAction(1.5, 1));
+        s.turret.startVision();
+        s.intakeState();
+        runAction(new SetTrajectoryAction(trajectories.secondBallToHumanPlayer, 135.0, 1));
+        runAction(new WaitToFinishPathAction(7));
+        runAction(new WaitForTwoBallsAction(2.0));
+        runAction(new SetTrajectoryAction(trajectories.humanPlayerToSecondBall, 90.0, 1));
+        runAction(new WaitToFinishPathAction(7));
+        s.wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+        s.intake.conformToState(Intake.ControlState.OFF);
+        s.visionShotState();
         runAction(new WaitForSuperstructureAction());
+        runAction(new WaitForShotsAction(2.0));
+        /*s.shooter.stop();
         s.intakeState();
-        runAction(new SetTrajectoryAction(trajectories.secondBallToHumanPlayer, 135, 1));
-        runAction(new WaitToFinishPathAction(5));
-        runAction(new WaitAction(2));
-        s.postIntakeState();
-        runAction(new SetTrajectoryAction(trajectories.humanPlayerToSecondOpponentBall, 270, 1));
-        runAction(new WaitToFinishPathAction(5));
-        s.intakeState();
-        runAction(new SetTrajectoryAction(trajectories.secondOpponentBallToThirdBall, 270, 1));
-        runAction(new WaitToFinishPathAction(5));
-        s.postIntakeState();
-
+        runAction(new SetTrajectoryAction(trajectories.secondBallToOpponentBall, 90.0, 1));
+        runAction(new WaitToFinishPathAction(7.0));*/
         System.out.println("Auto mode finished in " + currentTime() + " seconds");
     }
 

@@ -34,7 +34,7 @@ public class TestMode extends AutoModeBase {
     @Override
     protected void routine() throws AutoModeEndedException {
         super.startTime = Timer.getFPGATimestamp();
-        runAction(new ResetPoseAction(Constants.autoStartingPose));
+        runAction(new ResetPoseAction(Constants.autoRightStartingPose));
         s.intakeState();
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));
         runAction(new WaitToFinishPathAction(5));

@@ -260,8 +260,7 @@ public class Superstructure extends Subsystem {
 		request(
 			new ParallelRequest(
 				wrist.setWristAngleRequest(Constants.Wrist.kBallDebouncerAngle),
-				intake.stateRequest(Intake.ControlState.OFF),
-				ballFeeder.stateRequest(BallFeeder.State.OFF)
+				intake.stateRequest(Intake.ControlState.OFF)
 			)
 		);
 	}

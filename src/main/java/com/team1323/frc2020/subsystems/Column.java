@@ -36,15 +36,37 @@ public class Column extends Subsystem {
     Shooter shooter;
     Turret turret;
     MotorizedHood motorizedHood;
+    BallFeeder ballFeeder;
 
 
     LazyTalonFX column;
     DigitalInput banner;
 
     boolean detectedBall = false;
+    boolean previousDetectedBall = false;
+
+    boolean previousFeederDetected = false;
+
+    boolean shootingCurrentBall = false;
+    boolean previousShootingCurrentBall = false;
+    public boolean isShootingCurrentBall() {
+        return shootingCurrentBall;
+    }
+
+
     double columnStartTimestamp = Double.POSITIVE_INFINITY;
-    double ballDetectedTimestamp = Double.POSITIVE_INFINITY;
+    double ballDetectedTimestamp = 0.0;
     double targetRPM = 0.0;
+
+    private int loadedBallCount = 0;
+    public int getLoadedBallCount() {
+        return loadedBallCount;
+    }
+
+    private int totalBallCount = 0;
+    public int getTotalBallCount() {
+        return totalBallCount;
+    }
 
     private static Column instance = null;
     public static Column getInstance() {
@@ -56,6 +78,7 @@ public class Column extends Subsystem {
         shooter = Shooter.getInstance();
         turret = Turret.getInstance();
         motorizedHood = MotorizedHood.getInstance();
+        ballFeeder = BallFeeder.getInstance();
 
         column = new LazyTalonFX(Ports.COLUMN, "main");
         banner = new DigitalInput(Ports.COLUMN_BANNER);
@@ -82,14 +105,15 @@ public class Column extends Subsystem {
                     if(getBanner()) {
                         //column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
                         setOpenLoop(0.0);
-                        detectedBall = true;
                     }
                 }
                 if(getBanner()) {
                     ballDetectedTimestamp = Timer.getFPGATimestamp();
+                    detectedBall = true;
                 } else {
                     ballDetectedTimestamp = Double.POSITIVE_INFINITY;
                     detectedBall = false;
+                    shootingCurrentBall = false;
                 }
             }        
         });
@@ -147,6 +171,24 @@ public class Column extends Subsystem {
     private boolean allSubsystemsReady() {
         return shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle();
     }
+    private void updateBallCounter() {
+        if(!previousDetectedBall && detectedBall) {//The First ball is detected
+            loadedBallCount++;
+            totalBallCount++;
+        }
+        previousDetectedBall = detectedBall;
+
+        if(getBanner() && ballFeeder.isTeamBallDetected() && !previousFeederDetected) {//The Second ball is detected
+            totalBallCount++;
+            loadedBallCount++;
+        }
+        previousFeederDetected = ballFeeder.isTeamBallDetected();
+
+        if(!previousShootingCurrentBall && shootingCurrentBall) {
+            loadedBallCount--;
+        }
+        previousShootingCurrentBall = shootingCurrentBall;
+    }
 
     private double getFeedingDelay() {
         Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
@@ -183,10 +225,12 @@ public class Column extends Subsystem {
                     } else if((getBanner() && Double.isFinite(ballDetectedTimestamp) && 
                             (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay && allSubsystemsReady())) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
-                        columnStartTimestamp = timestamp;        
-                        setVelocity(Constants.Column.kFeedVelocitySpeed);     
+                        columnStartTimestamp = timestamp;
+                        shootingCurrentBall = true;
+                        setVelocity(Constants.Column.kFeedVelocitySpeed);
                     } else {
-                        setOpenLoop(0.0);
+                        if (!shootingCurrentBall)
+                            setOpenLoop(0.0);
                     }
                     break;
                 case INDEX_BALLS:
@@ -206,6 +250,8 @@ public class Column extends Subsystem {
                 default:
                 break;
             }
+            updateBallCounter();
+            
         }
 
         @Override
@@ -234,6 +280,8 @@ public class Column extends Subsystem {
         SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
         SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
         SmartDashboard.putNumber("Column RPM Target", targetRPM);
+        SmartDashboard.putNumber("Column Total Ball Counter", totalBallCount);
+        SmartDashboard.putNumber("Column Loaded Ball Counter", loadedBallCount);
         smartTuner.update();
     }
     @Override

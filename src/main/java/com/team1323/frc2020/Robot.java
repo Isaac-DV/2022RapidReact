@@ -12,6 +12,7 @@ import java.util.Set;
 import com.team1323.frc2020.auto.AutoModeBase;
 import com.team1323.frc2020.auto.AutoModeExecuter;
 import com.team1323.frc2020.auto.SmartDashboardInteractions;
+import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
 import com.team1323.frc2020.auto.modes.TestMode;
@@ -90,7 +91,7 @@ public class Robot extends TimedRobot {
 
 		generator.generateTrajectories();
 
-		AutoModeBase auto = new SixBallOneEjectMode();
+		AutoModeBase auto = new FiveBallOneEjectMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
 	}
@@ -133,7 +134,6 @@ public class Robot extends TimedRobot {
 			driverControls.setAutoMode(false);
 			disabledLooper.stop();
 			enabledLooper.start();
-			printStackTrace();
 			Wrist.getInstance().zeroWrist();
 			Turret.getInstance().zeroTurret();
 			SmartDashboard.putBoolean("Auto", false);
@@ -161,7 +161,6 @@ public class Robot extends TimedRobot {
 		try {
 			if (autoModeExecuter != null)
 				autoModeExecuter.stop();
-			printStackTrace();
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();

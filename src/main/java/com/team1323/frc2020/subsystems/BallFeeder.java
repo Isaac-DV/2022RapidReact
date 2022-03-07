@@ -27,7 +27,6 @@ public class BallFeeder extends Subsystem {
     BallSplitter ballSplitter;
     Intake intake;
     Shooter shooter;
-    Column column;
     
     LazyTalonFX feeder;
 
@@ -37,6 +36,11 @@ public class BallFeeder extends Subsystem {
     double splitterStartTimestamp = Double.POSITIVE_INFINITY;
     boolean intakeFeedEnabled = false;
     boolean isIntakeOpenLoop = false;
+
+    boolean teamBallDetected = false;
+    public boolean isTeamBallDetected() {
+        return teamBallDetected;
+    }
 
     private int ballCounter = 0; //The amount of balls that are in the robot
 
@@ -49,7 +53,6 @@ public class BallFeeder extends Subsystem {
 
     public BallFeeder() {
         ballSplitter = BallSplitter.getInstance();
-        column = Column.getInstance();
         intake = Intake.getInstance();
 
         shooter = Shooter.getInstance();
@@ -148,10 +151,9 @@ public class BallFeeder extends Subsystem {
 
                         if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
                             intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
-                        } else if(intake.getState() == Intake.ControlState.INTAKE) {
-                            //column.setIndexBallState();
                         }
                         intakeStartTimestamp = timestamp;
+                        teamBallDetected = true;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
@@ -159,13 +161,15 @@ public class BallFeeder extends Subsystem {
                             //column.conformToState(Column.ControlState.OFF);
                             splitterStartTimestamp = timestamp;
                         }
+                        teamBallDetected = false;
                     } else if (DetectedBall == Ball.None) { //There's no ball detected
                         if(pendingShutdown) {
                             setFeederOpenLoop(0.0);
                             pendingShutdown = false;
                         }
+                        teamBallDetected = false;
                     }
-                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > 2.0) {
+                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                         if(intake.getState() == Intake.ControlState.INTAKE) {
                             //column.setIndexBallState();
@@ -176,7 +180,7 @@ public class BallFeeder extends Subsystem {
                 default:
                     break;
             }
-            if((timestamp - intakeStartTimestamp) > 1.0 && Double.isFinite(intakeStartTimestamp)) {
+            if((timestamp - intakeStartTimestamp) > Constants.BallFeeder.kIntakeAutoRunTime && Double.isFinite(intakeStartTimestamp)) {
                 if(intake.getState() == Intake.ControlState.AUTO_FEED_INTAKE) { //If the intake is in any other state besides the autoFeedMode, it will not disable
                     intake.conformToState(Intake.ControlState.OFF);
                 }

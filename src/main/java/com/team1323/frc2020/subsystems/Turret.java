@@ -258,7 +258,8 @@ public class Turret extends Subsystem {
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
         SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
-        
+        SmartDashboard.putBoolean("Turret Is Ready", isReady());
+
         updateTurretTuning();
         //SmartDashboard.putNumber("Turret Current", periodicIO.current);
         //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);

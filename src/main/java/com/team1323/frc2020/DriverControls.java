@@ -132,7 +132,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, robotCentric, driver.leftTrigger.isBeingPressed());
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed(), driver.leftTrigger.isBeingPressed());
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -155,6 +155,7 @@ public class DriverControls implements Loop {
             swerve.rotate(ballSplitter.getRotationToTerminal());
         else if(driver.leftBumper.isBeingPressed())
             swerve.rotate(ballSplitter.getRotationToHanger());
+        
         
 
         if(s.needsToNotifyDrivers()) {
@@ -201,6 +202,7 @@ public class DriverControls implements Loop {
                 column.setState(Column.ControlState.INDEX_BALLS);
             }
         }
+        
         if(coDriver.aButton.wasActivated()) {
             intake.conformToState(Intake.ControlState.INTAKE);
             wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
@@ -209,18 +211,22 @@ public class DriverControls implements Loop {
                 column.setState(Column.ControlState.INDEX_BALLS);
             }
         } else if(coDriver.aButton.wasReleased()) {
-            if(coDriver.leftTrigger.isBeingPressed()) {
-                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
-            } else {
-                wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            }
             intake.conformToState(Intake.ControlState.OFF);
             ballFeeder.queueShutdown(true);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
         }
-        if(coDriver.bButton.longReleased() || coDriver.bButton.longPressed()) {
+
+        if (coDriver.leftTrigger.wasActivated()) {
+            if (coDriver.aButton.isBeingPressed()) {
+                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+            }
+        } else if (coDriver.leftTrigger.wasReleased()) {
+            if (coDriver.aButton.isBeingPressed()) {
+                wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+            }
+        }
+        if(coDriver.bButton.wasActivated()) {
             wrist.setWristAngle(Constants.Wrist.kStowedAngle);
-        }else if(coDriver.bButton.shortReleased()) {
-            wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
         }
         if(coDriver.yButton.wasActivated()) {
             s.manualShotState(2950.0, 12.5);

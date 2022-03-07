@@ -43,7 +43,7 @@ public class Shooter extends Subsystem {
     
     private State currentState = State.OPEN_LOOP;
 
-    private void setState(State newState) {
+    public void setState(State newState) {
         currentState = newState;
     }
     
@@ -304,6 +304,7 @@ public class Shooter extends Subsystem {
         SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
         SmartDashboard.putString("Shooter State", currentState.toString());
 
+        SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         smartTuner.update();
         updateRPM();
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);

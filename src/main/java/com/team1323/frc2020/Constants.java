@@ -38,7 +38,7 @@ public class Constants {
     public static final List<Pose2d> kFieldCornerPositions = Arrays.asList(kTopRightQuadrantPose, kTopLeftQuadrantPose,
         kBottomLeftQuadrantPose, kBottomRightQuadrantPose);
 
-    public static final Pose2d autoStartingPose = new Pose2d(new Translation2d(297.7142857142857, 92.85714285714286), Rotation2d.fromDegrees(90));
+    public static final Pose2d autoRightStartingPose = new Pose2d(new Translation2d(297.7142857142857, 92.85714285714286), Rotation2d.fromDegrees(90));
 
     /**
     * Target Specifications
@@ -150,7 +150,7 @@ public class Constants {
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
-        public static final double kAngleTolerance = 1.0;
+        public static final double kAngleTolerance = 1.5;
         public static final double kMinControlAngle = -315.0; //-250
         public static final double kMaxControlAngle = 190.0;
         public static final double kMinInitialAngle = -180.0;
@@ -189,7 +189,7 @@ public class Constants {
         public static final double kEncToOutputRatio = 18.0 / 12.0;
 
         public static final double kBottomToMotorRatio = 12.0 / 18.0; //1 : Falcon = 12 -> Bottom = 18
-        public static final double kTopToBottomRatio = 22.0 / 30.0; //24/18 : 22 -> 30
+        public static final double kTopToBottomRatio = 30.0 / 22.0; //24/18 : 22 -> 30
 
         public static final double kBottomWheelRadius = 2.0; // inches //2
         public static final double kTopWheelRadius = 1.25; // inches //1
@@ -216,7 +216,7 @@ public class Constants {
         public static final double kShooterRPMTolerance = 150.0; //50 //150
         public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
-        public static final double kBallVelocityScrubFactor = 301.278764112 / 320.704249596;
+        public static final double kBallVelocityScrubFactor = 315.576988 / 455.828434;
 
 
         public static final Translation2d closeShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 2), 2500.0);
@@ -255,7 +255,7 @@ public class Constants {
         public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = 98.0;
+        public static final double kIntakeAngle = 98.0; //96.0
         public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 35.0; //65.0
         public static final double kLowestAngle = 135.0;
@@ -281,8 +281,10 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
-        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.6;
-        public static final double kBallDelay = 0.375;
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.2;
+        public static final double kBallDelay = 0.01;
+
+        public static final double kColumnRunTime = 0.5;
     }    
 
 
@@ -309,20 +311,6 @@ public class Constants {
 
         public static final double kManualSpeed = 0.5;
     }
-
-    public static class Telescope {
-        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
-        public static final double kTicksPerInch = 0;
-
-        public static final double kMinControlHeight = 0.5;
-        public static final double kMaxControlHeight = 10.0;
-        public static final double kHeightTolerance = 0.2;
-
-        public static final double kP = 0.0;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kF = 0.0;
-    }
     public static class Elevator {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kFalconTicksPerInch = 150355.0 / 10.25;
@@ -341,28 +329,13 @@ public class Constants {
         public static final double kD = 0.0;
         public static final double kF = 1023.0 / kMaxSpeed;
     }
-    public static class ClawWrist {
-        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
-        public static final double kMinControlAngle = 0.0;
-        public static final double kMaxControlAngle = 100.0;
-        public static final double kMinInitialAngle = 0.0;
-        public static final double kMaxInitialAngle = 0.0;
-        public static final double kFalconToWristRatio = 1096.875;
-        public static final double kFalconToCANCoderRatio = 0.0;
-        public static final double kWristAngleTolerance = 2.0;
-        
-        public static final double kP = 0.01;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kF = 1023.0 / kMaxSpeed;
-    }
     public static class MotorizedHood {
         public static final double kMinControlAngle = 15.0; //Lowest Hood physical Angle = 27deg
         public static final double kMaxControlAngle = 45.0; //Highest Hood physical angle = 42.5deg 28
         public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
 
         // Measured upward from the ground; corresponds to kMinControlAngle
-        public static final double kMaxEmpiricalAngle = 68.0 + 25.0;
+        public static final double kMaxEmpiricalAngle = 70.609 + 18.0;
         public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
 
         public static final double kServoSpeed = 1.0 / 1.65; // Stroke percentage / second
@@ -403,6 +376,10 @@ public class Constants {
         public static final double kGameBallDiameter = 9.5;     
         
     }
+    public static class BallFeeder {
+        public static final double kSplitterRunTime = 2.0;
+        public static final double kIntakeAutoRunTime = 1.0;
+    }
     /*
     public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
     static {
@@ -438,17 +415,17 @@ public class Constants {
     static {
         // Key: distance from the vision target, in inches
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 10.0), 1650.0)); //
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 10.0), 1800.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 12.0), 1800.0)); //
+        /*kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 10.0), 1800.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(84.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 12.0), 1800.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(96.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1850.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(108.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1900.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(120.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 2000.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(132.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 20.0), 2250.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(108.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1900.0));*/
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(120.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 18.0), 2350.0));
+        /*kDistanceToShotVectorMap.put(new InterpolatingDouble(132.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 20.0), 2250.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(144.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 22.0), 2250.0));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(156.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 23.0), 2350.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(168.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 24.0), 2350.0));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(180.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 2600.0));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(168.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 24.0), 2350.0));*/
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(180.0), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 2800.0));
 
     }
 }

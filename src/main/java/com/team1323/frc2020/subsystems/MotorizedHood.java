@@ -204,7 +204,7 @@ public class MotorizedHood extends Subsystem {
         SmartDashboard.putNumber("Servo Right Position", getRightServoTargetPosition());
         SmartDashboard.putNumber("Servo Left Position", getLeftServoTargetPosition());
         SmartDashboard.putNumber("Servo Target Angle", servoTargetAngle);
-        
+        SmartDashboard.putBoolean("Hood Is Ready", Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance);
         updateAngleInput();
     }
 
