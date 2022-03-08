@@ -25,7 +25,7 @@ public class SmartTuning {
     public double getValue() {
         return mValue;
     }
-    //private CreatedDashboardValue[] mDBValuesArray;
+    private MicroTuner[] mMicroTuners = new MicroTuner[0];
 
 
 
@@ -53,14 +53,7 @@ public class SmartTuning {
             updatekD(getDashboardNumberValue(keyName + "kD"));
             updatekF(getDashboardNumberValue(keyName + "kF"));
             mValue = getDashboardNumberValue(keyName + "Input");
-            /*for(int i = 0; i < mDBValuesArray.length; i++) {
-                CreatedDashboardValue currentDBValue = mDBValuesArray[i];
-                if(currentDBValue.valueType == 's') {
-                    currentDBValue.valueString = getDashboardStringValue(currentDBValue.key);
-                } else if(currentDBValue.valueType == 'n') {
-                    currentDBValue.valueNumber = getDashboardNumberValue(currentDBValue.key);
-                }
-            }*/
+            updateMicroTuners();
         }
     }
     
@@ -74,19 +67,6 @@ public class SmartTuning {
         SmartDashboard.putNumber(keyName, value);
     }
 
-    /*public Object getDashboardValue(String keyName) {
-        for(int i = 0; i < mDBValuesArray.length; i++) {
-            CreatedDashboardValue currentDBValue = mDBValuesArray[i];
-            if(currentDBValue.key == keyName) {
-                if(currentDBValue.valueType == 's') {
-                    return (String) (currentDBValue.valueString);
-                } else if(currentDBValue.valueType == 'n') {
-                    return (double) (currentDBValue.valueNumber);
-                }
-            }
-        }
-        return null;
-    }*/
     public double getDashboardNumberValue(String keyName) {
         return SmartDashboard.getNumber(keyName, 0);
     }
@@ -94,7 +74,20 @@ public class SmartTuning {
         return SmartDashboard.getString(keyName, "");
     }
 
-
+    public MicroTuner linkMicroTuner(MicroTuner microTuner) {
+        MicroTuner[] tempMicroTuners = new MicroTuner[mMicroTuners.length + 1];
+        for(int i = 0; i < mMicroTuners.length; i++) {
+            tempMicroTuners[i] = mMicroTuners[i];
+        }
+        tempMicroTuners[mMicroTuners.length] = microTuner;
+        mMicroTuners = tempMicroTuners;
+        return microTuner;
+    }
+    public void updateMicroTuners() {
+        for(int i = 0; i < mMicroTuners.length; i++) {
+            mMicroTuners[i].update();
+        }
+    }
 
     public void updatekP(double value) {
         if(kP != value) {
@@ -125,31 +118,26 @@ public class SmartTuning {
         this.enabled = enabled;
     }
 
-    /*private class CreatedDashboardValue {
-        public String key;
-        public String valueString;
-        public double valueNumber;
-        public char valueType;
-        public CreatedDashboardValue(String key, String value) {
-            this.key = key;
-            this.valueString = value;
-            this.valueType = 's';
-            addToArray();
-        }
-        public CreatedDashboardValue(String key, double value) {
-            this.key = key;
-            this.valueNumber = value;
-            this.valueType = 'n';
-            addToArray();
-        }
-        protected void addToArray() {
-            CreatedDashboardValue[] newArray = new CreatedDashboardValue[mDBValuesArray.length + 1];
-            for(int i = 0; mDBValuesArray.length > i; i++) {
-                newArray[i] = mDBValuesArray[i];
+    public class MicroTuner {
+        String keyname;
+        char valueType;
+        double valueNumber;
+        String valueString;
+        public MicroTuner(String keyname, char valueTypeChar) {
+            this.keyname = keyname;
+            this.valueType = valueTypeChar;
+            if(valueTypeChar == 's') {
+                createDashboardKey(keyName, "");
+            } else if(valueTypeChar == 'n') {
+                createDashboardKey(keyName, 0);
             }
-            newArray[mDBValuesArray.length] = this;
-            mDBValuesArray = newArray;
         }
-        
-    }*/
+        public void update() {
+            if(this.valueType == 's') {
+                this.valueString = getDashboardStringValue(this.keyname);
+            } else if(this.valueType == 'n') {
+                this.valueNumber = getDashboardNumberValue(this.keyname);
+            }
+        }
+    }
 }

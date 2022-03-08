@@ -279,7 +279,7 @@ public class DriverControls implements Loop {
             turret.startVision();
         }
 
-        /*
+        
         double testControllerLeftY = -testController.getLeftY();
         if(testControllerLeftY != 0) {
             elevator.setOpenLoop(testControllerLeftY);
@@ -287,7 +287,7 @@ public class DriverControls implements Loop {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
         } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
             elevator.lockElevatorHeight();
-        }*/
+        }
     }
 
     private void oneControllerMode() {
