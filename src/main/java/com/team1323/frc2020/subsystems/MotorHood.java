@@ -211,10 +211,13 @@ public class MotorHood extends Subsystem {
                 //DriverStation.reportError("HOOD WAS RESET TO ABSOLUTE WITH THE MAG ENCODER", false);
                 double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.MotorHood.kEncStartingAngle);
                 double absolutePosition = Constants.MotorHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorHood.kEncoderToHoodRatio);
-                if (absolutePosition > Constants.MotorHood.kMaxInitialAngle)
-                    absolutePosition -= 360.0;
-                else if (absolutePosition < Constants.MotorHood.kMinInitialAngle)
-                    absolutePosition += 360.0;
+                if (absolutePosition > Constants.MotorHood.kMaxInitialAngle) {
+                    cancoderOffset -= 360.0;
+                    absolutePosition = Constants.MotorHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorHood.kEncoderToHoodRatio);
+                } else if (absolutePosition < Constants.MotorHood.kMinInitialAngle) {
+                    cancoderOffset += 360.0;
+                    absolutePosition = Constants.MotorHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorHood.kEncoderToHoodRatio);
+                }
                 if(absolutePosition > Constants.MotorHood.kMaxInitialAngle || absolutePosition < Constants.MotorHood.kMinInitialAngle){
                     DriverStation.reportError("Hood angle is out of bounds", false);
                     hasEmergency = true;
