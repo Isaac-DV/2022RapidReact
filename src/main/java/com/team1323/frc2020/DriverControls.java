@@ -9,12 +9,14 @@ package com.team1323.frc2020;
 
 import java.util.Arrays;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
 import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Elevator;
 import com.team1323.frc2020.subsystems.Intake;
+import com.team1323.frc2020.subsystems.MotorHood;
 import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.Shooter;
 import com.team1323.frc2020.subsystems.SubsystemManager;
@@ -48,6 +50,7 @@ public class DriverControls implements Loop {
     private Column column;
     private Turret turret;
     private MotorizedHood motorizedHood;
+    private MotorHood motorHood;
     private Shooter shooter;
     private Elevator elevator;
     private Superstructure s;
@@ -83,6 +86,7 @@ public class DriverControls implements Loop {
         column = Column.getInstance();
         turret = Turret.getInstance();
         motorizedHood = MotorizedHood.getInstance();
+        motorHood = MotorHood.getInstance();
         shooter = Shooter.getInstance();
         elevator = Elevator.getInstance();  
 
@@ -90,7 +94,7 @@ public class DriverControls implements Loop {
 
         subsystems = new SubsystemManager(
 				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, turret,
-                    motorizedHood, shooter, elevator, column, s));
+                    motorizedHood, shooter, elevator, motorHood, column, s));
     }
 
     @Override
@@ -175,10 +179,22 @@ public class DriverControls implements Loop {
         }
         */
         
-        if(coDriverLeftY != 0 || coDriverLeftX != 0) {
+        /*if(coDriverLeftY != 0 || coDriverLeftX != 0) {
             turret.fieldRelativeManual(coDriverLeftX, coDriverLeftY);
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
+        }*/
+        if(coDriverLeftY != 0) {
+            motorHood.setOpenLoop(coDriverLeftY);
+        } else if (motorHood.periodicIO.controlMode == ControlMode.PercentOutput) {
+            motorHood.lockAngle();
+        }
+        if(coDriver.POV90.wasActivated()) {
+            motorHood.setAngle(45);
+            System.out.println("POV90 Ran");
+        } 
+        if(coDriver.POV180.wasActivated()) {
+            motorHood.setAngle(15);
         }
         /*
         if(coDriverLeftY != 0) {
@@ -236,7 +252,7 @@ public class DriverControls implements Loop {
         if(coDriver.xButton.wasActivated()) {
             //s.manualShotState(1600.0, 5.0);
             //shooter.setOpenLoop(1.0);
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
+            motorHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
             turret.startVision();
             column.setState(Column.ControlState.FEED_BALLS);
@@ -269,16 +285,17 @@ public class DriverControls implements Loop {
             turret.setAngle(0.0);
         }
 
-
-        
-        if(coDriver.backButton.wasActivated()) {
-            s.disableState();
+        if(column.needsToNotifyDrivers()) {
+            coDriver.rumble(2.0, 1.0);
         }
         if(coDriver.startButton.wasActivated()) {
             //turret.lockAngle();
             turret.startVision();
         }
-
+        if(coDriver.backButton.wasActivated()) {
+            s.disableState();
+        }
+        
         
         double testControllerLeftY = -testController.getLeftY();
         if(testControllerLeftY != 0) {
@@ -288,6 +305,7 @@ public class DriverControls implements Loop {
         } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
             elevator.lockElevatorHeight();
         }
+        
     }
 
     private void oneControllerMode() {

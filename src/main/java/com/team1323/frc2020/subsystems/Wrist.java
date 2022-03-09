@@ -141,7 +141,7 @@ public class Wrist extends Subsystem {
             } else if (absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
                 cancoderOffset += 360.0;
                 absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
-            }
+            }   
 
             if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
                 DriverStation.reportError("Wrist angle is out of bounds", false);

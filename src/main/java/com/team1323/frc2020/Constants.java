@@ -142,11 +142,99 @@ public class Constants {
     public static final int kCANTimeoutMs = 10; // use for important on the fly updates
     public static final int kLongCANTimeoutMs = 100; // use for constructors
     
+    
+    
+    public static class LEDs {
+        
+        //LED Colors
+        public static final List<Double> pink = Arrays.asList(255.0, 20.0, 30.0);
+        public static final List<Double> blue = Arrays.asList(0.0, 0.0, 255.0);
+        public static final List<Double> red = Arrays.asList(255.0, 0.0, 0.0);
+        public static final List<Double> orange = Arrays.asList(255.0, 20.0, 0.0);
+        public static final List<Double> yellow = Arrays.asList(255.0, 60.0, 0.0);
+        public static final List<Double> green = Arrays.asList(0.0, 255.0, 0.0);
+        public static final List<Double> purple = Arrays.asList(255.0, 0.0, 255.0);
+        
+        //LED Arrays
+        public static final List<List<Double>> rainbow = Arrays.asList(red, orange, yellow, green, blue, pink, purple);
+        
+    }
+    
+    
+    
+    public static class Intake{ 
+        public static final double kIntakeSpeed = 1.0;
+        public static final double kOuttakeSpeed = -0.5;
+        public static final double kFeedingSpeed = 0.5;
+        public static final double kHumanLoadSpeed = 0.5;
+        public static final double kFastIntakeSpeed = 0.75;
+    }
+
+    public static class Wrist {
+        public static final double kWristRatio = 0.0; //This value needs to be found.
+        public static final double kWristSpeed = 0.5;
+        public static final double kWristStartingAngle = -25.47;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 178.654306;
+        public static final double kCANCoderToWristRatio = 22.0 / 12.0;
+        public static final double kFalconToWristRatio = 66.0;
+
+        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
+        public static final double kMaxInitialAngle = 165.0;
+        public static final double kMinInitialAngle = -30.0;
+
+
+        public static final double kMaxWristAngle = 135.0;
+        public static final double kMinWristAngle = -15.0;
+        public static final double kWristHardStopAngle = -25.47;
+
+        public static final double kP = 0.145;
+        public static final double kI = 0.0;
+        public static final double kD = 12.5;
+        public static final double kF = 1023.0/kMaxSpeed;
+
+        public static final double kIntakeAngle = 98.0; //96.0
+        public static final double kStowedAngle = -10.0;
+        public static final double kBallDebouncerAngle = 35.0; //65.0
+        public static final double kLowestAngle = 135.0;
+
+    }
+    
+    public static class BallSplitter {
+        public static final double kD2F = 64; //Distance to Flagpoint : The length in which the ball is fired from the ejectors, in inches
+        public static final double kWheelDiameter = 4.0;
+        public static final double kGameBallDiameter = 9.5;     
+        
+    }
+
+    public static class BallFeeder {
+        public static final double kSplitterRunTime = 2.0;
+        public static final double kIntakeAutoRunTime = 1.0;
+    }
+
+    public static class Column {
+        public static final double kMaxSpeed = 6380.0;
+
+        public static final double kFeedBallSpeed = 1.0;
+        public static final double kReverseSpeed = -1.0;
+
+        public static final double kMinFeedDelay = 0.125;
+        public static final double kMaxFeedDelay = 0.5;
+
+        public static final double kMinDistance = 60.0;
+        public static final double kMaxDistance = 180.0;
+
+        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.2;
+        public static final double kBallDelay = 0.01;
+
+        public static final double kColumnRunTime = 0.5;
+    }
+
     public static class Turret {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = 287.779219;
+        public static final double kTurretStartingEncoderPosition = 198.608441;
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
@@ -167,24 +255,51 @@ public class Constants {
         public static final double kYOffset = 0.0;
     
     }
-    
-    
-    public static class LEDs {
-        
-        //LED Colors
-        public static final List<Double> pink = Arrays.asList(255.0, 20.0, 30.0);
-        public static final List<Double> blue = Arrays.asList(0.0, 0.0, 255.0);
-        public static final List<Double> red = Arrays.asList(255.0, 0.0, 0.0);
-        public static final List<Double> orange = Arrays.asList(255.0, 20.0, 0.0);
-        public static final List<Double> yellow = Arrays.asList(255.0, 60.0, 0.0);
-        public static final List<Double> green = Arrays.asList(0.0, 255.0, 0.0);
-        public static final List<Double> purple = Arrays.asList(255.0, 0.0, 255.0);
-        
-        //LED Arrays
-        public static final List<List<Double>> rainbow = Arrays.asList(red, orange, yellow, green, blue, pink, purple);
-        
+
+    public static class MotorHood {
+        public static final double kReduction = 206.25;
+        public static final double kEncoderToHoodRatio = 4;
+
+        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
+
+        public static final double kP = 0.0;
+        public static final double kI = 0.0;
+        public static final double kD = 0.0;
+        public static final double kF = 1023.0 / kMaxSpeed;
+
+        public static final double kHoodStartingAngle = 15.0;
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 295.543105 : 295.543105; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+
+        public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
+
+        public static final double kMinInitialAngle = 10.0;
+        public static final double kMaxInitialAngle = 50.0;
+
+        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 15.0 : 15.0;
+        public static final double kMaxControlAngle = 45.0;
+
+        public static final double kAngleTolerance = 2.0;
+
+        //Shooter Hood Angles
+        public static final double kCloseAngle = 32.25;
+        public static final double kMidAngle = 42.5; //55 deg
+        public static final double kFarAngle = 59.0;
     }
-    
+
+    public static class MotorizedHood {
+        public static final double kMinControlAngle = 15.0; //Lowest Hood physical Angle = 27deg
+        public static final double kMaxControlAngle = 45.0; //Highest Hood physical angle = 42.5deg 28
+        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
+
+        // Measured upward from the ground; corresponds to kMinControlAngle
+        public static final double kMaxEmpiricalAngle = 70.609 + 18.0;
+        public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
+
+        public static final double kServoSpeed = 1.0 / 1.65; // Stroke percentage / second
+
+        public static final double kAngleTolerance = 1.0; // degrees
+    }
+
     public static class Shooter{
         public static final double kEncToOutputRatio = 18.0 / 12.0;
 
@@ -222,95 +337,7 @@ public class Constants {
         public static final Translation2d closeShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 2), 2500.0);
         public static final Translation2d farShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 10), 3500.0);
     }
-    
-    public static class Intake{
-        
-       
-        
-        public static final double kIntakeSpeed = 1.0;
-        public static final double kOuttakeSpeed = -0.5;
-        public static final double kFeedingSpeed = 0.5;
-        public static final double kHumanLoadSpeed = 0.5;
-        public static final double kFastIntakeSpeed = 0.75;
-    }
-    public static class Wrist {
-        public static final double kWristRatio = 0.0; //This value needs to be found.
-        public static final double kWristSpeed = 0.5;
-        public static final double kWristStartingAngle = -25.47;
-        public static final double kWristStartingEncoderPosition = 178.654306;
-        public static final double kCANCoderToWristRatio = 22.0 / 12.0;
-        public static final double kFalconToWristRatio = 66.0;
 
-        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kMaxInitialAngle = 165.0;
-        public static final double kMinInitialAngle = -30.0;
-
-
-        public static final double kMaxWristAngle = 135.0;
-        public static final double kMinWristAngle = -15.0;
-        public static final double kWristHardStopAngle = -25.47;
-
-        public static final double kP = 0.145;
-        public static final double kI = 0.0;
-        public static final double kD = 12.5;
-        public static final double kF = 1023.0/kMaxSpeed;
-
-        public static final double kIntakeAngle = 98.0; //96.0
-        public static final double kStowedAngle = -10.0;
-        public static final double kBallDebouncerAngle = 35.0; //65.0
-        public static final double kLowestAngle = 135.0;
-
-    }
-    public static class Feeder {
-        public static final double kFeedingSpeed = 0.9;
-        public static final double kReverseSpeed = -0.5;
-        public static final double kReceivingSpeed = 0.25;
-        
-        public static final double kRamp = 0.125;
-    }
-    public static class Column {
-        public static final double kMaxSpeed = 6380.0;
-
-        public static final double kFeedBallSpeed = 1.0;
-        public static final double kReverseSpeed = -1.0;
-
-        public static final double kMinFeedDelay = 0.125;
-        public static final double kMaxFeedDelay = 0.5;
-
-        public static final double kMinDistance = 60.0;
-        public static final double kMaxDistance = 180.0;
-
-        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
-        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.2;
-        public static final double kBallDelay = 0.01;
-
-        public static final double kColumnRunTime = 0.5;
-    }    
-
-
-    public static class Hanger {
-        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-
-        public static final double kEncoderReduction = 20.25;
-
-        public static final double kP = 0.01;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kF = 1023.0 / kMaxSpeed;
-
-        public static final double kTicksPerInch = 24154.0 / 2.0; //-2.0 -24156 2 inches
-        public static final double kHeightTolerance = 2.0;
-        
-        public static final double kMaxControlHeight = 25.5;
-        public static final double kMinControlHeight = 0.0;
-
-        public static final double kMaxInitialHeight = 4.64;//3.64
-        public static final double kMinInitialHeight = 2.64;
-
-        public static final double kEncoderStartingAngle = 97.64; //3.433 inches per rotation
-
-        public static final double kManualSpeed = 0.5;
-    }
     public static class Elevator {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kFalconTicksPerInch = 150355.0 / 10.25;
@@ -329,57 +356,7 @@ public class Constants {
         public static final double kD = 0.0;
         public static final double kF = 1023.0 / kMaxSpeed;
     }
-    public static class MotorizedHood {
-        public static final double kMinControlAngle = 15.0; //Lowest Hood physical Angle = 27deg
-        public static final double kMaxControlAngle = 45.0; //Highest Hood physical angle = 42.5deg 28
-        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
 
-        // Measured upward from the ground; corresponds to kMinControlAngle
-        public static final double kMaxEmpiricalAngle = 70.609 + 18.0;
-        public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
-
-        public static final double kServoSpeed = 1.0 / 1.65; // Stroke percentage / second
-
-        public static final double kAngleTolerance = 1.0; // degrees
-    }
-    public static class MotorHood {
-        public static final double kReduction = 80.89;
-
-        public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-
-        public static final double kP = 0.0;
-        public static final double kI = 0.0;
-        public static final double kD = 0.0;
-        public static final double kF = 1023.0 / kMaxSpeed;
-
-        public static final double kHoodStartingAngle = 65.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 0.0 : 0.0; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
-
-        public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
-
-        public static final double kMinInitialAngle = 10.0;
-        public static final double kMaxInitialAngle = 70.0;
-
-        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 16.0 : 18.0;
-        public static final double kMaxControlAngle = 63.0;
-
-        public static final double kAngleTolerance = 2.0;
-
-        //Shooter Hood Angles
-        public static final double kCloseAngle = 32.25;
-        public static final double kMidAngle = 42.5; //55 deg
-        public static final double kFarAngle = 59.0;
-    }
-    public static class BallSplitter {
-        public static final double kD2F = 64; //Distance to Flagpoint : The length in which the ball is fired from the ejectors, in inches
-        public static final double kWheelDiameter = 4.0;
-        public static final double kGameBallDiameter = 9.5;     
-        
-    }
-    public static class BallFeeder {
-        public static final double kSplitterRunTime = 2.0;
-        public static final double kIntakeAutoRunTime = 1.0;
-    }
     /*
     public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
     static {

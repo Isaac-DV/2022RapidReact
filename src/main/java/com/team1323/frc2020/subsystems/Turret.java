@@ -111,7 +111,7 @@ public class Turret extends Subsystem {
         
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
         turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 2.0), Constants.kCANTimeoutMs); // 3.0
+        turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs); // 3.0
         turret.configMotionSCurveStrength(0); // 0
         turret.configAllowableClosedloopError(0, degreesToEncUnits(0), Constants.kCANTimeoutMs);
         

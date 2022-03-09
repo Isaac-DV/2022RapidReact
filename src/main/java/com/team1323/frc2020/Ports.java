@@ -26,6 +26,7 @@ public class Ports {
     public static final int COLUMN = 5;
     public static final int TURRET = 14;    
     //public static final int SHOOTER_TOP = 7;
+    public static final int HOOD_TALON = 15;
     public static final int SHOOTER_LEFT = 20;
     public static final int SHOOTER_RIGHT = 7;
     public static final int ELEVATOR = 16;
@@ -64,8 +65,7 @@ public class Ports {
 
     //Canifier
     public static final int CANIFIER = 30;
-    public static final int HOOD_TALON = 0;
-    public static final int HOOD_ENCODER = 0;
+    public static final int HOOD_ENCODER = 7;
         
     }
     

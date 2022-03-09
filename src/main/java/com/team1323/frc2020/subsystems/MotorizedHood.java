@@ -58,7 +58,7 @@ public class MotorizedHood extends Subsystem {
         leftServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
 
         smartTuner = new SmartTuning("hood");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
 
         setAngle(Constants.MotorizedHood.kMinControlAngle);
     }

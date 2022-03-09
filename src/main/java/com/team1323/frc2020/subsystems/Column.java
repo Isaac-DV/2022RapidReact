@@ -42,6 +42,8 @@ public class Column extends Subsystem {
     LazyTalonFX column;
     DigitalInput banner;
 
+    private boolean notifyDrivers = false;
+
     boolean detectedBall = false;
     boolean previousDetectedBall = false;
 
@@ -181,6 +183,7 @@ public class Column extends Subsystem {
         if(getBanner() && ballFeeder.isTeamBallDetected() && !previousFeederDetected) {//The Second ball is detected
             totalBallCount++;
             loadedBallCount++;
+            notifyDrivers = true;
         }
         previousFeederDetected = ballFeeder.isTeamBallDetected();
 
@@ -188,6 +191,7 @@ public class Column extends Subsystem {
             loadedBallCount--;
         }
         previousShootingCurrentBall = shootingCurrentBall;
+
     }
 
     private double getFeedingDelay() {
@@ -260,6 +264,13 @@ public class Column extends Subsystem {
         }
         
     };
+    public boolean needsToNotifyDrivers() {
+        if(notifyDrivers) {
+            notifyDrivers = false;
+            return true;
+        }
+        return false;
+    }
 
    
 
