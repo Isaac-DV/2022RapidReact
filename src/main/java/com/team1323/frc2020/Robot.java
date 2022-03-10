@@ -16,11 +16,12 @@ import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
 import com.team1323.frc2020.auto.modes.TestMode;
+import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
 import com.team1323.frc2020.loops.QuinticPathTransmitter;
 import com.team1323.frc2020.loops.RobotStateEstimator;
-import com.team1323.frc2020.subsystems.MotorHood;
+import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.SubsystemManager;
 import com.team1323.frc2020.subsystems.Superstructure;
 import com.team1323.frc2020.subsystems.Turret;
@@ -92,7 +93,7 @@ public class Robot extends TimedRobot {
 
 		generator.generateTrajectories();
 
-		AutoModeBase auto = new FiveBallOneEjectMode();
+		AutoModeBase auto = new TwoBallTwoEjectMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
 	}
@@ -114,7 +115,7 @@ public class Robot extends TimedRobot {
 			driverControls.setAutoMode(true);
 			Wrist.getInstance().zeroWrist();
 			Turret.getInstance().zeroTurret();
-			MotorHood.getInstance().zeroHood();
+			MotorizedHood.getInstance().zeroHood();
 			disabledLooper.stop();
 			enabledLooper.start();
 
@@ -137,7 +138,7 @@ public class Robot extends TimedRobot {
 			enabledLooper.start();
 			Wrist.getInstance().zeroWrist();
 			Turret.getInstance().zeroTurret();
-			MotorHood.getInstance().zeroHood();
+			MotorizedHood.getInstance().zeroHood();
 			SmartDashboard.putBoolean("Auto", false);
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -182,7 +183,7 @@ public class Robot extends TimedRobot {
 			s.swerve.zeroModuleAngles();
 			Wrist.getInstance().resetToAbsolutePosition();
 			Turret.getInstance().resetToAbsolutePosition();
-			MotorHood.getInstance().resetToAbsolute();
+			MotorizedHood.getInstance().resetToAbsolute();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

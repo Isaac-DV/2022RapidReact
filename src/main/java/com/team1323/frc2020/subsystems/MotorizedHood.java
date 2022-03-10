@@ -1,11 +1,14 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package com.team1323.frc2020.subsystems;
 
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
@@ -15,30 +18,34 @@ import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.SmartTuning;
 import com.team1323.lib.util.Util;
+import com.team254.drivers.LazyTalonFX;
 
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/** Add your docs here. */
+/**
+ * An adjustable shooter hood, powered by a BAG motor
+ */
 public class MotorizedHood extends Subsystem {
     SmartTuning smartTuner;
-    public double angleInput = 0;
 
-    Servo rightServo;
-    Servo leftServo;
-    double servoTargetAngle;
-    double targetPosition = 0.0;
-    boolean travelingUp = false;
-    double finishTimestamp = 0.0; // timestamp when the hood is predicted to reach its target position
     private static MotorizedHood instance = null;
-    
     public static MotorizedHood getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new MotorizedHood();
         return instance;
     }
 
+    LazyTalonFX hood;
+    DutyCycle encoder;
+    RobotState robotState;
+    
+    public double angleInput = 0;
+    private boolean isEncoderFlipped = false;
+    private boolean zeroedAbsolutely = false;
     public enum State {
         POSITION, VISION
     }
@@ -46,77 +53,86 @@ public class MotorizedHood extends Subsystem {
     public State getState() {
         return currentState;
     }
-    public void setState(State newState) {
-        currentState = newState;
+    public void setState(State desiredState) {
+        currentState = desiredState;
     }
+    public PeriodicIO periodicIO = new PeriodicIO();
 
     public MotorizedHood() {
-        rightServo = new Servo(Ports.HOOD_RIGHT_SERVO);
-        leftServo = new Servo(Ports.HOOD_LEFT_SERVO);
+        hood = new LazyTalonFX(Ports.HOOD_TALON, "main");
+        encoder = new DutyCycle(new DigitalInput(Ports.HOOD_ENCODER));
 
-        rightServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
-        leftServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+        hood.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
+        hood.enableVoltageCompensation(true);
+        hood.setInverted(TalonFXInvertType.Clockwise);
+        setEncoderPhase(false);
 
-        smartTuner = new SmartTuning("hood");
-        smartTuner.enabled(false);
+        hood.setNeutralMode(NeutralMode.Coast);
 
-        setAngle(Constants.MotorizedHood.kMinControlAngle);
+        hood.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+
+        setCurrentLimit(10.0);
+ 
+        hood.selectProfileSlot(0, 0);
+        hood.config_kP(0, Constants.MotorizedHood.kP, Constants.kCANTimeoutMs);
+        hood.config_kI(0, Constants.MotorizedHood.kI, Constants.kCANTimeoutMs);
+        hood.config_kD(0, Constants.MotorizedHood.kD, Constants.kCANTimeoutMs);
+        hood.config_kF(0, Constants.MotorizedHood.kF, Constants.kCANTimeoutMs);
+
+        hood.configMotionCruiseVelocity(Constants.MotorizedHood.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
+        hood.configMotionAcceleration(Constants.MotorizedHood.kMaxSpeed * 10.0, Constants.kCANTimeoutMs);
+
+        hood.configForwardSoftLimitThreshold(hoodAngleToEncUnits(Constants.MotorizedHood.kMaxControlAngle), Constants.kCANTimeoutMs);
+        hood.configReverseSoftLimitThreshold(hoodAngleToEncUnits(Constants.MotorizedHood.kMinControlAngle), Constants.kCANTimeoutMs);
+        hood.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
+        hood.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
+
+        hood.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
+        hood.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 50);
+        
+        hood.setSelectedSensorPosition(degreesToEncUnits(15.0));
+        resetToAbsolute();
+        //hood.setSelectedSensorPosition(0);
+
+        setOpenLoop(0.0);
+        smartTuner = new SmartTuning(hood, "hood");
+        smartTuner.enabled(true);
     }
-    
-    private void setServoAngle(double angle) {
-        angle = Util.limit(angle, Constants.MotorizedHood.kMinControlAngle, Constants.MotorizedHood.kMaxControlAngle);
-        servoTargetAngle = angle;
 
-        double angleRange = Constants.MotorizedHood.kMaxControlAngle - Constants.MotorizedHood.kMinControlAngle;
-        double offsetAngle = angle - Constants.MotorizedHood.kMinControlAngle;
-        double adjacentSideLength = 1.0 / Math.tan(Math.toRadians(angleRange));
-        double oppositeSideLength = Math.tan(Math.toRadians(offsetAngle)) * adjacentSideLength;
-        setServoPercentage(oppositeSideLength);
+    private void setCurrentLimit(double amps) {
+        SupplyCurrentLimitConfiguration currentLimitConfiguration = new SupplyCurrentLimitConfiguration(true, amps, amps, 10);
+        hood.configSupplyCurrentLimit(currentLimitConfiguration, Constants.kCANTimeoutMs);
     }
 
-    private void setServoPercentage(double percent) {
-        rightServo.set(percent);
-        leftServo.set(percent);
-
-        double currentPosition = getPosition();
-        double travelDistance = percent - currentPosition;
-        travelingUp = travelDistance >= 0.0;
-        finishTimestamp = Timer.getFPGATimestamp() + (Math.abs(travelDistance) / Constants.MotorizedHood.kServoSpeed);
-        targetPosition = percent;
+    private void setEncoderPhase(boolean phase) {
+        isEncoderFlipped = phase;
     }
 
-    public void setAngle(double angle) {
-        setState(State.POSITION);
-        setServoAngle(angle);
+    private double getAbsoluteEncoderDegrees() {
+        return (isEncoderFlipped ? -1.0 : 1.0) * encoder.getOutput() * 360.0;
     }
 
-    public double getPosition() {
-        double timestamp = Timer.getFPGATimestamp();
-        if (timestamp >= finishTimestamp) {
-            return targetPosition;
+    private boolean isEncoderConnected() {
+        if (RobotBase.isReal()) {
+            return encoder.getFrequency() != 0;
         }
-
-        double remainingDistance = (finishTimestamp - timestamp) * Constants.MotorizedHood.kServoSpeed;
-        if (!travelingUp)
-            remainingDistance *= -1.0;
-
-        return targetPosition - remainingDistance;
+        return true;
     }
 
-    public double getAngle() {
-        double angleRange = Constants.MotorizedHood.kMaxControlAngle - Constants.MotorizedHood.kMinControlAngle;
-        double oppositeSideLength = getPosition();
-        double adjacentSideLength = 1.0 / Math.tan(Math.toRadians(angleRange));
-
-        return Constants.MotorizedHood.kMinControlAngle + Math.toDegrees(Math.atan(oppositeSideLength / adjacentSideLength));
+    public double encUnitsToDegrees(double encUnits) {
+        return encUnits / Constants.MotorizedHood.kTicksPerDegree;
     }
 
-    public double getRightServoTargetPosition() {
-        return rightServo.getPosition();
+    public double degreesToEncUnits(double degrees) {
+        return (degrees * Constants.MotorizedHood.kTicksPerDegree);
     }
 
-    public double getLeftServoTargetPosition() {
-        return leftServo.getPosition();
+    public double encUnitsToHoodAngle(double encUnits) {
+        return encUnitsToDegrees(encUnits);
+    }
+
+    public double hoodAngleToEncUnits(double degrees) {
+        return (degreesToEncUnits(degrees));
     }
 
     public static double physicalAngleToEmpiricalAngle(double physicalAngle) {
@@ -130,87 +146,175 @@ public class MotorizedHood extends Subsystem {
 
         return Constants.MotorizedHood.kMinControlAngle + empiricalAngleOffset;
     }
-    public boolean hasReachedAngle() {
-        return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
+
+    public double getAngle() {
+        return encUnitsToHoodAngle(periodicIO.position);
     }
 
-    private Loop loop = new Loop() {
+    public void setAngle(double angle) {
+        angle = Util.limit(angle, Constants.MotorizedHood.kMinControlAngle, Constants.MotorizedHood.kMaxControlAngle);
+
+        periodicIO.controlMode = ControlMode.MotionMagic;
+        periodicIO.demand = hoodAngleToEncUnits(angle);
+    }
+    public void setAngleState(double angle) {
+        setState(State.POSITION);
+        setAngle(angle);
+    }
+    public void lockAngle() {
+        setState(State.POSITION);
+        periodicIO.controlMode = ControlMode.MotionMagic;
+        periodicIO.demand = periodicIO.position;
+    }
+
+    public boolean hasReachedAngle() {
+        return periodicIO.controlMode == ControlMode.MotionMagic && 
+            Math.abs(encUnitsToDegrees(periodicIO.demand - periodicIO.position)) <= Constants.MotorizedHood.kAngleTolerance;
+    }
+
+    public void setOpenLoop(double percentOutput) {
+        periodicIO.controlMode = ControlMode.PercentOutput;
+        periodicIO.demand = percentOutput;
+    }
+    Loop loop = new Loop() {
 
         @Override
         public void onStart(double timestamp) {
-            
+            hood.setNeutralMode(NeutralMode.Brake);            
         }
 
         @Override
         public void onLoop(double timestamp) {
+            smartTuner.update();   
+            angleInput = smartTuner.getValue();
             switch (currentState) {
                 case VISION:
                     Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
                     if (aim.isPresent()) {
-                        setServoAngle(aim.get().getHoodAngle().getDegrees());
+                        setAngle(aim.get().getHoodAngle().getDegrees());
                     }
                     break;
                 default:
                     break;
-            }
+            }       
         }
 
         @Override
         public void onStop(double timestamp) {
-            
+            hood.setNeutralMode(NeutralMode.Coast);
         }
-
+        
     };
 
+    public Request angleRequest(double angle) {
+        return new Request(){
+        
+            @Override
+            public void act() {
+                setAngle(angle);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return hasReachedAngle();
+            }
+            
+        };
+    }
+
+    public Request openLoopRequest(double percentOutput) {
+        return new Request(){
+        
+            @Override
+            public void act() {
+                setOpenLoop(percentOutput);
+            }
+
+        };
+    }
+
+    @Override
+    public void readPeriodicInputs() {
+        periodicIO.position = hood.getSelectedSensorPosition(0);
+    }
+
+    @Override
+    public void writePeriodicOutputs() {
+        hood.set(periodicIO.controlMode, periodicIO.demand);
+    }
+
+    public void resetToAbsolute() {
+        if (!zeroedAbsolutely) {
+            if (isEncoderConnected() && RobotBase.isReal()) {
+                //DriverStation.reportError("HOOD WAS RESET TO ABSOLUTE WITH THE MAG ENCODER", false);
+                double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle);
+                double absolutePosition = Constants.MotorizedHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorizedHood.kEncoderToHoodRatio);
+                if (absolutePosition > Constants.MotorizedHood.kMaxInitialAngle) {
+                    cancoderOffset -= 360.0;
+                    absolutePosition = Constants.MotorizedHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorizedHood.kEncoderToHoodRatio);
+                } else if (absolutePosition < Constants.MotorizedHood.kMinInitialAngle) {
+                    cancoderOffset += 360.0;
+                    absolutePosition = Constants.MotorizedHood.kHoodStartingAngle + (cancoderOffset / Constants.MotorizedHood.kEncoderToHoodRatio);
+                }
+                if(absolutePosition > Constants.MotorizedHood.kMaxInitialAngle || absolutePosition < Constants.MotorizedHood.kMinInitialAngle){
+                    DriverStation.reportError("Hood angle is out of bounds", false);
+                    hasEmergency = true;
+                }
+                SmartDashboard.putNumber("Hood Zero", degreesToEncUnits(absolutePosition));
+                hood.setSelectedSensorPosition(degreesToEncUnits(absolutePosition), 0, Constants.kCANTimeoutMs);
+                //System.out.println("Hood Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + Constants.MotorizedHood.kEncStartingAngle + ", difference: " + (getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle) + ");
+            } else {
+                DriverStation.reportError("Hood encoder NOT DETECTED: CURRENT POSITION SET TO 0", false);
+                hood.setSelectedSensorPosition(degreesToEncUnits(Constants.MotorizedHood.kHoodStartingAngle), 0, Constants.kCANTimeoutMs);
+            }
+        }
+    }
+
+    public synchronized void zeroHood() {
+        System.out.println("Hood Zeroed");
+        System.out.println("Hood Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + Constants.MotorizedHood.kEncStartingAngle + ", difference: " + (getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle) + ", degreesToEncUnits: " + degreesToEncUnits(getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle));
+        zeroedAbsolutely = true;
+    }
+
+    @Override
+    public void outputTelemetry() {
+        SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
+        //SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
+        SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
+        SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
+        //SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));
+        //SmartDashboard.putNumber("Hood Velocity", hood.getSelectedSensorVelocity(0));
+    }
+    public Request setAngleRequest(double angle) {
+        return new Request() {
+            @Override
+            public void act() {
+                setAngleState(angle);
+            }        
+        };
+    }
+    public Request visionRequest() {
+        return new Request() {
+            @Override
+            public void act() {
+                currentState = State.VISION;
+            }
+        };
+    }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {
         enabledLooper.register(loop);
     }
 
-    public Request setAngleRequest(double desiredAngle) {
-        return new Request() {
-
-            @Override
-            public void act() {
-                setAngle(desiredAngle);
-            }
-            @Override
-            public boolean isFinished() {
-                return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
-            }
-        };
-    }
-
-    public Request visionRequest() {
-        return new Request() {
-
-            @Override
-            public void act() {
-                setState(State.VISION);
-            }
-
-            @Override
-            public boolean isFinished() {
-                return Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance;
-            }
-        };
-    }
-    public void updateAngleInput() {
-        smartTuner.update();
-        angleInput = smartTuner.getValue();
-    }
-    @Override
-    public void outputTelemetry() {
-        SmartDashboard.putNumber("Servo Right Position", getRightServoTargetPosition());
-        SmartDashboard.putNumber("Servo Left Position", getLeftServoTargetPosition());
-        SmartDashboard.putNumber("Servo Target Angle", servoTargetAngle);
-        SmartDashboard.putBoolean("Hood Is Ready", Math.abs(servoTargetAngle - getAngle()) <= Constants.MotorizedHood.kAngleTolerance);
-        updateAngleInput();
-    }
-
     @Override
     public void stop() {
-        
+        setOpenLoop(0.0);
     }
 
+    public class PeriodicIO {
+        public double position = 0.0;
+
+        public double demand = 0.0;
+        public ControlMode controlMode = ControlMode.PercentOutput;
+    }
 }

@@ -4,6 +4,7 @@ import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
 import com.team1323.frc2020.auto.modes.TestMode;
+import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,8 +21,8 @@ public class SmartDashboardInteractions {
     	modeChooser = new SendableChooser<AutoOption>();
         modeChooser.setDefaultOption(DEFAULT_MODE.name, DEFAULT_MODE);
         modeChooser.addOption(AutoOption.TEST_MODE.name, AutoOption.TEST_MODE);
-        modeChooser.addOption(AutoOption.SIX_BALL_ONE_EJECT_MODE.name, AutoOption.SIX_BALL_ONE_EJECT_MODE);
         modeChooser.addOption(AutoOption.FIVE_BALL_ONE_EJECT_MODE.name, AutoOption.FIVE_BALL_ONE_EJECT_MODE);
+        modeChooser.addOption(AutoOption.TWO_BALL_TWO_EJECT_MODE.name, AutoOption.TWO_BALL_TWO_EJECT_MODE);
 
         SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -39,8 +40,8 @@ public class SmartDashboardInteractions {
 
     enum AutoOption{
         STAND_STILL("Stand Still"), TEST_MODE("Test Mode"),
-        SIX_BALL_ONE_EJECT_MODE("Six Ball One Eject Mode"),
-        FIVE_BALL_ONE_EJECT_MODE("Five Ball One Eject Mode");
+        FIVE_BALL_ONE_EJECT_MODE("Five Ball One Eject Mode"),
+        TWO_BALL_TWO_EJECT_MODE("Two Ball Two Eject Mode");
     	
     	public final String name;
     	
@@ -55,10 +56,10 @@ public class SmartDashboardInteractions {
                 return new StandStillMode();
             case TEST_MODE:
                 return new TestMode();
-            case SIX_BALL_ONE_EJECT_MODE:
-                return new SixBallOneEjectMode();
             case FIVE_BALL_ONE_EJECT_MODE:
                 return new FiveBallOneEjectMode();
+            case TWO_BALL_TWO_EJECT_MODE:
+                return new TwoBallTwoEjectMode();
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();

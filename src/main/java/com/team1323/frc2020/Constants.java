@@ -13,7 +13,7 @@ public class Constants {
     /*All distance measurements are in inches, unless otherwise noted.*/
     
     public static final double kLooperDt = 0.01;
-    public static final double kAutoAimPredictionTime = 0.14; // 0.14
+    public static final double kAutoAimPredictionTime = 0.15; // 0.14
 
     public static final double kEpsilon = 0.0001;
     
@@ -39,7 +39,7 @@ public class Constants {
         kBottomLeftQuadrantPose, kBottomRightQuadrantPose);
 
     public static final Pose2d autoRightStartingPose = new Pose2d(new Translation2d(297.7142857142857, 92.85714285714286), Rotation2d.fromDegrees(90));
-
+    public static final Pose2d autoLeftStartingPose = new Pose2d(new Translation2d(233.71428571428572, -40.28571428571429), Rotation2d.fromDegrees(-135.0));
     /**
     * Target Specifications
     */
@@ -234,20 +234,20 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = 198.608441;
+        public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? 349.987509 : 349.987509;
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = 1.0;
-        public static final double kAngleTolerance = 1.5;
+        public static final double kAngleTolerance = 2.0;
         public static final double kMinControlAngle = -315.0; //-250
         public static final double kMaxControlAngle = 190.0;
         public static final double kMinInitialAngle = -180.0;
         public static final double kMaxInitialAngle = 180.0;
         public static final double kTrackingOffset = 2.0; //3.0 = Close
         
-        public static final double kP = 0.25; // 0.25
-        public static final double kI = 0.0;
-        public static final double kD = 2.5; //2.5
+        public static final double kP = 0.5; // 0.25
+        public static final double kI = 0.001;
+        public static final double kD = 7.5; //2.5
         public static final double kF = 1023.0 / kMaxSpeed;
         
         // Turret pose with respect to the robot's center
@@ -256,19 +256,21 @@ public class Constants {
     
     }
 
-    public static class MotorHood {
+
+    public static class MotorizedHood {
+
         public static final double kReduction = 206.25;
         public static final double kEncoderToHoodRatio = 4;
 
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
 
-        public static final double kP = 0.0;
+        public static final double kP = 0.1;
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kF = 1023.0 / kMaxSpeed;
 
         public static final double kHoodStartingAngle = 15.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 295.543105 : 295.543105; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 301.972445 : 301.972445; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
 
         public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
 
@@ -278,24 +280,10 @@ public class Constants {
         public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 15.0 : 15.0;
         public static final double kMaxControlAngle = 45.0;
 
-        public static final double kAngleTolerance = 2.0;
-
-        //Shooter Hood Angles
-        public static final double kCloseAngle = 32.25;
-        public static final double kMidAngle = 42.5; //55 deg
-        public static final double kFarAngle = 59.0;
-    }
-
-    public static class MotorizedHood {
-        public static final double kMinControlAngle = 15.0; //Lowest Hood physical Angle = 27deg
-        public static final double kMaxControlAngle = 45.0; //Highest Hood physical angle = 42.5deg 28
-        public static final double kServoAngleToHoodHeight = 2.0 / 180; //Not the real values 
-
         // Measured upward from the ground; corresponds to kMinControlAngle
         public static final double kMaxEmpiricalAngle = 70.609 + 18.0;
         public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
 
-        public static final double kServoSpeed = 1.0 / 1.65; // Stroke percentage / second
 
         public static final double kAngleTolerance = 1.0; // degrees
     }

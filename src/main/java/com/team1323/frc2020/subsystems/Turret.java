@@ -64,6 +64,7 @@ public class Turret extends Subsystem {
     private boolean zeroedAbsolutely = false;
     public double goalX = 0.0;
     public double goalY = 0.0;
+    private double turretTolerance = 2;
 
     
     private static Turret instance = null;
@@ -108,7 +109,8 @@ public class Turret extends Subsystem {
         turret.config_kI(0, Constants.Turret.kI, Constants.kCANTimeoutMs);
         turret.config_kD(0, Constants.Turret.kD, Constants.kCANTimeoutMs);
         turret.config_kF(0, Constants.Turret.kF, Constants.kCANTimeoutMs);
-        
+        turret.config_IntegralZone(0, degreesToEncUnits(2.0));
+
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
         turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
         turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs); // 3.0
@@ -211,7 +213,7 @@ public class Turret extends Subsystem {
     }
     
     public boolean hasReachedAngle() {
-        return Math.abs(getAngle() - targetAngle) < Constants.Turret.kAngleTolerance;
+        return Math.abs(getAngle() - targetAngle) < turretTolerance;
     }
     public boolean isReady() {
         return targetInfo.get(3).getDouble(0) == 1.0 && visionAngleInRange && hasReachedAngle();
@@ -253,13 +255,25 @@ public class Turret extends Subsystem {
         smartTuner.update();
         smartTunerValue = smartTuner.getValue();
     }
+    public void updateTurretTolerance() {
+        double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
+        double robotVelocity = swerve.getVelocity().norm();
+        double robotScaledAngleTolerance = Math.abs(T2O/10 * 15) + ((robotVelocity/120)* 15) + 1;
+        turretTolerance = robotScaledAngleTolerance;
+        System.out.println(T2O + "angular velocity : " + robotVelocity);
+    }
     
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
         SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
         SmartDashboard.putBoolean("Turret Is Ready", isReady());
-
+        SmartDashboard.putNumber("Turret Setpoint", targetAngle);
+        SmartDashboard.putBoolean("Turret TargetInfo", targetInfo.get(3).getDouble(0) == 1.0);
+        SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
+        SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
+        SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
+        SmartDashboard.putNumber("Turret tolerance", turretTolerance);
         updateTurretTuning();
         //SmartDashboard.putNumber("Turret Current", periodicIO.current);
         //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);
@@ -287,7 +301,7 @@ public class Turret extends Subsystem {
                         // Aim directly at the vision target
                         double turretAngle = params.get().getTurretToGoal().direction().getDegrees();
                         turretAngle = boundToTurretScope(turretAngle);
-                        if (Math.abs(turretAngle - getAngle()) <= Constants.Turret.kAngleTolerance && targetInfo.get(3).getDouble(0) != 1.0) {
+                        if (hasReachedAngle() && targetInfo.get(3).getDouble(0) != 1.0) {
                             turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
                             turretAngle = boundToTurretScope(turretAngle);
                             
@@ -329,6 +343,8 @@ public class Turret extends Subsystem {
                 default:
                 break;
             }
+
+            updateTurretTolerance();
         }
         
         @Override

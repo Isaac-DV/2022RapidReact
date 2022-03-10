@@ -169,7 +169,7 @@ public class RobotState {
 			return cached_shooter_aiming_params_ == null ? Optional.empty() : Optional.of(cached_shooter_aiming_params_);
 		}
 		
-		public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
+		public synchronized Optional<ShooterAimingParameters> getAimingParameters(boolean useRobotPose) {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
 				TrackReport report = reports.get(0);
@@ -178,6 +178,10 @@ public class RobotState {
 				Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_field
 						.transformBy(Pose2d.fromTranslation(report.field_to_goal));
 				Translation2d unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm()));
+
+				if(useRobotPose) {
+					unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(getTurretToCenterOfField().norm()));
+				}
 				Translation2d initial_ball_velocity = Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.physicalAngleToEmpiricalAngle(unmodified_shot_vector.direction().getDegrees())), Shooter.rpmToInitialBallVelocity(unmodified_shot_vector.norm()));
 				Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
 				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy));
@@ -197,7 +201,9 @@ public class RobotState {
 				return Optional.empty();
 			}
 		}
-
+		public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
+			return getAimingParameters(false);
+		}
 		public synchronized Optional<Pose2d> getEstimatedRobotPosition() {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
