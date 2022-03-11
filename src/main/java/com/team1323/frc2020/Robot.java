@@ -32,6 +32,10 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.trajectory.TrajectoryGenerator;
 // import com.wpilib.TimedRobot; // modified TimedRobot to remove watchdog error printing
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.MjpegServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,7 +71,10 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		driverControls = DriverControls.getInstance();
-
+		UsbCamera usbCam = new UsbCamera("IntakeCam", 0);
+		usbCam.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
+		new MjpegServer("cameraServer", 1182).setSource(usbCam);
+	
 		//pigeon = Pigeon.getInstance();
 		s = Superstructure.getInstance();
 		subsystems = driverControls.getSubsystems();

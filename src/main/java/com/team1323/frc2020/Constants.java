@@ -13,7 +13,7 @@ public class Constants {
     /*All distance measurements are in inches, unless otherwise noted.*/
     
     public static final double kLooperDt = 0.01;
-    public static final double kAutoAimPredictionTime = 0.15; // 0.14
+    public static final double kAutoAimPredictionTime = 0.14; // 0.14
 
     public static final double kEpsilon = 0.0001;
     
@@ -135,7 +135,7 @@ public class Constants {
     /** The number of rotations the swerve rotation motor undergoes for every rotation of the module. */
     public static final double kSwerveRotationReduction = 15.42857143;
     /** The number of rotations the swerve drive encoder undergoes for every rotation of the wheel. */
-    public static final double kSwerveEncoderToWheelRatio = 6.538461538;
+    public static final double kSwerveEncoderToWheelRatio = 7.132867133;
     public static final double kSwerveEncUnitsPerWheelRev = kSwerveDriveEncoderResolution * kSwerveEncoderToWheelRatio;
     public static final double kSwerveEncUnitsPerInch = kSwerveEncUnitsPerWheelRev / (Math.PI * kSwerveWheelDiameter);
     
@@ -270,7 +270,7 @@ public class Constants {
         public static final double kF = 1023.0 / kMaxSpeed;
 
         public static final double kHoodStartingAngle = 15.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 301.972445 : 301.972445; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 307.939319 : 307.939319; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
 
         public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
 

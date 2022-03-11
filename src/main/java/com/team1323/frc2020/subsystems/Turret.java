@@ -258,7 +258,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O/10 * 15) + ((robotVelocity/120)* 15) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120)* 15) + 1;
         turretTolerance = robotScaledAngleTolerance;
         System.out.println(T2O + "angular velocity : " + robotVelocity);
     }
