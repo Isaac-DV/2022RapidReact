@@ -16,7 +16,7 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.InterpolatingDouble;
-import com.team1323.lib.util.SmartTuning;
+import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -27,7 +27,7 @@ public class Shooter extends Subsystem {
     LazyTalonFX master, slave;
     List<LazyTalonFX> motors;
 
-    SmartTuning smartTuner;
+    SmartTuner smartTuner;
     
     private static Shooter instance = null;
     public static Shooter getInstance() {
@@ -108,7 +108,7 @@ public class Shooter extends Subsystem {
         slave.set(ControlMode.Follower, Ports.SHOOTER_LEFT);
         setOpenLoop(0.0);
 
-        smartTuner = new SmartTuning(master, "shooter");
+        smartTuner = new SmartTuner(master, "shooter");
         smartTuner.enabled(true);
         /*
         double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);

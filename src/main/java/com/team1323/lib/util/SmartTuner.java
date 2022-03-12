@@ -10,7 +10,7 @@ import com.team254.drivers.LazyTalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
-public class SmartTuning {
+public class SmartTuner {
 
     private LazyTalonFX motor;
     private String keyName;
@@ -29,12 +29,12 @@ public class SmartTuning {
 
 
 
-    public SmartTuning(LazyTalonFX motorInstance, String dashboardKeyName) {
+    public SmartTuner(LazyTalonFX motorInstance, String dashboardKeyName) {
         motor = motorInstance;
         keyName = dashboardKeyName;
         initalizeWidgets();
     }
-    public SmartTuning(String dashboardKeyName) {
+    public SmartTuner(String dashboardKeyName) {
         keyName = dashboardKeyName;
         createDashboardKey(keyName + "Input", 0);
     }
@@ -85,6 +85,7 @@ public class SmartTuning {
     }
     public void updateMicroTuners() {
         for(int i = 0; i < mMicroTuners.length; i++) {
+            System.out.println("Micro tuner index : " + i + "updated");
             mMicroTuners[i].update();
         }
     }
@@ -134,9 +135,18 @@ public class SmartTuning {
         }
         public void update() {
             if(this.valueType == 's') {
+                System.out.println("Smart Tuner :" + this.keyname + ", update with a value of :" + this.valueString);
                 this.valueString = getDashboardStringValue(this.keyname);
             } else if(this.valueType == 'n') {
+                System.out.println("Smart Tuner :" + this.keyname + ", update with a value of :" + this.valueNumber);
                 this.valueNumber = getDashboardNumberValue(this.keyname);
+            }
+        }
+        public Object getValue() {
+            if(this.valueType == 's') {
+                return this.valueString;
+            } else {
+                return this.valueNumber;
             }
         }
     }

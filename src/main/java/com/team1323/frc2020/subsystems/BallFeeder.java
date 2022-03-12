@@ -4,7 +4,6 @@
 
 package com.team1323.frc2020.subsystems;
 
-import java.sql.Driver;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -15,15 +14,19 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.SmartTuner;
+import com.team1323.lib.util.SmartTuner.MicroTuner;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Controls the ball ejector and feeder motor*/
 public class BallFeeder extends Subsystem {
+    SmartTuner smartTuner;
+    MicroTuner testTuner;
+
     BallSplitter ballSplitter;
     Intake intake;
     Shooter shooter;
@@ -42,6 +45,7 @@ public class BallFeeder extends Subsystem {
         return teamBallDetected;
     }
 
+    private double testCounter = 0;
     private int ballCounter = 0; //The amount of balls that are in the robot
 
     private static BallFeeder instance = null;
@@ -69,6 +73,10 @@ public class BallFeeder extends Subsystem {
         banner = new DigitalInput(Ports.FEEDER_BANNER);
         colorSensor = new DigitalInput(Ports.COLOR_SENSOR);
 
+        smartTuner = new SmartTuner(feeder, "ballFeeder");
+        smartTuner.enabled(true);
+
+        testTuner = smartTuner.linkMicroTuner(smartTuner.new MicroTuner("feederInput", 'n'));
     }
 
     
@@ -128,7 +136,10 @@ public class BallFeeder extends Subsystem {
     public void shiftPower(boolean shiftToRollers) {
         rollersShifted = shiftToRollers;
     }
-
+    public void updateSmartTuner() {
+        testCounter = (double) testTuner.getValue();
+        smartTuner.update();
+    }
     Loop loop = new Loop() {
 
         @Override
@@ -140,6 +151,7 @@ public class BallFeeder extends Subsystem {
         @Override
         public void onLoop(double timestamp) {
             updateDetectedBall();
+            updateSmartTuner();
             switch(currentState) {
                 case OFF:
                     setFeederOpenLoop(0.0);
@@ -224,7 +236,7 @@ public class BallFeeder extends Subsystem {
         SmartDashboard.putString("Ball Feeder State", getState().toString()); 
         SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
         SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
-        SmartDashboard.putString("Detected Ball", DetectedBall.toString());   
+        SmartDashboard.putString("Detected Ball", DetectedBall.toString());
     }
 
 

@@ -23,7 +23,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
-import com.team1323.lib.util.SmartTuning;
+import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Rotation2d;
@@ -41,7 +41,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 * Add your docs here.
 */
 public class Turret extends Subsystem {
-    SmartTuning smartTuner;
+    SmartTuner smartTuner;
     double smartTunerValue = 0.0;
 
     LazyTalonFX turret;
@@ -129,7 +129,7 @@ public class Turret extends Subsystem {
         targetInfo = Arrays.asList(table.getEntry("tx"), table.getEntry("ty"),
         table.getEntry("ta"), table.getEntry("tv"));
         
-        smartTuner = new SmartTuning(turret, "turret");
+        smartTuner = new SmartTuner(turret, "turret");
         smartTuner.enabled(true);
     }
 
@@ -260,7 +260,6 @@ public class Turret extends Subsystem {
         double robotVelocity = swerve.getVelocity().norm();
         double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120)* 15) + 1;
         turretTolerance = robotScaledAngleTolerance;
-        System.out.println(T2O + "angular velocity : " + robotVelocity);
     }
     
     @Override

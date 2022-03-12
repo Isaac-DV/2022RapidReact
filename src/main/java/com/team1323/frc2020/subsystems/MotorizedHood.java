@@ -16,7 +16,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
-import com.team1323.lib.util.SmartTuning;
+import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * An adjustable shooter hood, powered by a BAG motor
  */
 public class MotorizedHood extends Subsystem {
-    SmartTuning smartTuner;
+    SmartTuner smartTuner;
 
     private static MotorizedHood instance = null;
     public static MotorizedHood getInstance() {
@@ -95,7 +95,7 @@ public class MotorizedHood extends Subsystem {
         //hood.setSelectedSensorPosition(0);
 
         setOpenLoop(0.0);
-        smartTuner = new SmartTuning(hood, "hood");
+        smartTuner = new SmartTuner(hood, "hood");
         smartTuner.enabled(true);
     }
 

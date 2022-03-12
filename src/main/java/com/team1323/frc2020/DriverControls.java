@@ -39,7 +39,7 @@ public class DriverControls implements Loop {
         return instance;
     }
 
-	Xbox driver, coDriver, testController;
+	Xbox driver, coDriver, testController, singleController;
 
     private Swerve swerve;
     private Intake intake;
@@ -56,7 +56,7 @@ public class DriverControls implements Loop {
     private SubsystemManager subsystems;
     public SubsystemManager getSubsystems(){ return subsystems; }
 
-    private final boolean oneControllerMode = false;
+    private final boolean oneControllerMode = true;
     private boolean robotCentric = false;
         
     private boolean inAuto = true;
@@ -72,6 +72,7 @@ public class DriverControls implements Loop {
         driver = new Xbox(0);
 		coDriver = new Xbox(1);
         testController = new Xbox(2);
+        singleController = new Xbox(5);
         driver.setDeadband(0.0);
 		coDriver.setDeadband(0.25);
 		coDriver.rightBumper.setLongPressDuration(1.0);
@@ -118,6 +119,7 @@ public class DriverControls implements Loop {
         } else {
             driver.update();
 			coDriver.update();
+            singleController.update();
             if(oneControllerMode) oneControllerMode();
             else twoControllerMode();
         }
@@ -311,6 +313,80 @@ public class DriverControls implements Loop {
     }
 
     private void oneControllerMode() {
+        /*double swerveYInput = singleController.getLeftX();
+        double swerveXInput = -singleController.getLeftY();
+        double swerveRotationInput = singleController.getRightX();
+        
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, singleController.rightTrigger.isBeingPressed(), singleController.leftTrigger.isBeingPressed());
+        
+        if (singleController.startButton.isBeingPressed()) 
+            swerve.setState(Swerve.ControlState.NEUTRAL);
 
+        if (singleController.backButton.shortReleased() || singleController.backButton.longPressed()) {
+            swerve.temporarilyDisableHeadingController();
+            swerve.zeroSensors(new Pose2d());
+            swerve.resetAveragedDirection();
+            s.disableState();
+        }
+
+
+        if(singleController.aButton.isBeingPressed()) {
+            if(column.getState() != Column.ControlState.FEED_BALLS) {
+                column.setState(Column.ControlState.INDEX_BALLS);
+            }
+        }
+        
+        if(singleController.aButton.wasActivated()) {
+            intake.conformToState(Intake.ControlState.INTAKE);
+            wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+            ballFeeder.setState(BallFeeder.State.DETECT);
+            if(column.getState() != Column.ControlState.FEED_BALLS) {
+                column.setState(Column.ControlState.INDEX_BALLS);
+            }
+        } else if(singleController.aButton.wasReleased()) {
+            intake.conformToState(Intake.ControlState.OFF);
+            ballFeeder.queueShutdown(true);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
+        }
+
+        if (singleController.leftTrigger.wasActivated()) {
+            if (singleController.aButton.isBeingPressed()) {
+                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+            }
+        } else if (singleController.leftTrigger.wasReleased()) {
+            if (singleController.aButton.isBeingPressed()) {
+                wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+            }
+        }
+        if(singleController.bButton.wasActivated()) {
+            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+        }
+        if(column.needsToNotifyDrivers()) {
+            singleController.rumble(2.0, 1.0);
+        }
+        if(singleController.startButton.wasActivated()) {
+            //turret.lockAngle();
+            turret.startVision();
+        }
+
+
+        if(singleController.leftBumper.wasActivated()) {
+            s.reverseAllSubsystems();
+        } else if(singleController.leftBumper.wasReleased()) {
+            s.disableState();
+        }
+           
+
+        if(singleController.rightTrigger.wasActivated()) {
+            s.visionShotState();
+        } else if(singleController.rightTrigger.wasReleased()) {
+            s.postShotState();
+        }
+        
+
+        if(singleController.rightCenterClick.wasActivated()) {
+            turret.setAngle(0.0);
+        }*/
+        
     }
 }

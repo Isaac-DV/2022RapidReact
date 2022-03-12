@@ -19,7 +19,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
-import com.team1323.lib.util.SmartTuning;
+import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.AsynchronousInterrupt;
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class Column extends Subsystem {
-    SmartTuning smartTuner;
+    SmartTuner smartTuner;
 
     Shooter shooter;
     Turret turret;
@@ -122,7 +122,7 @@ public class Column extends Subsystem {
         interrupt.setInterruptEdges(true, true);
         interrupt.enable();
 
-        smartTuner = new SmartTuning(column, "column");
+        smartTuner = new SmartTuner(column, "column");
         smartTuner.enabled(true);
     }
     public boolean getBanner() {
