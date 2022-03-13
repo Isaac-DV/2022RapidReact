@@ -85,7 +85,6 @@ public class SmartTuner {
     }
     public void updateMicroTuners() {
         for(int i = 0; i < mMicroTuners.length; i++) {
-            System.out.println("Micro tuner index : " + i + "updated");
             mMicroTuners[i].update();
         }
     }
@@ -135,10 +134,8 @@ public class SmartTuner {
         }
         public void update() {
             if(this.valueType == 's') {
-                System.out.println("Smart Tuner :" + this.keyname + ", update with a value of :" + this.valueString);
                 this.valueString = getDashboardStringValue(this.keyname);
             } else if(this.valueType == 'n') {
-                System.out.println("Smart Tuner :" + this.keyname + ", update with a value of :" + this.valueNumber);
                 this.valueNumber = getDashboardNumberValue(this.keyname);
             }
         }

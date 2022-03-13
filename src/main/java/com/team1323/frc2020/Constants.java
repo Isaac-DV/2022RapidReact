@@ -174,7 +174,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -25.47;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 178.654306;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 155.541091;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -192,7 +192,7 @@ public class Constants {
         public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = 98.0; //96.0
+        public static final double kIntakeAngle = 101.0; //96.0
         public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 35.0; //65.0
         public static final double kLowestAngle = 135.0;
@@ -224,7 +224,7 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
-        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.2;
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4;
         public static final double kBallDelay = 0.01;
 
         public static final double kColumnRunTime = 0.5;

@@ -13,6 +13,8 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /** Add your docs here. */
 public class Intake extends Subsystem {
     LazyTalonFX intake;
@@ -76,7 +78,8 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        
+        SmartDashboard.putNumber("Intake Voltage", intake.getMotorOutputVoltage());
+        SmartDashboard.putNumber("Intake Current", intake.getOutputCurrent());
     }
 
     @Override

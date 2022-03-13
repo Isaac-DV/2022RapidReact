@@ -78,12 +78,13 @@ public class Turret extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
     
     public enum ControlState {
-        OPEN_LOOP, FIELD_RELATIVE, VISION, POSITION, ROBOT_STATE_VISION, VISION_OFFSET;
+        OPEN_LOOP, FIELD_RELATIVE, VISION, POSITION, ROBOT_STATE_VISION, VISION_OFFSET, AIM_TO_COF;
     }
     private ControlState currentState = ControlState.OPEN_LOOP;
     public ControlState getState() {
         return currentState;
     }
+    
     
     public List<NetworkTableEntry> targetInfo;
 
@@ -146,7 +147,7 @@ public class Turret extends Subsystem {
             targetAngle = angle;
         
         periodicIO.demand = degreesToEncUnits(targetAngle);
-        if (currentState != ControlState.VISION && currentState != ControlState.ROBOT_STATE_VISION && currentState != ControlState.VISION_OFFSET && currentState != ControlState.FIELD_RELATIVE)
+        if (currentState == ControlState.OPEN_LOOP)
             currentState = ControlState.POSITION;
     }
     
@@ -171,6 +172,9 @@ public class Turret extends Subsystem {
     public void startVisionOffset() {
         currentState = ControlState.VISION_OFFSET;
     }
+    public void setCOFState() {
+        currentState = ControlState.AIM_TO_COF;
+    }
     
     public double getAngle() {
         return encUnitsToDegrees(periodicIO.position);
@@ -184,8 +188,8 @@ public class Turret extends Subsystem {
         return encUnits / 2048.0 / Constants.Turret.kFalconToTurretRatio * 360.0;
     }
     
-    public int degreesToEncUnits(double degrees) {
-        return (int) (degrees / 360.0 * Constants.Turret.kFalconToTurretRatio * 2048.0);
+    public double degreesToEncUnits(double degrees) {
+        return (degrees / 360.0 * Constants.Turret.kFalconToTurretRatio * 2048.0);
     }
     
     
@@ -202,6 +206,7 @@ public class Turret extends Subsystem {
         double turretFieldRelativeAngle = Util.boundToScope(Constants.Turret.kMaxControlAngle - 360.0, Constants.Turret.kMaxControlAngle, fieldCentricRotation.getDegrees());
         setAngle(turretFieldRelativeAngle);
     }
+
 
     public void setOpenLoop(double output) {
         periodicIO.demand = output * 0.5;
@@ -258,7 +263,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120)* 15) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120) * 10) + 1;
         turretTolerance = robotScaledAngleTolerance;
     }
     
@@ -303,7 +308,7 @@ public class Turret extends Subsystem {
                         if (hasReachedAngle() && targetInfo.get(3).getDouble(0) != 1.0) {
                             turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
                             turretAngle = boundToTurretScope(turretAngle);
-                            
+                            System.out.println("Aiming at center-field because target not seen");
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
@@ -312,6 +317,7 @@ public class Turret extends Subsystem {
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
+                        System.out.println("Aiming at center-field because params not present");
                     }
                     break;
                 case ROBOT_STATE_VISION:
@@ -339,6 +345,11 @@ public class Turret extends Subsystem {
                     }
 
                     break;
+                case AIM_TO_COF:
+                    setAngle(boundToTurretScope(robotState.getTurretToCenterOfField().direction().getDegrees()));
+                    if(hasReachedAngle()) {
+                        startVision();
+                    }
                 default:
                 break;
             }
@@ -467,7 +478,7 @@ public class Turret extends Subsystem {
                 DriverStation.reportError("Turret angle is out of bounds", false);
             }
 
-            turret.setSelectedSensorPosition(degreesToEncUnits(absoluteTurretAngle), 0, Constants.kCANTimeoutMs);
+            turret.setSelectedSensorPosition(degreesToEncUnits(absoluteTurretAngle), 0, 0);
         }
     }
     

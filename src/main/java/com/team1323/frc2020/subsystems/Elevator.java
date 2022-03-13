@@ -158,7 +158,6 @@ public class Elevator extends Subsystem {
         if(currentState == State.LOCKED || currentState == State.POSITION) {
             motor.set(ControlMode.MotionMagic, periodicIO.demand);
         } else if(currentState == State.OPEN_LOOP) {
-            System.out.println("setting open loop to " + periodicIO.demand);
             motor.set(ControlMode.PercentOutput, periodicIO.demand);
         }
     }

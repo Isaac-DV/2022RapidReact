@@ -56,7 +56,7 @@ public class DriverControls implements Loop {
     private SubsystemManager subsystems;
     public SubsystemManager getSubsystems(){ return subsystems; }
 
-    private final boolean oneControllerMode = true;
+    private final boolean oneControllerMode = false;
     private boolean robotCentric = false;
         
     private boolean inAuto = true;
@@ -155,11 +155,9 @@ public class DriverControls implements Loop {
             swerve.resetAveragedDirection();
         }
         if(driver.rightBumper.isBeingPressed())
-            swerve.rotate(ballSplitter.getRotationToTerminal());
+            swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_TERMINAL.location));
         else if(driver.leftBumper.isBeingPressed())
-            swerve.rotate(ballSplitter.getRotationToHanger());
-        
-        
+            swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));
 
         if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
@@ -234,6 +232,7 @@ public class DriverControls implements Loop {
             intake.conformToState(Intake.ControlState.OFF);
             ballFeeder.queueShutdown(true);
             wrist.setWristAngle(Constants.Wrist.kLowestAngle);
+            column.shutDownIfUnused();
         }
 
         if (coDriver.leftTrigger.wasActivated()) {
@@ -317,7 +316,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -singleController.getLeftY();
         double swerveRotationInput = singleController.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, singleController.rightTrigger.isBeingPressed(), singleController.leftTrigger.isBeingPressed());
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, false, singleController.leftTrigger.isBeingPressed());
         
         if (singleController.startButton.isBeingPressed()) 
             swerve.setState(Swerve.ControlState.NEUTRAL);

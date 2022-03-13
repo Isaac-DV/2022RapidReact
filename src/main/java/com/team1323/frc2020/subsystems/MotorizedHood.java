@@ -261,11 +261,11 @@ public class MotorizedHood extends Subsystem {
                     hasEmergency = true;
                 }
                 SmartDashboard.putNumber("Hood Zero", degreesToEncUnits(absolutePosition));
-                hood.setSelectedSensorPosition(degreesToEncUnits(absolutePosition), 0, Constants.kCANTimeoutMs);
+                hood.setSelectedSensorPosition(degreesToEncUnits(absolutePosition), 0, 0);
                 //System.out.println("Hood Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + Constants.MotorizedHood.kEncStartingAngle + ", difference: " + (getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle) + ");
             } else {
                 DriverStation.reportError("Hood encoder NOT DETECTED: CURRENT POSITION SET TO 0", false);
-                hood.setSelectedSensorPosition(degreesToEncUnits(Constants.MotorizedHood.kHoodStartingAngle), 0, Constants.kCANTimeoutMs);
+                hood.setSelectedSensorPosition(degreesToEncUnits(Constants.MotorizedHood.kHoodStartingAngle), 0, 0);
             }
         }
     }

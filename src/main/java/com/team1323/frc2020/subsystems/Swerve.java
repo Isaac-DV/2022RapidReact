@@ -206,8 +206,10 @@ public class Swerve extends Subsystem{
 
 		frontLeft.invertDriveMotor(TalonFXInvertType.Clockwise);
 		rearLeft.invertDriveMotor(TalonFXInvertType.Clockwise);
-		frontRight.invertDriveMotor(TalonFXInvertType.CounterClockwise);
+		frontRight.invertDriveMotor(TalonFXInvertType.Clockwise);
 		rearRight.invertDriveMotor(TalonFXInvertType.CounterClockwise);
+
+		frontRight.reverseDriveSensor(true);
 		
 		pigeon = Pigeon.getInstance();
 		

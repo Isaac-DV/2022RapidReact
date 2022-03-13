@@ -17,7 +17,7 @@ import com.team254.lib.trajectory.timing.VelocityLimitRegionConstraint;
 import edu.wpi.first.wpilibj.Timer;
 
 public class TrajectoryGenerator {
-    private static final double kMaxVelocity = 120.0;
+    private static final double kMaxVelocity = 72.0;
     private static final double kMaxAccel = 120.0; // 120 
     private static final double kMaxDecel = 72.0; //72
     private static final double kMaxVoltage = 9.0;
@@ -88,10 +88,10 @@ public class TrajectoryGenerator {
     static final Pose2d firstBallPickupPose = new Pose2d(new Translation2d(297.7142857142857, 133.42857142857144), Rotation2d.fromDegrees(90));
     static final Pose2d firstOpponentBallPickupPose = new Pose2d(new Translation2d(360.0, 140.42857142857144), Rotation2d.fromDegrees(90));
     static final Pose2d secondBallPickupPose = new Pose2d(new Translation2d(215.42857142857142, 100.0), Rotation2d.fromDegrees(180));
-    static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(174.0, 33.0), Rotation2d.fromDegrees(-90));
+    static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(174.0, 30.0), Rotation2d.fromDegrees(-90));
     static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0));
-    static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(194.28571428571428, -80.85714285714286), Rotation2d.fromDegrees(-90));
-    static final Pose2d thirdOpponentBallPickupPose = new Pose2d(new Translation2d(234.28571428571428, -126.57142857142857), Rotation2d.fromDegrees(-90));
+    static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(207.42857142857142, -70), Rotation2d.fromDegrees(-90));
+    static final Pose2d thirdOpponentBallPickupPose = new Pose2d(new Translation2d(236, -107.71428571428572), Rotation2d.fromDegrees(-90));
 
     public class TrajectorySet {
         public class MirroredTrajectory {

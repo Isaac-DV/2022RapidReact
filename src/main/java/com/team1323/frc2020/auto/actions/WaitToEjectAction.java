@@ -5,36 +5,38 @@
 package com.team1323.frc2020.auto.actions;
 
 import com.team1323.frc2020.subsystems.BallFeeder;
-import com.team1323.frc2020.subsystems.Column;
-import com.team1323.frc2020.subsystems.BallFeeder.BallType;
 
 import edu.wpi.first.wpilibj.Timer;
 
 /** Add your docs here. */
-public class WaitForTwoBallsAction implements Action {
-    Column column;
+public class WaitToEjectAction implements Action {
     BallFeeder ballFeeder;
-    double timeout = 0;
-    double startTimestamp = 0;
 
-    public WaitForTwoBallsAction(double timeout) {
-        column = Column.getInstance();
+
+    double startTime;
+    double timeout;
+    public WaitToEjectAction(double timeout) {
         ballFeeder = BallFeeder.getInstance();
+
         this.timeout = timeout;
-        this.startTimestamp = Timer.getFPGATimestamp();
+        this.startTime = Timer.getFPGATimestamp();
     }
     @Override
     public boolean isFinished() {
-        return column.getBanner() && (ballFeeder.getDetectedBallType() == BallType.Team) || ((Timer.getFPGATimestamp() - startTimestamp) >= timeout);
+        System.out.println("detected ball type is = " + ballFeeder.getDetectedBallType().toString() + ": the time is = " + (Timer.getFPGATimestamp() - this.startTime));
+        return (ballFeeder.getDetectedBallType() == BallFeeder.BallType.Opponent) || ((Timer.getFPGATimestamp() - this.startTime) >= this.timeout);
     }
 
     @Override
     public void start() {
-
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
     public void update() {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override

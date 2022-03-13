@@ -72,7 +72,7 @@ public class BallSplitter extends Subsystem {
         TEAM_TERMINAL(2, Constants.kBottomRightQuadrantPose.getTranslation()), 
         OPPOSITE_HANGER(3, Constants.kTopRightQuadrantPose.getTranslation());
         int priority;//The lower the number, the higher the priority
-        Translation2d location;
+        public Translation2d location;
         EjectLocations(int priority, Translation2d location) {
             this.priority = priority;
             this.location = location;
@@ -81,7 +81,7 @@ public class BallSplitter extends Subsystem {
     EjectLocations[] ejectLocationsArray = {EjectLocations.TEAM_HANGER, EjectLocations.TEAM_TERMINAL, EjectLocations.OPPOSITE_HANGER};
     private EjectLocations bestEjectLocation = EjectLocations.TEAM_HANGER;
     public EjectLocations getBestEjectLocation() {
-        return bestEjectLocation;
+        return bestEjectLocation; 
     }
 
 
@@ -190,29 +190,21 @@ public class BallSplitter extends Subsystem {
 
 
     }
-    public double getRotationToHanger() {
-        Translation2d hangerPosition = EjectLocations.TEAM_HANGER.location;
+
+    public double getEjectRotation(Translation2d target) {
+        Translation2d targetPosition = target;
         Translation2d robotPosition = swerve.getPose().getTranslation();
-        Translation2d robotToHangerVector = hangerPosition.translateBy(robotPosition.inverse());
-        Rotation2d robotToHangerRotation = robotToHangerVector.direction().rotateBy(Rotation2d.fromDegrees(-90)).inverse();
-        if(bestSplitterState == ControlState.RIGHT_EJECT) {
-            robotToHangerRotation = robotToHangerRotation.rotateBy(Rotation2d.fromDegrees(90));
-        } else if(bestSplitterState == ControlState.LEFT_EJECT) {
-            robotToHangerRotation = robotToHangerRotation.rotateBy(Rotation2d.fromDegrees(-90));
+        Rotation2d robotRotation = swerve.getPose().getRotation();
+        Translation2d robotToTargetVector = targetPosition.translateBy(robotPosition.inverse());
+        Rotation2d robotToTargetRotation = robotToTargetVector.direction();
+        Rotation2d leftEjectRotation = robotToTargetRotation.rotateBy(Rotation2d.fromDegrees(-90));
+        Rotation2d rightEjectRotation = robotToTargetRotation.rotateBy(Rotation2d.fromDegrees(90));
+        if(Math.abs(robotRotation.distance(leftEjectRotation)) > Math.abs(robotRotation.distance(rightEjectRotation))) {
+            return rightEjectRotation.getDegrees();
+        } else {
+            return leftEjectRotation.getDegrees();
         }
-        return robotToHangerRotation.getDegrees();
-    }
-    public double getRotationToTerminal() {
-        Translation2d terminalPosition = EjectLocations.TEAM_TERMINAL.location;
-        Translation2d robotPosition = swerve.getPose().getTranslation();
-        Translation2d robotToHangerVector = terminalPosition.translateBy(robotPosition.inverse());
-        Rotation2d robotToTerminalRotation = robotToHangerVector.direction().rotateBy(Rotation2d.fromDegrees(90)).inverse();
-        if(bestSplitterState == ControlState.RIGHT_EJECT) {
-            robotToTerminalRotation = robotToTerminalRotation.rotateBy(Rotation2d.fromDegrees(90));
-        } else if(bestSplitterState == ControlState.LEFT_EJECT) {
-            robotToTerminalRotation = robotToTerminalRotation.rotateBy(Rotation2d.fromDegrees(-90));
-        }
-        return robotToTerminalRotation.getDegrees();
+        //return robotToTerminalRotation.getDegrees();
     }
 
     Loop loop = new Loop() {

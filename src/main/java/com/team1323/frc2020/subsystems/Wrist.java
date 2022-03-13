@@ -147,7 +147,7 @@ public class Wrist extends Subsystem {
                 DriverStation.reportError("Wrist angle is out of bounds", false);
             }
 
-            wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, Constants.kCANTimeoutMs);
+            wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, 0);
         }
         
     }

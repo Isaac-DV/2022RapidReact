@@ -17,6 +17,7 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
+import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.SmartTuner;
@@ -32,7 +33,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Add your docs here. */
 public class Column extends Subsystem {
     SmartTuner smartTuner;
-
+    
     Shooter shooter;
     Turret turret;
     MotorizedHood motorizedHood;
@@ -47,6 +48,7 @@ public class Column extends Subsystem {
     boolean detectedBall = false;
     boolean previousDetectedBall = false;
 
+    boolean pendingShutdown = false;
     boolean previousFeederDetected = false;
 
     boolean shootingCurrentBall = false;
@@ -173,25 +175,11 @@ public class Column extends Subsystem {
     private boolean allSubsystemsReady() {
         return shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle();
     }
-    private void updateBallCounter() {
-        if(!previousDetectedBall && detectedBall) {//The First ball is detected
-            loadedBallCount++;
-            totalBallCount++;
-        }
-        previousDetectedBall = detectedBall;
 
-        if(getBanner() && ballFeeder.isTeamBallDetected() && !previousFeederDetected) {//The Second ball is detected
-            totalBallCount++;
-            loadedBallCount++;
-            notifyDrivers = true;
+    public void shutDownIfUnused() {
+        if (getState() == ControlState.INDEX_BALLS && !ballFeeder.hasSentUpBall()) {
+            conformToState(ControlState.OFF);
         }
-        previousFeederDetected = ballFeeder.isTeamBallDetected();
-
-        if(!previousShootingCurrentBall && shootingCurrentBall) {
-            loadedBallCount--;
-        }
-        previousShootingCurrentBall = shootingCurrentBall;
-
     }
 
     private double getFeedingDelay() {
@@ -254,7 +242,10 @@ public class Column extends Subsystem {
                 default:
                 break;
             }
-            updateBallCounter();
+            
+            if(ballFeeder.hasSentUpBall() && getBanner()) {
+                ballFeeder.setSentUpBall(false);
+            }
             
         }
 

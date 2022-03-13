@@ -40,9 +40,12 @@ public class BallFeeder extends Subsystem {
     boolean intakeFeedEnabled = false;
     boolean isIntakeOpenLoop = false;
 
-    boolean teamBallDetected = false;
-    public boolean isTeamBallDetected() {
-        return teamBallDetected;
+    boolean sentUpBall = false;
+    public boolean hasSentUpBall() {
+        return sentUpBall;
+    }
+    public void setSentUpBall(boolean bool) {
+        sentUpBall = bool;
     }
 
     private double testCounter = 0;
@@ -79,11 +82,22 @@ public class BallFeeder extends Subsystem {
         testTuner = smartTuner.linkMicroTuner(smartTuner.new MicroTuner("feederInput", 'n'));
     }
 
+    public enum BallType {
+        Team, Opponent, None
+    }
+    public BallType detectedBallType = BallType.None;
+    public BallType getDetectedBallType() {
+        return detectedBallType;
+    }
+
     
     public enum Ball {
         None, Blue, Red
     }
     public Ball DetectedBall = Ball.None;
+    public Ball getDetectedBall() {
+        return DetectedBall;
+    }
     public DriverStation.Alliance DSAlliance;
     public void setDSAlliance(DriverStation.Alliance alliance) {
         DSAlliance = alliance;
@@ -144,8 +158,8 @@ public class BallFeeder extends Subsystem {
 
         @Override
         public void onStart(double timestamp) {
-            setState(State.OFF);
-            setDSAlliance(DriverStation.Alliance.Red/*DriverStation.getAlliance()*/);
+            setState(State.DETECT);
+            setDSAlliance(/*DriverStation.Alliance.Red*/DriverStation.getAlliance());
         }
 
         @Override
@@ -158,28 +172,28 @@ public class BallFeeder extends Subsystem {
                     break;
                 case DETECT:
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        setFeederOpenLoop(-0.25);
-                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                        detectedBallType = BallType.Team;
+                        setFeederOpenLoop(0);
+                        //ballSplitter.conformToState(BallSplitter.ControlState.OFF);
 
                         if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
                             intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
                         }
                         intakeStartTimestamp = timestamp;
-                        teamBallDetected = true;
+                        sentUpBall = true;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
+                        detectedBallType = BallType.Opponent;
                         setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
-                        if (Double.isInfinite(splitterStartTimestamp)) {
-                            //column.conformToState(Column.ControlState.OFF);
-                            splitterStartTimestamp = timestamp;
-                        }
-                        teamBallDetected = false;
+                        //column.conformToState(Column.ControlState.OFF);
+                        splitterStartTimestamp = timestamp;
+                        
                     } else if (DetectedBall == Ball.None) { //There's no ball detected
+                        detectedBallType = BallType.None;
                         if(pendingShutdown) {
-                            setFeederOpenLoop(0.0);
+                            //setFeederOpenLoop(0.0);
                             pendingShutdown = false;
                         }
-                        teamBallDetected = false;
                     }
                     if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
                         ballSplitter.conformToState(BallSplitter.ControlState.OFF);
