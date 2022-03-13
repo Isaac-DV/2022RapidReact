@@ -113,7 +113,7 @@ public class BallFeeder extends Subsystem {
     }
 
     public enum State {
-        OFF, DETECT, HOLD, HOLD_DETECT, OPEN_LOOP, FEED_BALLS
+        OFF, DETECT, HOLD, OPEN_LOOP, FEED_BALLS
     }
     private State currentState = State.OFF;
     public State getState() {

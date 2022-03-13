@@ -220,6 +220,7 @@ public class Column extends Subsystem {
                         columnStartTimestamp = timestamp;
                         shootingCurrentBall = true;
                         setVelocity(Constants.Column.kFeedVelocitySpeed);
+                        System.out.println("Shot the ball at a range of : " + shooter.getTargetRange());
                     } else {
                         if (!shootingCurrentBall)
                             setOpenLoop(0.0);
