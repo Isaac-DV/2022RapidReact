@@ -53,6 +53,11 @@ public class Shooter extends Subsystem {
     
     private double targetRPM = 0.0;
     public double dashboardRPMInput = 0.0;
+    
+    private double limelightRange = 0.0;
+    public double getTargetRange() {
+        return limelightRange;
+    }
     private double onTargetTimestamp = Double.POSITIVE_INFINITY;
 
     PeriodicIO periodicIO = new PeriodicIO();
@@ -192,6 +197,7 @@ public class Shooter extends Subsystem {
                         double rpm = aim.get().getShooterRPM();
                         periodicIO.demand = rpmToEncVelocity(rpm);
                         targetRPM = rpm;
+                        limelightRange = aim.get().getRange();
                     } else {
                         System.out.println("Vision target not visible in shooter loop!");
                     }
