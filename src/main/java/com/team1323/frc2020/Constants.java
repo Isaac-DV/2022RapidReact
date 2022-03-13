@@ -192,7 +192,7 @@ public class Constants {
         public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = 101.0; //96.0
+        public static final double kIntakeAngle = 102.0; //96.0
         public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 35.0; //65.0
         public static final double kLowestAngle = 135.0;
