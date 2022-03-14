@@ -222,10 +222,11 @@ public class Wrist extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
-        SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
-        SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
-        SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
-        
+        if(false) {
+            SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
+            SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
+            SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
+        }
     }
 
     @Override

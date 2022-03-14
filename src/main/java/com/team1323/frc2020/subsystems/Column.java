@@ -278,14 +278,16 @@ public class Column extends Subsystem {
     
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
         SmartDashboard.putString("Column State", getState().toString());
-        SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
-        SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
-        SmartDashboard.putNumber("Column RPM Target", targetRPM);
-        SmartDashboard.putNumber("Column Total Ball Counter", totalBallCount);
-        SmartDashboard.putNumber("Column Loaded Ball Counter", loadedBallCount);
-        smartTuner.update();
+        if(false) {
+            SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
+            SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
+            SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
+            SmartDashboard.putNumber("Column RPM Target", targetRPM);
+            SmartDashboard.putNumber("Column Total Ball Counter", totalBallCount);
+            SmartDashboard.putNumber("Column Loaded Ball Counter", loadedBallCount);
+            smartTuner.update();
+        }
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

@@ -32,11 +32,11 @@ public class SmartTuner {
     public SmartTuner(LazyTalonFX motorInstance, String dashboardKeyName) {
         motor = motorInstance;
         keyName = dashboardKeyName;
-        initalizeWidgets();
+        //initalizeWidgets();
     }
     public SmartTuner(String dashboardKeyName) {
         keyName = dashboardKeyName;
-        createDashboardKey(keyName + "Input", 0);
+        //createDashboardKey(keyName + "Input", 0);
     }
     public void initalizeWidgets() {
         createDashboardKey(keyName + "kP", 0);
@@ -47,7 +47,7 @@ public class SmartTuner {
     }
 
     public void update() {
-        if(this.enabled) {
+        if(false) {
             updatekP(getDashboardNumberValue(keyName + "kP"));
             updatekI(getDashboardNumberValue(keyName + "kI"));
             updatekD(getDashboardNumberValue(keyName + "kD"));

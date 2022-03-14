@@ -12,10 +12,6 @@ import java.util.Set;
 import com.team1323.frc2020.auto.AutoModeBase;
 import com.team1323.frc2020.auto.AutoModeExecuter;
 import com.team1323.frc2020.auto.SmartDashboardInteractions;
-import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
-import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
-import com.team1323.frc2020.auto.modes.StandStillMode;
-import com.team1323.frc2020.auto.modes.TestMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
@@ -33,9 +29,10 @@ import com.team254.lib.trajectory.TrajectoryGenerator;
 // import com.wpilib.TimedRobot; // modified TimedRobot to remove watchdog error printing
 
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.MjpegServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.cscore.VideoSink;
 import edu.wpi.first.cscore.VideoMode.PixelFormat;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -71,9 +68,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotInit() {
 		driverControls = DriverControls.getInstance();
-		UsbCamera usbCam = new UsbCamera("IntakeCam", 0);
-		usbCam.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
-		new MjpegServer("cameraServer", 1182).setSource(usbCam);
+		
 	
 		//pigeon = Pigeon.getInstance();
 		s = Superstructure.getInstance();
@@ -103,6 +98,17 @@ public class Robot extends TimedRobot {
 		AutoModeBase auto = new TwoBallTwoEjectMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
+
+		/*UsbCamera usbCam = new UsbCamera("IntakeCam", 0);
+		usbCam.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
+		new MjpegServer("cameraServer", 1182).setSource(usbCam);
+		//usbCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);*/
+		
+		/*UsbCamera usbCam = CameraServer.startAutomaticCapture(0);
+		VideoSink server = CameraServer.getServer();
+		usbCam.setVideoMode(PixelFormat.kYUYV, 320, 240, 30);
+		usbCam.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+		server.setSource(usbCam);*/
 	}
 
 	@Override

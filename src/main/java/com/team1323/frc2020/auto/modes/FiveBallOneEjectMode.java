@@ -17,6 +17,7 @@ import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitForTwoBallsAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
+import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Intake;
 import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.Shooter;
@@ -47,7 +48,8 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoRightStartingPose));
         s.intake.conformToState(Intake.ControlState.EJECT);
-        s.turret.startVision();
+        s.turret.setCOFState();
+        s.column.conformToState(Column.ControlState.OFF);
         s.motorizedHood.setState(MotorizedHood.State.VISION);
         s.shooter.setState(Shooter.State.VISION); 
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));

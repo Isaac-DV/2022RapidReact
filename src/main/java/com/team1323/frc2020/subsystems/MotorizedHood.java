@@ -278,12 +278,14 @@ public class MotorizedHood extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
-        //SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
-        SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
-        //SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));
-        //SmartDashboard.putNumber("Hood Velocity", hood.getSelectedSensorVelocity(0));
+        if(false) {
+            SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
+            SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
+            SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
+            SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));
+            SmartDashboard.putNumber("Hood Velocity", hood.getSelectedSensorVelocity(0));
+        }
     }
     public Request setAngleRequest(double angle) {
         return new Request() {

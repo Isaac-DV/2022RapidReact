@@ -119,7 +119,8 @@ public class DriverControls implements Loop {
         } else {
             driver.update();
 			coDriver.update();
-            singleController.update();
+            if(oneControllerMode)
+                singleController.update();
             if(oneControllerMode) oneControllerMode();
             else twoControllerMode();
         }
@@ -135,7 +136,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed(), driver.leftTrigger.isBeingPressed());
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed(), false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -163,6 +164,11 @@ public class DriverControls implements Loop {
             driver.rumble(1.0, 2.0);
             coDriver.rumble(1.0, 2.0);
         }
+        if(driver.leftTrigger.isBeingPressed()) {
+            swerve.setMaxSpeed(0.75);
+        } else {
+            swerve.setMaxSpeed(1.0);
+        }
 
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
@@ -176,11 +182,11 @@ public class DriverControls implements Loop {
         }
         */
         
-        /*if(coDriverLeftY != 0 || coDriverLeftX != 0) {
+        if(coDriverLeftY != 0 || coDriverLeftX != 0) {
             turret.fieldRelativeManual(coDriverLeftX, coDriverLeftY);
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
-        }*/
+        }
 
         /*if(coDriver.POV90.wasActivated()) {
             motorizedHood.setAngle(45);
@@ -200,11 +206,7 @@ public class DriverControls implements Loop {
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
         }
-        /*if(coDriver.POV0.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + (Constants.MotorizedHood.kMaxControlAngle - Constants.MotorizedHood.kMinControlAngle));
-        } else if(coDriver.POV0.wasReleased()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-        }*/
+        
         if(coDriver.POV270.wasActivated()) {
             turret.setAngle(-90);
         }
@@ -248,21 +250,26 @@ public class DriverControls implements Loop {
             wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         }
         if(coDriver.yButton.wasActivated()) {
-            s.manualShotState(2950.0, 12.5);
+            s.manualShotState(2250.0, 19);
         } else if(coDriver.yButton.wasReleased()) {
             s.postShotState();
         }
         if(coDriver.xButton.wasActivated()) {
+            s.manualShotState(1800, 12);
+        } else if(coDriver.xButton.wasReleased()) {
+            s.postShotState();
+        }
+        /*if(coDriver.xButton.wasActivated()) {
             //s.manualShotState(1600.0, 5.0);
             //shooter.setOpenLoop(1.0);
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
             turret.startVision();
             column.setState(Column.ControlState.FEED_BALLS);
-            //turret.startVision();
+            turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }
+        }*/
         
 
         if(coDriver.rightBumper.wasActivated()) {
@@ -287,9 +294,13 @@ public class DriverControls implements Loop {
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
+        if(coDriver.leftCenterClick.wasActivated()) {
+            turret.setCOFState();
+        }
 
         if(column.needsToNotifyDrivers()) {
             coDriver.rumble(2.0, 1.0);
+            driver.rumble(2.0, 1.0);
         }
         if(coDriver.startButton.wasActivated()) {
             //turret.lockAngle();

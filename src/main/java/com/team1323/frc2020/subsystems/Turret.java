@@ -263,21 +263,23 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120) * 10) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120) * 7) + 1;
         turretTolerance = robotScaledAngleTolerance;
     }
     
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
-        SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
-        SmartDashboard.putBoolean("Turret Is Ready", isReady());
-        SmartDashboard.putNumber("Turret Setpoint", targetAngle);
-        SmartDashboard.putBoolean("Turret TargetInfo", targetInfo.get(3).getDouble(0) == 1.0);
-        SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
-        SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
-        SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
-        SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+        if(false) {
+            SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
+            SmartDashboard.putBoolean("Turret Is Ready", isReady());
+            SmartDashboard.putNumber("Turret Setpoint", targetAngle);
+            SmartDashboard.putBoolean("Turret TargetInfo", targetInfo.get(3).getDouble(0) == 1.0);
+            SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
+            SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
+            SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
+            SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+        }
         updateTurretTuning();
         //SmartDashboard.putNumber("Turret Current", periodicIO.current);
         //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);
@@ -327,7 +329,6 @@ public class Turret extends Subsystem {
                         double turretAngle = aim.get().getTurretAngle().getDegrees();
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
-                        double offsetAngle = 0;
                         /*if (turretAngle < Constants.Turret.kMinControlAngle || turretAngle > Constants.Turret.kMaxControlAngle) {
                             if (swerve.getVelocity().norm() < 0.01) {
                                 double offsetAngle = 0.0;

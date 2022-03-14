@@ -78,8 +78,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Intake Voltage", intake.getMotorOutputVoltage());
-        SmartDashboard.putNumber("Intake Current", intake.getOutputCurrent());
+        
     }
 
     @Override

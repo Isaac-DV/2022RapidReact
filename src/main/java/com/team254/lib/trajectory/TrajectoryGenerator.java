@@ -17,7 +17,7 @@ import com.team254.lib.trajectory.timing.VelocityLimitRegionConstraint;
 import edu.wpi.first.wpilibj.Timer;
 
 public class TrajectoryGenerator {
-    private static final double kMaxVelocity = 72.0;
+    private static final double kMaxVelocity = 120.0;
     private static final double kMaxAccel = 120.0; // 120 
     private static final double kMaxDecel = 72.0; //72
     private static final double kMaxVoltage = 9.0;

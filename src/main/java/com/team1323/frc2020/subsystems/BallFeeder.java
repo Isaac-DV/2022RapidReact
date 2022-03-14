@@ -103,7 +103,7 @@ public class BallFeeder extends Subsystem {
         DSAlliance = alliance;
     }
     public void updateDetectedBall() {
-        if(banner.get() && isColorSensorRed()) { //detected a red ball
+        if(isColorSensorRed()) { //detected a red ball
             DetectedBall = Ball.Red;
         } else if(banner.get() && !isColorSensorRed()) { //detected a blue ball
             DetectedBall = Ball.Blue;
@@ -174,12 +174,14 @@ public class BallFeeder extends Subsystem {
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
                         detectedBallType = BallType.Team;
                         setFeederOpenLoop(0);
-                        //ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-
                         if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
                             intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
                         }
                         intakeStartTimestamp = timestamp;
+                        if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
+                            ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                            splitterStartTimestamp = Double.POSITIVE_INFINITY;
+                        }
                         sentUpBall = true;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         detectedBallType = BallType.Opponent;
@@ -247,10 +249,12 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putString("Ball Feeder State", getState().toString()); 
-        SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
-        SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
-        SmartDashboard.putString("Detected Ball", DetectedBall.toString());
+        if(false) {
+            SmartDashboard.putString("Ball Feeder State", getState().toString()); 
+            SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
+            SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
+            SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
+        }
     }
 
 

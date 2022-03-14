@@ -278,11 +278,11 @@ public class Superstructure extends Subsystem {
 			new SequentialRequest(
 				new ParallelRequest(
 					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle + rawHoodAngle),
-					turret.robotStateVisionRequest(),
+					turret.angleRequest(0),
 					shooter.velocityRequest(shooterRPM) //2200 - Mid //2100 - Close //2400
 				),
-				intake.stateRequest(Intake.ControlState.INTAKE)
-				//column.stateRequest(Column.ControlState.FEED_BALLS)
+				intake.stateRequest(Intake.ControlState.INTAKE),
+				column.stateRequest(Column.ControlState.FEED_BALLS)
 			)
 		);
 	}
@@ -302,7 +302,7 @@ public class Superstructure extends Subsystem {
 			new SequentialRequest(
 				new ParallelRequest(
 					motorizedHood.visionRequest(),
-					swerve.setDriveMaxPowerRequest(0.75),
+					//swerve.setDriveMaxPowerRequest(0.75),
 					turret.robotStateVisionRequest(),
 					shooter.visionVelocityRequest()
 				),
@@ -318,9 +318,9 @@ public class Superstructure extends Subsystem {
 			new ParallelRequest(
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
-				swerve.setDriveMaxPowerRequest(1.0),
+				/*swerve.setDriveMaxPowerRequest(1.0),
 				//motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle),
-				//shooter.openLoopRequest(Constants.Shooter.kPostShotPercentOutput),
+				//shooter.openLoopRequest(Constants.Shooter.kPostShotPercentOutput),*/
 				shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();

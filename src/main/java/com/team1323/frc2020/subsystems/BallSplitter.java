@@ -253,9 +253,11 @@ public class BallSplitter extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Swerve Rotation to BEL", targetSwerveTheta);
-        SmartDashboard.putNumber("Swerve Raw Theta",  Util.boundAngle0to360Degrees(translationVector.direction().getDegrees()));
-        SmartDashboard.putString("Eject Mode", bestSplitterState.toString());
+        if(false) {
+            SmartDashboard.putNumber("Swerve Rotation to BEL", targetSwerveTheta);
+            SmartDashboard.putNumber("Swerve Raw Theta",  Util.boundAngle0to360Degrees(translationVector.direction().getDegrees()));
+            SmartDashboard.putString("Eject Mode", bestSplitterState.toString());
+        }
         /*SmartDashboard.putString("Closest Oof Location", bestEjectLocation.toString());
         SmartDashboard.putNumber("Closest Oof Location magnitude", bestEjectLocation.location.translateBy(swerve.pose.getTranslation().inverse()).norm());
         SmartDashboard.putNumber("TopRight Magnitude", EjectLocations.OPPOSITE_HANGER.location.getTranslation().translateBy(swerve.pose.getTranslation().inverse()).norm());

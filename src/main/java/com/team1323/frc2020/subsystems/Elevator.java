@@ -151,7 +151,6 @@ public class Elevator extends Subsystem {
     public void readPeriodicInputs() {
         periodicIO.position = motor.getSelectedSensorPosition(0);
         periodicIO.current = motor.getOutputCurrent();
-        periodicIO.voltage = motor.getMotorOutputVoltage();
     }
     @Override
     public void writePeriodicOutputs() {
@@ -167,12 +166,13 @@ public class Elevator extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Elevator Demand", periodicIO.demand);
-        SmartDashboard.putString("Elevator State", currentState.toString());
-        SmartDashboard.putNumber("Elevator Current", motor.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
-        SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));
-        SmartDashboard.putNumber("Elevator Absolute Height", encUnitsToInches(inchesToEncUnits(absoluteEncoderRotationsToInches(getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition))));
+        if(false) {
+            SmartDashboard.putNumber("Elevator Demand", periodicIO.demand);
+            SmartDashboard.putString("Elevator State", currentState.toString());
+            SmartDashboard.putNumber("Elevator Absolute Encoder", getAbsoluteEncoderPosition());
+            SmartDashboard.putNumber("Elevator Height", encUnitsToInches(periodicIO.position));
+            SmartDashboard.putNumber("Elevator Absolute Height", encUnitsToInches(inchesToEncUnits(absoluteEncoderRotationsToInches(getAbsoluteEncoderPosition() - Constants.Elevator.kMagEncoderStartingPosition))));
+        }
     }
 
     @Override

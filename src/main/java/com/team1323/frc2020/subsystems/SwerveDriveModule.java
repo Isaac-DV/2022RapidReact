@@ -47,7 +47,7 @@ public class SwerveDriveModule extends Subsystem{
 	public void setCarpetDirection(boolean standardDirection){
 		standardCarpetDirection = standardDirection;
 	}
-	
+
 	PeriodicIO periodicIO = new PeriodicIO();
 	
 	public SwerveDriveModule(int rotationSlot, int driveSlot, int moduleID, 
@@ -264,7 +264,7 @@ public class SwerveDriveModule extends Subsystem{
 	private double getAbsoluteEncoderDegrees() {
 		if (!RobotBase.isReal())
 			return 0.0;
-		return (isRotationEncoderFlipped ? -1.0 : 1.0) * rotationEncoder.getAbsolutePosition();
+		return (isRotationEncoderFlipped ? -1.0 : 1.0) * periodicIO.absoluteRotation;
 	}
 	
 	private double getDriveDistanceInches(){
@@ -400,6 +400,7 @@ public class SwerveDriveModule extends Subsystem{
 	public void readPeriodicInputs() {
 		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
+		periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
 
 		if (Settings.debugSwerve()) {
@@ -430,11 +431,11 @@ public class SwerveDriveModule extends Subsystem{
 			ErrorCode rotationFalconCheck = rotationMotor.setSelectedSensorPosition(0);
 			if (rotationFalconCheck == ErrorCode.OK) {
 				if (isRotationSensorConnected() && RobotBase.isReal()) {
-					rotationMotor.setSelectedSensorPosition(degreesToEncUnits(getAbsoluteEncoderDegrees() - encoderOffset), 0, 10);
+					rotationMotor.setSelectedSensorPosition(degreesToEncUnits(getAbsoluteEncoderDegrees() - encoderOffset), 0, 0);
 					moduleZeroedWitoutMagEnc = false;
 					//System.out.println(name + "Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + encoderOffset + ", difference: " + (getAbsoluteEncoderDegrees() - encoderOffset) + ", degreesToEncUnits: " + degreesToEncUnits(getAbsoluteEncoderDegrees() - encoderOffset));
 				} else {
-					rotationMotor.setSelectedSensorPosition(degreesToEncUnits(0), 0, 10);
+					rotationMotor.setSelectedSensorPosition(degreesToEncUnits(0), 0, 0);
 					DriverStation.reportError("MAG ENCODER FOR " + name + " WAS NOT CONNECTED UPON BOOT", false);
 					moduleZeroedWitoutMagEnc = true;
 				}
@@ -508,6 +509,7 @@ public class SwerveDriveModule extends Subsystem{
 		public double drivePosition = 0;
 		public double velocity = 0;
 		public double driveVoltage = 0.0;
+		public double absoluteRotation = 0.0;
 		
 		
 		//Outputs
