@@ -178,10 +178,10 @@ public class BallFeeder extends Subsystem {
                             intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
                         }
                         intakeStartTimestamp = timestamp;
-                        if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
+                        /*if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
                             ballSplitter.conformToState(BallSplitter.ControlState.OFF);
                             splitterStartTimestamp = Double.POSITIVE_INFINITY;
-                        }
+                        }*/
                         sentUpBall = true;
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
                         detectedBallType = BallType.Opponent;
@@ -249,7 +249,7 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        if(false) {
+        if(true) {
             SmartDashboard.putString("Ball Feeder State", getState().toString()); 
             SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
             SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());

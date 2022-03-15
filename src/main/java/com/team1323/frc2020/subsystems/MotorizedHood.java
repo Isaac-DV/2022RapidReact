@@ -47,7 +47,7 @@ public class MotorizedHood extends Subsystem {
     private boolean isEncoderFlipped = false;
     private boolean zeroedAbsolutely = false;
     public enum State {
-        POSITION, VISION
+        POSITION, VISION, ROBOT_POSITION
     }
     private State currentState = State.POSITION;
     public State getState() {
@@ -194,6 +194,11 @@ public class MotorizedHood extends Subsystem {
                         setAngle(aim.get().getHoodAngle().getDegrees());
                     }
                     break;
+                case ROBOT_POSITION:
+                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getAimingParameters(true);
+                    if (poseAim.isPresent()) {
+                        setAngle(poseAim.get().getHoodAngle().getDegrees());
+                    }
                 default:
                     break;
             }       
@@ -279,7 +284,7 @@ public class MotorizedHood extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
-        if(false) {
+        if(true) {
             SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
             SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
             SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
@@ -300,6 +305,14 @@ public class MotorizedHood extends Subsystem {
             @Override
             public void act() {
                 currentState = State.VISION;
+            }
+        };
+    }
+    public Request positionStateRequest() {
+        return new Request() {
+            @Override
+            public void act() {
+                currentState = State.ROBOT_POSITION;
             }
         };
     }

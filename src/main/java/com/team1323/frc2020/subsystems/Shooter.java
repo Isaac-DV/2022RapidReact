@@ -1,5 +1,6 @@
 package com.team1323.frc2020.subsystems;
 
+import java.lang.StackWalker.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class Shooter extends Subsystem {
     }
     
     public enum State {
-        OPEN_LOOP, VELOCITY, VISION
+        OPEN_LOOP, VELOCITY, VISION, POSITION
     }
     
     private State currentState = State.OPEN_LOOP;
@@ -202,6 +203,17 @@ public class Shooter extends Subsystem {
                         System.out.println("Vision target not visible in shooter loop!");
                     }
                     break;
+                case POSITION:
+                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getAimingParameters(true);
+                    if (poseAim.isPresent()) {
+                        double rpm = poseAim.get().getShooterRPM();
+                        periodicIO.demand = rpmToEncVelocity(rpm);
+                        targetRPM = rpm;
+                        limelightRange = poseAim.get().getRange();
+                        System.out.println("COF Magnitude" + poseAim.get().getRange());
+                    } else {
+                        System.out.println("Goal target not visible in shooter loop!");
+                    }
                 default:
                     break;
             }
@@ -248,6 +260,16 @@ public class Shooter extends Subsystem {
             public boolean isFinished() {
                 return hasReachedSetpoint();
             }
+        };
+    }
+    public Request positionVelocityRequest() {
+        return new Request() {
+
+            @Override
+            public void act() {
+                setState(State.POSITION);
+            }
+
         };
     }
 

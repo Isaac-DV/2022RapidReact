@@ -78,7 +78,7 @@ public class Turret extends Subsystem {
     PeriodicIO periodicIO = new PeriodicIO();
     
     public enum ControlState {
-        OPEN_LOOP, FIELD_RELATIVE, VISION, POSITION, ROBOT_STATE_VISION, VISION_OFFSET, AIM_TO_COF;
+        OPEN_LOOP, FIELD_RELATIVE, VISION, POSITION, ROBOT_STATE_VISION, AIM_TO_COF, ROBOT_POSITION;
     }
     private ControlState currentState = ControlState.OPEN_LOOP;
     public ControlState getState() {
@@ -168,10 +168,10 @@ public class Turret extends Subsystem {
     public void startRobotStateVision() {
         currentState = ControlState.ROBOT_STATE_VISION;
     }
-    
-    public void startVisionOffset() {
-        currentState = ControlState.VISION_OFFSET;
+    public void startRobotPosition() {
+        currentState = ControlState.ROBOT_POSITION;
     }
+   
     public void setCOFState() {
         currentState = ControlState.AIM_TO_COF;
     }
@@ -270,6 +270,7 @@ public class Turret extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
+        SmartDashboard.putNumber("COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
         if(false) {
             SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
@@ -350,6 +351,15 @@ public class Turret extends Subsystem {
                     setAngle(boundToTurretScope(robotState.getTurretToCenterOfField().direction().getDegrees()));
                     if(hasReachedAngle()) {
                         startVision();
+                    }
+                case ROBOT_POSITION:
+                    Optional<ShooterAimingParameters> poseAim = robotState.getAimingParameters();
+                    if (poseAim.isPresent()) {
+                        // Compensate for the robot's velocity when aiming
+                        double turretAngle = poseAim.get().getTurretAngle().getDegrees();
+                        turretAngle = boundToTurretScope(turretAngle);
+                        visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
+                        setAngle(turretAngle);
                     }
                 default:
                 break;
@@ -449,6 +459,15 @@ public class Turret extends Subsystem {
             @Override
             public boolean isFinished() {
                 return targetInfo.get(3).getDouble(0) == 1.0 && visionAngleInRange && hasReachedAngle();
+            }
+        };
+    }
+
+    public Request startRobotStatePositionRequest() {
+        return new Request() {
+            @Override
+            public void act() {
+                startRobotPosition();
             }
         };
     }

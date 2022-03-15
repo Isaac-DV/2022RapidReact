@@ -132,7 +132,7 @@ public class Column extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
+        OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), MANUAL_FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
         INDEX_BALLS(0.5), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
         double speed;
         ControlState(double speed) {
@@ -226,6 +226,18 @@ public class Column extends Subsystem {
                             setOpenLoop(0.0);
                     }
                     break;
+                case MANUAL_FEED_BALLS:
+                    if (!getBanner()) {
+                        setVelocity(Constants.Column.kQueueVelocitySpeed);
+                    } else if(getBanner() && Double.isFinite(ballDetectedTimestamp) && (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay
+                                && shooter.hasReachedSetpoint() && motorizedHood.hasReachedAngle()) {
+                        columnStartTimestamp = timestamp;
+                        shootingCurrentBall = true;
+                        setVelocity(Constants.Column.kFeedVelocitySpeed);
+                    } else {
+                        if (!shootingCurrentBall)
+                            setOpenLoop(0.0);
+                    }
                 case INDEX_BALLS:
                     if(!getBanner() && !detectedBall) {
                         //column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);

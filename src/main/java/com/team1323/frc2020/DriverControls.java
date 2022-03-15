@@ -119,8 +119,8 @@ public class DriverControls implements Loop {
         } else {
             driver.update();
 			coDriver.update();
-            if(oneControllerMode)
-                singleController.update();
+            singleController.update();
+
             if(oneControllerMode) oneControllerMode();
             else twoControllerMode();
         }
@@ -207,15 +207,6 @@ public class DriverControls implements Loop {
             turret.lockAngle();
         }
         
-        if(coDriver.POV270.wasActivated()) {
-            turret.setAngle(-90);
-        }
-        if(coDriver.POV90.wasActivated()) {
-            turret.setAngle(90);
-        }
-        if(coDriver.POV0.wasActivated()) {
-            turret.setAngle(0.0);
-        }
 
         if(coDriver.aButton.isBeingPressed()) {
             if(column.getState() != Column.ControlState.FEED_BALLS) {
@@ -259,17 +250,6 @@ public class DriverControls implements Loop {
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }
-        /*if(coDriver.xButton.wasActivated()) {
-            //s.manualShotState(1600.0, 5.0);
-            //shooter.setOpenLoop(1.0);
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
-            shooter.setVelocity(shooter.dashboardRPMInput); //2100
-            turret.startVision();
-            column.setState(Column.ControlState.FEED_BALLS);
-            turret.startVision();
-        } else if(coDriver.xButton.wasReleased()) {
-            s.postShotState();
-        }*/
         
 
         if(coDriver.rightBumper.wasActivated()) {
@@ -282,14 +262,17 @@ public class DriverControls implements Loop {
         } else if(coDriver.leftBumper.wasReleased()) {
             s.disableState();
         }
-           
 
         if(coDriver.rightTrigger.wasActivated()) {
             s.visionShotState();
         } else if(coDriver.rightTrigger.wasReleased()) {
             s.postShotState();
         }
-        
+        if(singleController.leftTrigger.wasActivated()) {
+            s.positionShotState();
+        } else if(singleController.leftTrigger.wasReleased()) {
+            s.postShotState();
+        }
 
         if(coDriver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
@@ -309,6 +292,9 @@ public class DriverControls implements Loop {
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
         }
+        if(singleController.backButton.wasActivated()) {
+            s.disableState();
+        }
         
         
         double testControllerLeftY = -testController.getLeftY();
@@ -320,10 +306,20 @@ public class DriverControls implements Loop {
             elevator.lockElevatorHeight();
         }
         
+        if(singleController.xButton.wasActivated()) {
+            motorizedHood.setState(MotorizedHood.State.POSITION);
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
+            shooter.setVelocity(shooter.dashboardRPMInput); //2100
+            turret.startVision();
+            column.setState(Column.ControlState.FEED_BALLS);
+            turret.startVision();
+        } else if(singleController.xButton.wasReleased()) {
+            s.postShotState();
+        }
     }
 
     private void oneControllerMode() {
-        /*double swerveYInput = singleController.getLeftX();
+        double swerveYInput = singleController.getLeftX();
         double swerveXInput = -singleController.getLeftY();
         double swerveRotationInput = singleController.getRightX();
         
@@ -339,6 +335,15 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
+        if(singleController.xButton.wasActivated()) {
+            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
+            shooter.setVelocity(shooter.dashboardRPMInput); //2100
+            turret.startVision();
+            column.setState(Column.ControlState.FEED_BALLS);
+            turret.startVision();
+        } else if(singleController.xButton.wasReleased()) {
+            s.postShotState();
+        }
 
         if(singleController.aButton.isBeingPressed()) {
             if(column.getState() != Column.ControlState.FEED_BALLS) {
@@ -396,7 +401,7 @@ public class DriverControls implements Loop {
 
         if(singleController.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
-        }*/
+        }
         
     }
 }
