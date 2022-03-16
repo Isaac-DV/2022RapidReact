@@ -19,6 +19,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -270,8 +271,7 @@ public class Turret extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
-        SmartDashboard.putNumber("COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
-        if(false) {
+        if(Settings.debugTurret()) {
             SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
             SmartDashboard.putNumber("Turret Setpoint", targetAngle);
@@ -280,13 +280,12 @@ public class Turret extends Subsystem {
             SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
             SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
             SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+            SmartDashboard.putNumber("Turret Current", periodicIO.current);
+            SmartDashboard.putNumber("Turret COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
+
         }
         updateTurretTuning();
-        //SmartDashboard.putNumber("Turret Current", periodicIO.current);
-        //SmartDashboard.putNumber("Turret Encoder", periodicIO.position);
-        //SmartDashboard.putNumber("Turret Velocity", periodicIO.velocity);
-        //SmartDashboard.putNumber("Turret Angle Error", targetAngle - getAngle());
-        //SmartDashboard.putNumber("Turret Vision Angle", targetInfo.get(0).getDouble(0.0));
+        
     }
     
     private final Loop loop = new Loop() {

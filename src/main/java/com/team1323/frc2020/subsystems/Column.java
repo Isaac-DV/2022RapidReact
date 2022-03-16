@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallFeeder;
@@ -290,9 +291,9 @@ public class Column extends Subsystem {
     
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putString("Column State", getState().toString());
-        if(false) {
-            SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
+        SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
+        if(Settings.debugColumn()) {
+            SmartDashboard.putString("Column State", getState().toString());
             SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
             SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
             SmartDashboard.putNumber("Column RPM Target", targetRPM);

@@ -1,6 +1,7 @@
 [NetworkTables Storage 3.0]
 boolean "/Shuffleboard/Settings/Debug Elevator"=false
 boolean "/Shuffleboard/Settings/Debug Feeder"=false
+boolean "/Shuffleboard/Settings/Debug Hanger"=false
 boolean "/Shuffleboard/Settings/Debug Intakes"=false
 boolean "/Shuffleboard/Settings/Debug Jacks"=false
 boolean "/Shuffleboard/Settings/Debug Shooter"=false

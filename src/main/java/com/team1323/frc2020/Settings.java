@@ -32,6 +32,8 @@ public class Settings {
     private boolean kDebugVision = false;
     private boolean kDebugFeeder = false;
     private boolean kDebugHanger = false;
+    private boolean kDebugHood = false;
+    private boolean kDebugColumn = false;
 
     private NetworkTableEntry swerveToggle;
     private NetworkTableEntry turretToggle;
@@ -39,6 +41,8 @@ public class Settings {
     private NetworkTableEntry visionToggle;
     private NetworkTableEntry feederToggle;
     private NetworkTableEntry hangerToggle;
+    private NetworkTableEntry hoodToggle;
+    private NetworkTableEntry columnToggle;
 
     private final String TAB = "Settings";
 
@@ -49,6 +53,9 @@ public class Settings {
         visionToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Vision", kDebugVision).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         feederToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Feeder", kDebugFeeder).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         hangerToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Hanger", kDebugHanger).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        hoodToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Hood", kDebugHood).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        columnToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Column", kDebugColumn).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+
     }
 
     private void updateSettings() {
@@ -58,6 +65,8 @@ public class Settings {
         instance.kDebugVision = visionToggle.getBoolean(instance.kDebugVision);
         instance.kDebugFeeder = feederToggle.getBoolean(instance.kDebugFeeder);
         instance.kDebugHanger = hangerToggle.getBoolean(instance.kDebugHanger);
+        instance.kDebugHood = hoodToggle.getBoolean(instance.kDebugHood);
+        instance.kDebugColumn = columnToggle.getBoolean(instance.kDebugColumn);
     }
 
     public static void initializeToggles() {
@@ -74,5 +83,7 @@ public class Settings {
     public static boolean debugVision(){ return instance.kDebugVision; }
     public static boolean debugFeeder(){ return instance.kDebugFeeder ;}
     public static boolean debugHanger(){ return instance.kDebugHanger ;}
+    public static boolean debugHood(){ return instance.kDebugHood ;}
+    public static boolean debugColumn(){ return instance.kDebugColumn ;}
 
 }

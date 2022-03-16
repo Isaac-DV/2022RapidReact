@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** Controls the ball ejector and feeder motor*/
 public class BallFeeder extends Subsystem {
     SmartTuner smartTuner;
-    MicroTuner testTuner;
 
     BallSplitter ballSplitter;
     Intake intake;
@@ -39,13 +39,17 @@ public class BallFeeder extends Subsystem {
     double splitterStartTimestamp = Double.POSITIVE_INFINITY;
     boolean intakeFeedEnabled = false;
     boolean isIntakeOpenLoop = false;
-
     boolean sentUpBall = false;
     public boolean hasSentUpBall() {
         return sentUpBall;
     }
     public void setSentUpBall(boolean bool) {
         sentUpBall = bool;
+    }
+
+    private boolean autoDetectEnabled = false;
+    public boolean isAutoDetectEnabled() {
+        return autoDetectEnabled;
     }
 
     private double testCounter = 0;
@@ -79,9 +83,12 @@ public class BallFeeder extends Subsystem {
         smartTuner = new SmartTuner(feeder, "ballFeeder");
         smartTuner.enabled(true);
 
-        testTuner = smartTuner.linkMicroTuner(smartTuner.new MicroTuner("feederInput", 'n'));
+        initializeDashboardValues();
     }
-
+    private void initializeDashboardValues() {
+        boolean autoDetectToggle = SmartDashboard.getBoolean("Auto Detect Balls", true);
+        SmartDashboard.putBoolean("Auto Detect Balls", autoDetectToggle);
+    }
     public enum BallType {
         Team, Opponent, None
     }
@@ -151,7 +158,6 @@ public class BallFeeder extends Subsystem {
         rollersShifted = shiftToRollers;
     }
     public void updateSmartTuner() {
-        testCounter = (double) testTuner.getValue();
         smartTuner.update();
     }
     Loop loop = new Loop() {
@@ -166,6 +172,9 @@ public class BallFeeder extends Subsystem {
         public void onLoop(double timestamp) {
             updateDetectedBall();
             updateSmartTuner();
+            if(!isAutoDetectEnabled()) {
+                setState(State.OFF);
+            }
             switch(currentState) {
                 case OFF:
                     setFeederOpenLoop(0.0);
@@ -249,11 +258,13 @@ public class BallFeeder extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        if(true) {
+        autoDetectEnabled = SmartDashboard.getBoolean("Auto Detect Balls", true);
+        if(Settings.debugFeeder()) {
             SmartDashboard.putString("Ball Feeder State", getState().toString()); 
             SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
             SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
             SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
+            SmartDashboard.putString("Ball Eject Location", ballSplitter.bestSplitterState.toString());
         }
     }
 

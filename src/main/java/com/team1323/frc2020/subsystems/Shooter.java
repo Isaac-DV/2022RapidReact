@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -322,20 +323,19 @@ public class Shooter extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
+        SmartDashboard.putNumber("Shooter RPM", getLeftRPM());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
-        if(false) {
+        if(Settings.debugShooter()) {
             SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
             SmartDashboard.putNumber("Shooter Right RPM", getRightRPM());
-
             SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
             SmartDashboard.putString("Shooter State", getState().toString());
-
             SmartDashboard.putNumber("Shooter Left Commanded Input", master.getMotorOutputPercent());
             SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
             SmartDashboard.putString("Shooter State", currentState.toString());
-
             SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
+            SmartDashboard.putNumber("Shooter Left Current", master.getOutputCurrent());
+            SmartDashboard.putNumber("Shooter Right Current", slave.getOutputCurrent());
         }
         smartTuner.update();
         updateRPM();
