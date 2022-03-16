@@ -159,6 +159,9 @@ public class DriverControls implements Loop {
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_TERMINAL.location));
         else if(driver.leftBumper.isBeingPressed())
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));
+        if(driver.rightCenterClick.wasActivated()) {
+            turret.setAngle(0.0);
+        }
 
         if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
@@ -249,6 +252,9 @@ public class DriverControls implements Loop {
             s.manualShotState(1800, 12);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
+        }
+        if(coDriver.POV180.wasActivated()) {
+            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
         
 

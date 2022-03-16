@@ -47,7 +47,7 @@ public class BallFeeder extends Subsystem {
         sentUpBall = bool;
     }
 
-    private boolean autoDetectEnabled = false;
+    private boolean autoDetectEnabled = true;
     public boolean isAutoDetectEnabled() {
         return autoDetectEnabled;
     }
@@ -172,9 +172,9 @@ public class BallFeeder extends Subsystem {
         public void onLoop(double timestamp) {
             updateDetectedBall();
             updateSmartTuner();
-            if(!isAutoDetectEnabled()) {
+            /*if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
-            }
+            }*/
             switch(currentState) {
                 case OFF:
                     setFeederOpenLoop(0.0);
