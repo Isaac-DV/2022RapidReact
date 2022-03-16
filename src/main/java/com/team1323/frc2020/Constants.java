@@ -269,7 +269,7 @@ public class Constants {
         public static final double kF = 1023.0 / kMaxSpeed;
 
         public static final double kHoodStartingAngle = 15.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 307.939319 : 307.939319; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 321.116345 : 321.116345; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
 
         public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
 
@@ -342,6 +342,26 @@ public class Constants {
         public static final double kI = 0.0;
         public static final double kD = 0.0;
         public static final double kF = 1023.0 / kMaxSpeed;
+    }
+    public static class DoubleTelescopes {
+        public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
+        public static final double kMinControlHeight = 0.0;
+        public static final double kLowestPoint = 0.0;
+        public static final double kMaxControlHeight = 24.5;
+        public static final double kTicksPerInch = 12749.0 / 1.0;
+
+        public static final double kLeftP = 0.1;
+        public static final double kLeftI = 0.0;
+        public static final double kLeftD = 6.0;
+        public static final double kLeftF = 1023.0 / kMaxSpeed;
+
+        public static final double kRightP = 0.1;
+        public static final double kRightI = 0.0;
+        public static final double kRightD = 0.0;
+        public static final double kRightF = 1023.0 / kMaxSpeed;
+        public static final double kFirstPitchAngle = 25.0;
+        public static final double kSecondPitchAngle = 30.0;
+        public static final double kHeightTolerance = 2.0;
     }
 
     /*

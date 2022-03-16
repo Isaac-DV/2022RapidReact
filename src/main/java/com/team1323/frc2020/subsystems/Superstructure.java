@@ -389,7 +389,6 @@ public class Superstructure extends Subsystem {
 		request(
 			new ParallelRequest(
 				intake.stateRequest(Intake.ControlState.OFF),
-				ballSplitter.stateRequest(BallSplitter.ControlState.OFF),
 				column.stateRequest(Column.ControlState.OFF),
 				shooter.openLoopRequest(0.0),
 				new LambdaRequest(()-> ballFeeder.queueShutdown(true))

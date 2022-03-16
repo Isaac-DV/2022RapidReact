@@ -52,6 +52,7 @@ public class BallFeeder extends Subsystem {
         return autoDetectEnabled;
     }
 
+
     private double testCounter = 0;
     private int ballCounter = 0; //The amount of balls that are in the robot
 
@@ -96,7 +97,6 @@ public class BallFeeder extends Subsystem {
     public BallType getDetectedBallType() {
         return detectedBallType;
     }
-
     
     public enum Ball {
         None, Blue, Red
@@ -110,10 +110,10 @@ public class BallFeeder extends Subsystem {
         DSAlliance = alliance;
     }
     public void updateDetectedBall() {
-        if(isColorSensorRed()) { //detected a red ball
-            DetectedBall = Ball.Red;
-        } else if(banner.get() && !isColorSensorRed()) { //detected a blue ball
+        if(banner.get() && !isColorSensorRed()) { //detected a red ball
             DetectedBall = Ball.Blue;
+        } else if(isColorSensorRed()) { //detected a blue ball
+            DetectedBall = Ball.Red;
         } else if(!banner.get()) { //does not detect a ball
             DetectedBall = Ball.None;
         }
@@ -181,6 +181,9 @@ public class BallFeeder extends Subsystem {
                     break;
                 case DETECT:
                     if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
+                        if(detectedBallType != BallType.Team) {
+                            System.out.println(DetectedBall.toString() + " Detected");
+                        }
                         detectedBallType = BallType.Team;
                         setFeederOpenLoop(0);
                         if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
@@ -192,7 +195,11 @@ public class BallFeeder extends Subsystem {
                             splitterStartTimestamp = Double.POSITIVE_INFINITY;
                         }*/
                         sentUpBall = true;
+                        
                     } else if(DetectedBall != Ball.None) {//Detected opponents ball
+                        if(detectedBallType != BallType.Opponent) {
+                            System.out.println(DetectedBall.toString() + " Detected");
+                        }
                         detectedBallType = BallType.Opponent;
                         setFeederOpenLoop(1.0);
                         ballSplitter.conformToState(ballSplitter.bestSplitterState);
@@ -200,6 +207,9 @@ public class BallFeeder extends Subsystem {
                         splitterStartTimestamp = timestamp;
                         
                     } else if (DetectedBall == Ball.None) { //There's no ball detected
+                        if(detectedBallType != BallType.None) {
+                            System.out.println(DetectedBall.toString() + " Detected");
+                        }
                         detectedBallType = BallType.None;
                         if(pendingShutdown) {
                             //setFeederOpenLoop(0.0);

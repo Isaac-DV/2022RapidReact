@@ -168,7 +168,30 @@ public class RobotState {
 		public synchronized Optional<ShooterAimingParameters> getCachedAimingParameters() {
 			return cached_shooter_aiming_params_ == null ? Optional.empty() : Optional.of(cached_shooter_aiming_params_);
 		}
-		
+		public synchronized Optional<ShooterAimingParameters> getAimingParametersFromPosition() {
+			Pose2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime)
+						.transformBy(kVehicleToTurretFixed).inverse();
+			Pose2d latest_turret_fixed_to_cof = latest_turret_fixed_to_field
+						.transformBy(Pose2d.fromTranslation(Constants.kCenterOfField));
+			
+			Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_cof;
+			Translation2d unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm()));
+			Translation2d initial_ball_velocity = Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.physicalAngleToEmpiricalAngle(unmodified_shot_vector.direction().getDegrees())), Shooter.rpmToInitialBallVelocity(unmodified_shot_vector.norm()));
+			Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
+			Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy).scale(0.90));
+
+			Rotation2d turretAngle = stationary_shot_vector.direction().interpolate(moving_shot_vector.direction(), 0.5);
+			Rotation2d hood_angle = Rotation2d.fromDegrees(MotorizedHood.empiricalAngleToPhysicalAngle(Math.toDegrees(Math.atan(initial_ball_velocity.y() / moving_shot_vector.norm()))));
+			double shooter_rpm = Shooter.initialBallVelocityToRPM(Math.hypot(moving_shot_vector.norm(), initial_ball_velocity.y()));
+			/*ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
+					new Rotation2d(latest_turret_fixed_to_goal.getTranslation().x(), latest_turret_fixed_to_goal.getTranslation().y(), true), 
+					latest_turret_fixed_to_goal.getTranslation(), report.latest_timestamp, report.stability);*/
+			ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
+					turretAngle, latest_turret_fixed_to_goal.getTranslation(), hood_angle, shooter_rpm, 0,0);
+			cached_shooter_aiming_params_ = params;
+
+			return Optional.of(params);
+		}
 		public synchronized Optional<ShooterAimingParameters> getAimingParameters(boolean useRobotPose) {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
