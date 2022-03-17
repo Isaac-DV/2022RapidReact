@@ -203,6 +203,19 @@ public class Column extends Subsystem {
         return Constants.Column.kMaxFeedDelay;
     }
 
+    private void printVisionSubsystemInfo() {
+        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+        if (aim.isPresent()) {
+            System.out.println("SHOOTING BALL:");
+            System.out.println("Distance to goal: " + aim.get().getRange() + ", robot velocity: " + Swerve.getInstance().getVelocity().toString());
+            System.out.println("Turret -> current angle: " + turret.getAngle() + ", vision angle: " + aim.get().getTurretAngle().getDegrees());
+            System.out.println("Shooter -> current RPM: " + shooter.getLeftRPM() + ", vision RPM: " + aim.get().getShooterRPM());
+            System.out.println("Hood -> current angle: " + motorizedHood.getAngle() + ", vision angle: " + aim.get().getHoodAngle().getDegrees());
+        } else {
+            System.out.println("SHOOTING BALL BUT NO TARGET PRESENT");
+        }
+    }
+
     Loop loop = new Loop() {
 
         @Override
@@ -220,9 +233,12 @@ public class Column extends Subsystem {
                             (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay && allSubsystemsReady())) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
                         columnStartTimestamp = timestamp;
+                        if (!shootingCurrentBall) {
+                            printVisionSubsystemInfo();
+                        }
                         shootingCurrentBall = true;
                         setVelocity(Constants.Column.kFeedVelocitySpeed);
-                        System.out.println("Shot the ball at a range of : " + shooter.getTargetRange());
+                        //System.out.println("Shot the ball at a range of : " + shooter.getTargetRange());
                     } else {
                         if (!shootingCurrentBall)
                             setOpenLoop(0.0);

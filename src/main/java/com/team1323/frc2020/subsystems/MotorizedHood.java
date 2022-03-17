@@ -96,7 +96,7 @@ public class MotorizedHood extends Subsystem {
 
         setOpenLoop(0.0);
         smartTuner = new SmartTuner(hood, "hood");
-        smartTuner.enabled(false);
+        smartTuner.enabled(true);
     }
 
     private void setCurrentLimit(double amps) {

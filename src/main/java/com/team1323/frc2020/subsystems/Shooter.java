@@ -117,7 +117,7 @@ public class Shooter extends Subsystem {
         setOpenLoop(0.0);
 
         smartTuner = new SmartTuner(master, "shooter");
-        smartTuner.enabled(false);
+        smartTuner.enabled(true);
         /*
         double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
         SmartDashboard.putNumber("ShooterRPMInput", dsRPMInputValue);*/

@@ -39,7 +39,7 @@ public class DriverControls implements Loop {
         return instance;
     }
 
-	Xbox driver, coDriver, testController, singleController;
+	Xbox driver, coDriver, singleController;
 
     private Swerve swerve;
     private Intake intake;
@@ -71,7 +71,6 @@ public class DriverControls implements Loop {
     public DriverControls() {
         driver = new Xbox(0);
 		coDriver = new Xbox(1);
-        testController = new Xbox(2);
         singleController = new Xbox(5);
         driver.setDeadband(0.0);
 		coDriver.setDeadband(0.25);
@@ -119,10 +118,12 @@ public class DriverControls implements Loop {
         } else {
             driver.update();
 			coDriver.update();
-            singleController.update();
 
+            if(oneControllerMode)
+                singleController.update();
             if(oneControllerMode) oneControllerMode();
             else twoControllerMode();
+
         }
     }
 
@@ -136,7 +137,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed(), false);
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightBumper.isBeingPressed(), false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -155,10 +156,10 @@ public class DriverControls implements Loop {
             swerve.zeroSensors(new Pose2d());
             swerve.resetAveragedDirection();
         }
-        if(driver.rightBumper.isBeingPressed())
+        /*if(driver.rightBumper.isBeingPressed())
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_TERMINAL.location));
         else if(driver.leftBumper.isBeingPressed())
-            swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));
+            swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));*/
         if(driver.rightCenterClick.wasActivated()) {
             turret.setAngle(0.0);
         }
@@ -167,9 +168,16 @@ public class DriverControls implements Loop {
             driver.rumble(1.0, 2.0);
             coDriver.rumble(1.0, 2.0);
         }
-        if(driver.leftTrigger.isBeingPressed()) {
+        if(driver.leftTrigger.wasActivated()) {
             swerve.setMaxSpeed(0.75);
-        } else {
+        } else if(driver.leftTrigger.wasReleased()) {
+            swerve.setMaxSpeed(1.0);
+        }
+        if(driver.rightTrigger.wasActivated()) {
+            swerve.useSlewLimiter(true);
+            swerve.setMaxSpeed(0.5);
+        } else if(driver.rightTrigger.wasReleased()) {
+            swerve.useSlewLimiter(false);
             swerve.setMaxSpeed(1.0);
         }
 
@@ -248,11 +256,11 @@ public class DriverControls implements Loop {
         } else if(coDriver.yButton.wasReleased()) {
             s.postShotState();
         }
-        if(coDriver.xButton.wasActivated()) {
+        /*if(coDriver.xButton.wasActivated()) {
             s.manualShotState(1800, 12);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }
+        }*/
         if(coDriver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
@@ -303,23 +311,14 @@ public class DriverControls implements Loop {
         }
         
         
-        double testControllerLeftY = -testController.getLeftY();
-        if(testControllerLeftY != 0) {
-            elevator.setOpenLoop(testControllerLeftY);
-            turret.setAngle(-90.0);
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-        } else if(elevator.getState() == Elevator.State.OPEN_LOOP) {
-            elevator.lockElevatorHeight();
-        }
-        
-        if(singleController.xButton.wasActivated()) {
+        if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
             turret.startVision();
             column.setState(Column.ControlState.FEED_BALLS);
             turret.startVision();
-        } else if(singleController.xButton.wasReleased()) {
+        } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }
     }
@@ -342,7 +341,7 @@ public class DriverControls implements Loop {
         }
 
         if(singleController.xButton.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
+            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
             turret.startVision();
             column.setState(Column.ControlState.FEED_BALLS);

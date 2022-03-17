@@ -5,6 +5,8 @@
 package com.team1323.frc2020.subsystems;
 
 
+import java.util.function.BiConsumer;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -16,11 +18,12 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.SmartTuner;
-import com.team1323.lib.util.SmartTuner.MicroTuner;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.AsynchronousInterrupt;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Controls the ball ejector and feeder motor*/
@@ -81,6 +84,20 @@ public class BallFeeder extends Subsystem {
         banner = new DigitalInput(Ports.FEEDER_BANNER);
         colorSensor = new DigitalInput(Ports.COLOR_SENSOR);
 
+        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(colorSensor, new BiConsumer<Boolean,Boolean>() {
+
+            @Override
+            public void accept(Boolean arg0, Boolean arg1) {
+                updateDetectionLogic(Timer.getFPGATimestamp());
+                if (isColorSensorRed()) {
+                    System.out.println("Interrupt detected a red ball");
+                }
+            }        
+
+        });
+        interrupt.setInterruptEdges(true, true);
+        interrupt.enable();
+
         smartTuner = new SmartTuner(feeder, "ballFeeder");
         smartTuner.enabled(false);
 
@@ -110,9 +127,9 @@ public class BallFeeder extends Subsystem {
         DSAlliance = alliance;
     }
     public void updateDetectedBall() {
-        if(banner.get() && !isColorSensorRed()) { //detected a red ball
+        if(banner.get() && !isColorSensorRed()) { //detected a blue ball
             DetectedBall = Ball.Blue;
-        } else if(isColorSensorRed()) { //detected a blue ball
+        } else if(isColorSensorRed()) { //detected a red ball
             DetectedBall = Ball.Red;
         } else if(!banner.get()) { //does not detect a ball
             DetectedBall = Ball.None;
@@ -151,6 +168,54 @@ public class BallFeeder extends Subsystem {
     public void queueShutdown(boolean shutdown) {
         pendingShutdown = shutdown;
     }
+
+    private void updateDetectionLogic(double timestamp) {
+        updateDetectedBall();
+
+        if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
+            if(detectedBallType != BallType.Team) {
+                System.out.println(DetectedBall.toString() + " Detected");
+            }
+            detectedBallType = BallType.Team;
+            setFeederOpenLoop(0);
+            if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
+                intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
+            }
+            intakeStartTimestamp = timestamp;
+            /*if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
+                ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                splitterStartTimestamp = Double.POSITIVE_INFINITY;
+            }*/
+            sentUpBall = true;
+            
+        } else if(DetectedBall != Ball.None) {//Detected opponents ball
+            if(detectedBallType != BallType.Opponent) {
+                System.out.println(DetectedBall.toString() + " Detected");
+            }
+            detectedBallType = BallType.Opponent;
+            setFeederOpenLoop(1.0);
+            ballSplitter.conformToState(ballSplitter.bestSplitterState);
+            //column.conformToState(Column.ControlState.OFF);
+            splitterStartTimestamp = timestamp;
+            
+        } else if (DetectedBall == Ball.None) { //There's no ball detected
+            if(detectedBallType != BallType.None) {
+                System.out.println(DetectedBall.toString() + " Detected");
+            }
+            detectedBallType = BallType.None;
+            if(pendingShutdown) {
+                //setFeederOpenLoop(0.0);
+                pendingShutdown = false;
+            }
+        }
+        if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
+            ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+            if(intake.getState() == Intake.ControlState.INTAKE) {
+                //column.setIndexBallState();
+            }
+            splitterStartTimestamp = Double.POSITIVE_INFINITY;
+        }
+    }
     
 
     private boolean rollersShifted = false;
@@ -170,7 +235,6 @@ public class BallFeeder extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            updateDetectedBall();
             updateSmartTuner();
             /*if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
@@ -180,49 +244,7 @@ public class BallFeeder extends Subsystem {
                     setFeederOpenLoop(0.0);
                     break;
                 case DETECT:
-                    if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
-                        if(detectedBallType != BallType.Team) {
-                            System.out.println(DetectedBall.toString() + " Detected");
-                        }
-                        detectedBallType = BallType.Team;
-                        setFeederOpenLoop(0);
-                        if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
-                            intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
-                        }
-                        intakeStartTimestamp = timestamp;
-                        /*if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
-                            ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                            splitterStartTimestamp = Double.POSITIVE_INFINITY;
-                        }*/
-                        sentUpBall = true;
-                        
-                    } else if(DetectedBall != Ball.None) {//Detected opponents ball
-                        if(detectedBallType != BallType.Opponent) {
-                            System.out.println(DetectedBall.toString() + " Detected");
-                        }
-                        detectedBallType = BallType.Opponent;
-                        setFeederOpenLoop(1.0);
-                        ballSplitter.conformToState(ballSplitter.bestSplitterState);
-                        //column.conformToState(Column.ControlState.OFF);
-                        splitterStartTimestamp = timestamp;
-                        
-                    } else if (DetectedBall == Ball.None) { //There's no ball detected
-                        if(detectedBallType != BallType.None) {
-                            System.out.println(DetectedBall.toString() + " Detected");
-                        }
-                        detectedBallType = BallType.None;
-                        if(pendingShutdown) {
-                            //setFeederOpenLoop(0.0);
-                            pendingShutdown = false;
-                        }
-                    }
-                    if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
-                        ballSplitter.conformToState(BallSplitter.ControlState.OFF);
-                        if(intake.getState() == Intake.ControlState.INTAKE) {
-                            //column.setIndexBallState();
-                        }
-                        splitterStartTimestamp = Double.POSITIVE_INFINITY;
-                    }
+                    updateDetectionLogic(timestamp);
                     break;               
                 default:
                     break;

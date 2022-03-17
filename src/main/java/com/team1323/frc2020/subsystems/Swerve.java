@@ -36,6 +36,7 @@ import com.wpilib.SwerveDriveKinematics;
 import com.wpilib.SwerveDriveOdometry;
 import com.wpilib.SwerveModuleState;
 
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -247,6 +248,12 @@ public class Swerve extends Subsystem{
 	public void setMaxSpeed(double max){
 		maxSpeedFactor = max;
 	}
+	private SlewRateLimiter xInputLimiter = new SlewRateLimiter(Constants.kSwerveXInputRate);
+	private SlewRateLimiter yInputLimiter = new SlewRateLimiter(Constants.kSwerveYInputRate);
+	private boolean useSlewLimiter = false;
+	public void useSlewLimiter(boolean use) {
+		useSlewLimiter = use;
+	}
 	private boolean robotCentric = false;
 	
 	//Swerve kinematics (exists in a separate class)
@@ -277,6 +284,13 @@ public class Swerve extends Subsystem{
 	* @param lowPower scaled down output
 	*/
 	public void sendInput(double x, double y, double rotate, boolean robotCentric, boolean lowPower){
+		if (useSlewLimiter) {
+			x = xInputLimiter.calculate(x);
+			y = yInputLimiter.calculate(y);
+		} else {
+			xInputLimiter.reset(x);
+			yInputLimiter.reset(y);
+		}
 		Translation2d translationalInput = new Translation2d(x, y);
 		double inputMagnitude = translationalInput.norm();
 		
