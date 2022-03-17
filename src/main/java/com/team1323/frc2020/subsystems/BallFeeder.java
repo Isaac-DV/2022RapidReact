@@ -76,13 +76,13 @@ public class BallFeeder extends Subsystem {
         feeder.enableVoltageCompensation(true);
         feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 50);
         feeder.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100);
-        feeder.setInverted(TalonFXInvertType.Clockwise);
+        feeder.setInverted(TalonFXInvertType.CounterClockwise);
 
         banner = new DigitalInput(Ports.FEEDER_BANNER);
         colorSensor = new DigitalInput(Ports.COLOR_SENSOR);
 
         smartTuner = new SmartTuner(feeder, "ballFeeder");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
 
         initializeDashboardValues();
     }
@@ -276,6 +276,8 @@ public class BallFeeder extends Subsystem {
             SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
             SmartDashboard.putString("Ball Eject Location", ballSplitter.bestSplitterState.toString());
         }
+        if(feeder.getBusVoltage() == 0)
+            DriverStation.reportError("FEEDER MOTOR NOT DETECTED", false);
     }
 
 

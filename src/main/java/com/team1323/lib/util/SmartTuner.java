@@ -16,6 +16,7 @@ public class SmartTuner {
     private String keyName;
 
     private boolean enabled = false;
+    boolean hasBeenEnabled = false;
 
     private double kP;
     private double kI;
@@ -32,7 +33,6 @@ public class SmartTuner {
     public SmartTuner(LazyTalonFX motorInstance, String dashboardKeyName) {
         motor = motorInstance;
         keyName = dashboardKeyName;
-        initalizeWidgets();
     }
     public SmartTuner(String dashboardKeyName) {
         keyName = dashboardKeyName;
@@ -115,6 +115,9 @@ public class SmartTuner {
     }
 
     public void enabled(boolean enabled) {
+        if(enabled && !hasBeenEnabled)
+            hasBeenEnabled = true;
+            initalizeWidgets();
         this.enabled = enabled;
     }
 

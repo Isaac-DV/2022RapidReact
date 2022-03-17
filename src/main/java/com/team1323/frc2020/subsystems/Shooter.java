@@ -21,6 +21,7 @@ import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -116,7 +117,7 @@ public class Shooter extends Subsystem {
         setOpenLoop(0.0);
 
         smartTuner = new SmartTuner(master, "shooter");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
         /*
         double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
         SmartDashboard.putNumber("ShooterRPMInput", dsRPMInputValue);*/
@@ -337,6 +338,10 @@ public class Shooter extends Subsystem {
             SmartDashboard.putNumber("Shooter Left Current", master.getOutputCurrent());
             SmartDashboard.putNumber("Shooter Right Current", slave.getOutputCurrent());
         }
+        if(master.getBusVoltage() == 0)
+            DriverStation.reportError("LEFT SHOOTER MOTOR NOT DETECTED", false);
+        if(master.getBusVoltage() == 0)
+            DriverStation.reportError("RIGHT SHOOTER MOTOR NOT DETECTED", false);
         smartTuner.update();
         updateRPM();
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);

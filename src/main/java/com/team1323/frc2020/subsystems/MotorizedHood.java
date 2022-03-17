@@ -96,7 +96,7 @@ public class MotorizedHood extends Subsystem {
 
         setOpenLoop(0.0);
         smartTuner = new SmartTuner(hood, "hood");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
     }
 
     private void setCurrentLimit(double amps) {
@@ -291,6 +291,8 @@ public class MotorizedHood extends Subsystem {
             SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));
             SmartDashboard.putNumber("Hood Velocity", hood.getSelectedSensorVelocity(0));
         }
+        if(hood.getBusVoltage() == 0)
+            DriverStation.reportError("HOOD MOTOR NOT DETECTED", false);
     }
     public Request setAngleRequest(double angle) {
         return new Request() {

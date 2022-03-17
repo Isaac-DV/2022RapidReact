@@ -132,7 +132,7 @@ public class Turret extends Subsystem {
         table.getEntry("ta"), table.getEntry("tv"));
         
         smartTuner = new SmartTuner(turret, "turret");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
     }
 
     public double getAbsoluteEncoderPosition() {

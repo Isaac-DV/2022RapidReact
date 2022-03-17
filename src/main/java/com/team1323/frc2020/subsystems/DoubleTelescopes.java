@@ -78,9 +78,9 @@ public class DoubleTelescopes extends Subsystem {
             motor.setSelectedSensorPosition(0);
         }
         leftTuner = new SmartTuner(leftTelescope, "leftTelescope");
-        leftTuner.enabled(true);
+        leftTuner.enabled(false);
         rightTuner = new SmartTuner(rightTelescope, "rightTelescope");
-        rightTuner.enabled(true);
+        rightTuner.enabled(false);
         configPID();
     }
 

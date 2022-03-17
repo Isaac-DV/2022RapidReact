@@ -26,6 +26,7 @@ import com.team254.drivers.LazyTalonFX;
 
 import edu.wpi.first.wpilibj.AsynchronousInterrupt;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Timer;
@@ -90,7 +91,7 @@ public class Column extends Subsystem {
 
         column.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         column.enableVoltageCompensation(true);
-        column.setInverted(TalonFXInvertType.Clockwise);
+        column.setInverted(TalonFXInvertType.CounterClockwise);
         column.setNeutralMode(NeutralMode.Brake);
         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
         column.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
@@ -126,7 +127,7 @@ public class Column extends Subsystem {
         interrupt.enable();
 
         smartTuner = new SmartTuner(column, "column");
-        smartTuner.enabled(true);
+        smartTuner.enabled(false);
     }
     public boolean getBanner() {
         return banner.get();
@@ -301,6 +302,8 @@ public class Column extends Subsystem {
             SmartDashboard.putNumber("Column Loaded Ball Counter", loadedBallCount);
             smartTuner.update();
         }
+        if(column.getBusVoltage() == 0)
+            DriverStation.reportError("COLUMN MOTOR NOT DETECTED", false);
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

@@ -13,6 +13,7 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team254.drivers.LazyTalonFX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
@@ -78,7 +79,8 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        
+        if(intake.getBusVoltage() == 0)
+            DriverStation.reportError("INTAKE MOTOR NOT DETECTED", false);
     }
 
     @Override
