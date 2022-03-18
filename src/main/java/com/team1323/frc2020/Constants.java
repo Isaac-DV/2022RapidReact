@@ -349,8 +349,8 @@ public class Constants {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kMinControlHeight = 0.0;
         public static final double kLowestPoint = 0.0;
-        public static final double kMaxControlHeight = 24.5;
-        public static final double kTicksPerInch = 12749.0 / 1.0;
+        public static final double kMaxControlHeight = 27.5;
+        public static final double kTicksPerInch = 353228.000000 / 24.0; //-3.000000
 
         public static final double kLeftP = 0.1;
         public static final double kLeftI = 0.0;
@@ -361,7 +361,7 @@ public class Constants {
         public static final double kRightI = 0.0;
         public static final double kRightD = 0.0;
         public static final double kRightF = 1023.0 / kMaxSpeed;
-        public static final double kFirstPitchAngle = 25.0;
+        public static final double kFirstPitchAngle = 52.0;
         public static final double kSecondPitchAngle = 30.0;
         public static final double kHeightTolerance = 2.0;
     }

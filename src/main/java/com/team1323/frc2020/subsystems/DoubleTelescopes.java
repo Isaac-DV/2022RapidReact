@@ -46,7 +46,8 @@ public class DoubleTelescopes extends Subsystem {
     private boolean hitPitchAngle = false;
     private boolean climbPaused = false;
     private boolean secondPullDownRan = false;
-    private boolean autoLiftMode = true;
+    private boolean hangScopeReleased = false;
+    private boolean autoLiftMode = false;
     private double atTargetCounter = 0;
     public void enabledClimber(boolean enable) {
         liftModeEnabled = enable;
@@ -56,8 +57,8 @@ public class DoubleTelescopes extends Subsystem {
     }
     public DoubleTelescopes() {
         pigeon = Pigeon.getInstance();
-        leftTelescope = new LazyTalonFX(Ports.TELESCOPE_LEFT);
-        rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT);
+        leftTelescope = new LazyTalonFX(Ports.TELESCOPE_LEFT, "main");
+        rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT, "main");
 
         motors = Arrays.asList(leftTelescope, rightTelescope);
         SupplyCurrentLimitConfiguration supplyLimit = new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1);
@@ -91,7 +92,7 @@ public class DoubleTelescopes extends Subsystem {
         rightTelescope.config_kF(0, Constants.DoubleTelescopes.kRightF, Constants.kCANTimeoutMs);
         rightTelescope.selectProfileSlot(0, 0);
         rightTelescope.configMotionCruiseVelocity(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
-        rightTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
+        rightTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 5.0, Constants.kCANTimeoutMs);
         rightTelescope.configMotionSCurveStrength(0);
         rightTelescope.setInverted(TalonFXInvertType.Clockwise);
 
@@ -101,7 +102,7 @@ public class DoubleTelescopes extends Subsystem {
         leftTelescope.config_kF(0, Constants.DoubleTelescopes.kLeftF, Constants.kCANTimeoutMs);
         leftTelescope.selectProfileSlot(0, 0);
         leftTelescope.configMotionCruiseVelocity(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
-        leftTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
+        leftTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 5.0, Constants.kCANTimeoutMs);
         leftTelescope.configMotionSCurveStrength(0);
 
 
@@ -206,8 +207,8 @@ public class DoubleTelescopes extends Subsystem {
                 }
                 
                 if(currentLiftMode == LiftMode.FIRST_RUNG) {
-                    setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight);
                     setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+                    setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight);
                     if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
                         //if(autoLiftMode)
                             //currentLiftMode = LiftMode.SECOND_RUNG;
@@ -215,32 +216,36 @@ public class DoubleTelescopes extends Subsystem {
                 }
                 if(currentLiftMode == LiftMode.SECOND_RUNG) {
                     if(!secondPullDownRan) {
-                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
+                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
                         secondPullDownRan = true;
                     }
-                    if(!hitPitchAngle && rightTelescopeOnTarget() && Util.epsilonEquals(pigeon.getRoll(), Constants.DoubleTelescopes.kFirstPitchAngle, 3.0)) {
-                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight + 5);
-                        //setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
+                    if(!hitPitchAngle && leftTelescopeOnTarget() && Util.epsilonEquals(-pigeon.getRoll(), Constants.DoubleTelescopes.kFirstPitchAngle, 3.0)) {
+                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight + 12);
+                        hangScopeReleased = true;
                         hitPitchAngle = true;
                     }
-                    //if(hitPitchAngle && rightTelescopeOnTarget() && )
-                    if(hitPitchAngle && rightTelescopeOnTarget() && leftTelescopeOnTarget()) {
+                    if(hangScopeReleased && leftTelescopeOnTarget()) {
+                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
+                        setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+                        hangScopeReleased = false;
+                    }
+                    if(hitPitchAngle && leftTelescopeOnTarget() && rightTelescopeOnTarget() && !hangScopeReleased) {
                         if(autoLiftMode)
                             currentLiftMode = LiftMode.THIRD_RUNG;
-                        hitPitchAngle = false;
+                        //hitPitchAngle = false;
                     }
                 }
                 if(currentLiftMode == LiftMode.THIRD_RUNG) {
-                    if(!hitPitchAngle && Util.epsilonEquals(pigeon.getRoll(), Constants.DoubleTelescopes.kSecondPitchAngle, 10)) {
+                    if(!hitPitchAngle && Util.epsilonEquals(-pigeon.getRoll(), Constants.DoubleTelescopes.kSecondPitchAngle, 10)) {
                         atTargetCounter++;
                     }
                     if(!hitPitchAngle && atTargetCounter >= 100) {
                         hitPitchAngle = true;
-                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight + (Constants.DoubleTelescopes.kMaxControlHeight / 2));
-                        setLeftHeight((Constants.DoubleTelescopes.kMaxControlHeight / 2 ) + Constants.DoubleTelescopes.kMinControlHeight);
+                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight + (Constants.DoubleTelescopes.kMaxControlHeight / 2));
+                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight + 12.0);
                     }
 
-                    if(hitPitchAngle && leftTelescopeOnTarget()) {
+                    if(hitPitchAngle && rightTelescopeOnTarget()) {
                         //setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
                     }
 

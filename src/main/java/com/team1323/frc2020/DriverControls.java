@@ -14,7 +14,7 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
 import com.team1323.frc2020.subsystems.Column;
-import com.team1323.frc2020.subsystems.Elevator;
+import com.team1323.frc2020.subsystems.DoubleTelescopes;
 import com.team1323.frc2020.subsystems.Intake;
 import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.Shooter;
@@ -39,7 +39,7 @@ public class DriverControls implements Loop {
         return instance;
     }
 
-	Xbox driver, coDriver, singleController;
+	Xbox driver, coDriver, singleController, testController;
 
     private Swerve swerve;
     private Intake intake;
@@ -50,7 +50,7 @@ public class DriverControls implements Loop {
     private Turret turret;
     private MotorizedHood motorizedHood;
     private Shooter shooter;
-    private Elevator elevator;
+    private DoubleTelescopes doubleTelescopes;
     private Superstructure s;
 
     private SubsystemManager subsystems;
@@ -71,6 +71,7 @@ public class DriverControls implements Loop {
     public DriverControls() {
         driver = new Xbox(0);
 		coDriver = new Xbox(1);
+        testController = new Xbox(4);
         singleController = new Xbox(5);
         driver.setDeadband(0.0);
 		coDriver.setDeadband(0.25);
@@ -85,13 +86,13 @@ public class DriverControls implements Loop {
         turret = Turret.getInstance();
         motorizedHood = MotorizedHood.getInstance();
         shooter = Shooter.getInstance();
-        elevator = Elevator.getInstance();  
+        doubleTelescopes = DoubleTelescopes.getInstance();
 
         s = Superstructure.getInstance();
 
         subsystems = new SubsystemManager(
-				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, turret,
-                    motorizedHood, shooter, elevator, column, s));
+				Arrays.asList(swerve, intake, wrist, ballSplitter, ballFeeder, turret, doubleTelescopes,
+                    motorizedHood, shooter, column, s));
     }
 
     @Override
@@ -118,7 +119,8 @@ public class DriverControls implements Loop {
         } else {
             driver.update();
 			coDriver.update();
-
+            singleController.update();
+            testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -309,6 +311,40 @@ public class DriverControls implements Loop {
         if(singleController.backButton.wasActivated()) {
             s.disableState();
         }
+
+        double singleLeftY = -testController.getLeftY();
+        double singleRightY = -testController.getRightY();        
+
+        if(singleRightY != 0) {
+            doubleTelescopes.setLeftOpenLoop(singleRightY);
+        } else if(doubleTelescopes.getLeftTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
+            doubleTelescopes.lockLeftHeight();
+        }
+        if(singleLeftY != 0) {
+            doubleTelescopes.setRightOpenLoop(singleLeftY);
+        } else if(doubleTelescopes.getRightTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
+            doubleTelescopes.lockRightHeight();
+        }
+        if(testController.leftTrigger.wasActivated()) {
+            doubleTelescopes.enableLimits(false);
+        } else if(testController.leftTrigger.wasReleased()) {
+            doubleTelescopes.enableLimits(true);
+        }
+        
+        if(testController.aButton.wasActivated()) {
+            turret.setAngle(-90);
+            //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
+            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+            doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+        }
+        if(testController.xButton.wasActivated()) {
+            //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_RUNG);
+            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
+        }
+        if(testController.yButton.wasActivated()) {
+            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+            doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
+        }
         
         
         /*if(coDriver.xButton.wasActivated()) {
@@ -339,8 +375,17 @@ public class DriverControls implements Loop {
             swerve.resetAveragedDirection();
             s.disableState();
         }
-
+        
+        if(singleController.aButton.wasActivated()) {
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
+        }
         if(singleController.xButton.wasActivated()) {
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_RUNG);
+        }
+        if(singleController.yButton.wasActivated()) {
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_RUNG);
+        }
+        /*if(singleController.xButton.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
             turret.startVision();
@@ -367,7 +412,7 @@ public class DriverControls implements Loop {
             intake.conformToState(Intake.ControlState.OFF);
             ballFeeder.queueShutdown(true);
             wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-        }
+        }*/
 
         if (singleController.leftTrigger.wasActivated()) {
             if (singleController.aButton.isBeingPressed()) {
@@ -378,9 +423,9 @@ public class DriverControls implements Loop {
                 wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
             }
         }
-        if(singleController.bButton.wasActivated()) {
+        /*if(singleController.bButton.wasActivated()) {
             wrist.setWristAngle(Constants.Wrist.kStowedAngle);
-        }
+        }*/
         if(column.needsToNotifyDrivers()) {
             singleController.rumble(2.0, 1.0);
         }
