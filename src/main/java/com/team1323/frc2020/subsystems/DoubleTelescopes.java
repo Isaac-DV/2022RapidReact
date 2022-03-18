@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
@@ -43,27 +44,16 @@ public class DoubleTelescopes extends Subsystem {
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = false;
-    private boolean hitPitchAngle = false;
-    private boolean climbPaused = false;
-    private boolean secondPullDownRan = false;
-    private boolean hangScopeReleased = false;
-    private boolean autoLiftMode = false;
-    private double atTargetCounter = 0;
-    public void enabledClimber(boolean enable) {
-        liftModeEnabled = enable;
-    }
-    public void pauseClimb(boolean pause) {
-        climbPaused = pause;
-    }
+
     public DoubleTelescopes() {
         pigeon = Pigeon.getInstance();
         leftTelescope = new LazyTalonFX(Ports.TELESCOPE_LEFT, "main");
         rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT, "main");
 
         motors = Arrays.asList(leftTelescope, rightTelescope);
-        SupplyCurrentLimitConfiguration supplyLimit = new SupplyCurrentLimitConfiguration(true, 40, 40, 0.1);
+        StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(true, 40, 40, 0.1);
         for(LazyTalonFX motor : motors) {
-            motor.configSupplyCurrentLimit(supplyLimit);
+            motor.configStatorCurrentLimit(statorLimit);
             motor.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
             motor.enableVoltageCompensation(true);
             motor.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
@@ -115,8 +105,10 @@ public class DoubleTelescopes extends Subsystem {
         leftTelescope.configReverseSoftLimitEnable(enable);
         leftTelescope.configForwardSoftLimitEnable(enable);
     }
+    static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
+    static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(25, 25), FIRST_RUNG(25, 25), SECOND_RUNG(25, 0), THIRD_RUNG(0, 25);
+        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 12.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
@@ -145,9 +137,9 @@ public class DoubleTelescopes extends Subsystem {
 
     private LiftMode currentLiftMode = LiftMode.DISABLED;
     public void setLiftMode(LiftMode liftMode) {
-        hitPitchAngle = false;
-        enabledClimber(true);
         currentLiftMode = liftMode;
+        setLeftHeight(liftMode.leftEndingHeight);
+        setRightHeight(liftMode.rightEndingHeight);
     }
     public void setLeftOpenLoop(double demand) {
         leftTelescopeState = TelescopeState.OPEN_LOOP;
@@ -194,71 +186,15 @@ public class DoubleTelescopes extends Subsystem {
         public void onStart(double timestamp) {
             setLeftOpenLoop(0.0);
             setRightOpenLoop(0.0);
-            liftModeEnabled = false;
-            secondPullDownRan = false;
         }
 
         @Override
         public void onLoop(double timestamp) {
-            if(liftModeEnabled) {
-                enableLimits(true);
-                if(currentLiftMode == LiftMode.DISABLED) {
-                    //currentLiftMode = LiftMode.FIRST_RUNG;
-                }
-                
-                if(currentLiftMode == LiftMode.FIRST_RUNG) {
-                    setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
-                    setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight);
-                    if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
-                        //if(autoLiftMode)
-                            //currentLiftMode = LiftMode.SECOND_RUNG;
-                    }
-                }
-                if(currentLiftMode == LiftMode.SECOND_RUNG) {
-                    if(!secondPullDownRan) {
-                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-                        secondPullDownRan = true;
-                    }
-                    if(!hitPitchAngle && leftTelescopeOnTarget() && Util.epsilonEquals(-pigeon.getRoll(), Constants.DoubleTelescopes.kFirstPitchAngle, 3.0)) {
-                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight + 12);
-                        hangScopeReleased = true;
-                        hitPitchAngle = true;
-                    }
-                    if(hangScopeReleased && leftTelescopeOnTarget()) {
-                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
-                        setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
-                        hangScopeReleased = false;
-                    }
-                    if(hitPitchAngle && leftTelescopeOnTarget() && rightTelescopeOnTarget() && !hangScopeReleased) {
-                        if(autoLiftMode)
-                            currentLiftMode = LiftMode.THIRD_RUNG;
-                        //hitPitchAngle = false;
-                    }
-                }
-                if(currentLiftMode == LiftMode.THIRD_RUNG) {
-                    if(!hitPitchAngle && Util.epsilonEquals(-pigeon.getRoll(), Constants.DoubleTelescopes.kSecondPitchAngle, 10)) {
-                        atTargetCounter++;
-                    }
-                    if(!hitPitchAngle && atTargetCounter >= 100) {
-                        hitPitchAngle = true;
-                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight + (Constants.DoubleTelescopes.kMaxControlHeight / 2));
-                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight + 12.0);
-                    }
-
-                    if(hitPitchAngle && rightTelescopeOnTarget()) {
-                        //setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-                    }
-
-                }
-            } else if(climbPaused) {
-                lockRightHeight();
-                lockLeftHeight();
-            }
+            
         }
 
         @Override
         public void onStop(double timestamp) {
-            liftModeEnabled = false;            
         }
         
     };

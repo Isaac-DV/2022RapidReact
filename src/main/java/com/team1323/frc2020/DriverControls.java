@@ -312,6 +312,7 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
+
         double singleLeftY = -testController.getLeftY();
         double singleRightY = -testController.getRightY();        
 
@@ -331,6 +332,7 @@ public class DriverControls implements Loop {
             doubleTelescopes.enableLimits(true);
         }
         
+
         if(testController.aButton.wasActivated()) {
             turret.setAngle(-90);
             //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
@@ -342,10 +344,14 @@ public class DriverControls implements Loop {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
         }
         if(testController.yButton.wasActivated()) {
-            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+            
+        }
+        if(testController.leftBumper.wasActivated()) {
             doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
         }
-        
+        if(testController.rightBumper.wasActivated()) {
+            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
+        }
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);
@@ -376,15 +382,7 @@ public class DriverControls implements Loop {
             s.disableState();
         }
         
-        if(singleController.aButton.wasActivated()) {
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
-        }
-        if(singleController.xButton.wasActivated()) {
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_RUNG);
-        }
-        if(singleController.yButton.wasActivated()) {
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_RUNG);
-        }
+        
         /*if(singleController.xButton.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
