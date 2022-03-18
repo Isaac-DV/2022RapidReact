@@ -91,7 +91,7 @@ public class DoubleTelescopes extends Subsystem {
         rightTelescope.config_kF(0, Constants.DoubleTelescopes.kRightF, Constants.kCANTimeoutMs);
         rightTelescope.selectProfileSlot(0, 0);
         rightTelescope.configMotionCruiseVelocity(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
-        rightTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 5.0, Constants.kCANTimeoutMs);
+        rightTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
         rightTelescope.configMotionSCurveStrength(0);
         rightTelescope.setInverted(TalonFXInvertType.Clockwise);
 
@@ -101,7 +101,7 @@ public class DoubleTelescopes extends Subsystem {
         leftTelescope.config_kF(0, Constants.DoubleTelescopes.kLeftF, Constants.kCANTimeoutMs);
         leftTelescope.selectProfileSlot(0, 0);
         leftTelescope.configMotionCruiseVelocity(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
-        leftTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 5.0, Constants.kCANTimeoutMs);
+        leftTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 1.0, Constants.kCANTimeoutMs);
         leftTelescope.configMotionSCurveStrength(0);
 
 
@@ -219,10 +219,11 @@ public class DoubleTelescopes extends Subsystem {
                         secondPullDownRan = true;
                     }
                     if(!hitPitchAngle && rightTelescopeOnTarget() && Util.epsilonEquals(pigeon.getRoll(), Constants.DoubleTelescopes.kFirstPitchAngle, 3.0)) {
-                        setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight - 1);
-                        setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
+                        setRightHeight(Constants.DoubleTelescopes.kMinControlHeight + 5);
+                        //setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
                         hitPitchAngle = true;
                     }
+                    //if(hitPitchAngle && rightTelescopeOnTarget() && )
                     if(hitPitchAngle && rightTelescopeOnTarget() && leftTelescopeOnTarget()) {
                         if(autoLiftMode)
                             currentLiftMode = LiftMode.THIRD_RUNG;

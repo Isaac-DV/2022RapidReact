@@ -200,14 +200,14 @@ public class RobotState {
 						.transformBy(kVehicleToTurretFixed).inverse();
 				Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_field
 						.transformBy(Pose2d.fromTranslation(report.field_to_goal));
-				if(useRobotPose)
-					latest_turret_fixed_to_goal = Pose2d.fromTranslation(getTurretToCenterOfField().translateBy(Translation2d.fromPolar(getTurretToCenterOfField().direction(), 10).inverse()));
+				/*if(useRobotPose)
+					latest_turret_fixed_to_goal = Pose2d.fromTranslation(getTurretToCenterOfField().translateBy(Translation2d.fromPolar(getTurretToCenterOfField().direction(), 10).inverse()));*/
 				Translation2d unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm()));
 				Translation2d initial_ball_velocity = Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.physicalAngleToEmpiricalAngle(unmodified_shot_vector.direction().getDegrees())), Shooter.rpmToInitialBallVelocity(unmodified_shot_vector.norm()));
 				Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
-				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy).scale(0.75));
+				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy).scale(0.8));
 
-				Rotation2d turretAngle = stationary_shot_vector.direction().interpolate(moving_shot_vector.direction(), 0.5);
+				Rotation2d turretAngle = stationary_shot_vector.direction().interpolate(moving_shot_vector.direction(), 0.775);
 				Rotation2d hood_angle = Rotation2d.fromDegrees(MotorizedHood.empiricalAngleToPhysicalAngle(Math.toDegrees(Math.atan(initial_ball_velocity.y() / moving_shot_vector.norm()))));
 				double shooter_rpm = Shooter.initialBallVelocityToRPM(Math.hypot(moving_shot_vector.norm(), initial_ball_velocity.y()));
 				/*ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 

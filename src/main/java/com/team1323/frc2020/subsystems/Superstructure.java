@@ -335,7 +335,7 @@ public class Superstructure extends Subsystem {
 				//new LambdaRequest(() -> swerve.useSlewLimiter(false)),
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
-				shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
+				//shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
 					if (newRobotPose.isPresent()) {
@@ -377,6 +377,9 @@ public class Superstructure extends Subsystem {
 	
 	public void reverseAllSubsystems() {
 		request(
+			new SequentialRequest(
+				wrist.setWristAngleRequest(Constants.Wrist.kBallDebouncerAngle)
+			),
 			new ParallelRequest(
 				intake.stateRequest(Intake.ControlState.EJECT),
 				ballFeeder.openLoopRequest(0.5),

@@ -169,7 +169,7 @@ public class DriverControls implements Loop {
             coDriver.rumble(1.0, 2.0);
         }
         if(driver.leftTrigger.wasActivated()) {
-            swerve.setMaxSpeed(0.75);
+            swerve.setMaxSpeed(0.5);
         } else if(driver.leftTrigger.wasReleased()) {
             swerve.setMaxSpeed(1.0);
         }
@@ -256,11 +256,11 @@ public class DriverControls implements Loop {
         } else if(coDriver.yButton.wasReleased()) {
             s.postShotState();
         }
-        /*if(coDriver.xButton.wasActivated()) {
+        if(coDriver.xButton.wasActivated()) {
             s.manualShotState(1800, 12);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }*/
+        }
         if(coDriver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
@@ -311,7 +311,7 @@ public class DriverControls implements Loop {
         }
         
         
-        if(coDriver.xButton.wasActivated()) {
+        /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
             shooter.setVelocity(shooter.dashboardRPMInput); //2100
@@ -320,7 +320,7 @@ public class DriverControls implements Loop {
             turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }
+        }*/
     }
 
     private void oneControllerMode() {

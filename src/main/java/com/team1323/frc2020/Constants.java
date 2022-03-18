@@ -226,8 +226,8 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
-        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
-        public static final double kBallDelay = 0.01;
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.5; //0.4
+        public static final double kBallDelay = 0.001;
 
         public static final double kColumnRunTime = 0.5;
     }
