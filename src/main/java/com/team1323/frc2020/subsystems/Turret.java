@@ -114,7 +114,7 @@ public class Turret extends Subsystem {
         turret.config_IntegralZone(0, degreesToEncUnits(2.0));
 
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
-        turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
+        turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 0.5), Constants.kCANTimeoutMs);
         turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs); // 3.0
         turret.configMotionSCurveStrength(0); // 0
         turret.configAllowableClosedloopError(0, degreesToEncUnits(0), Constants.kCANTimeoutMs);
@@ -264,7 +264,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O/5 * 50) + ((robotVelocity/120) * 7) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O/5 * 40) + ((robotVelocity/120) * 6) + 1;
         turretTolerance = robotScaledAngleTolerance;
     }
     
@@ -378,7 +378,7 @@ public class Turret extends Subsystem {
             
             @Override
             public void act() {
-                turret.configMotionCruiseVelocity((int)(Constants.Turret.kMaxSpeed * speedScalar), Constants.kCANTimeoutMs);
+                //turret.configMotionCruiseVelocity((int)(Constants.Turret.kMaxSpeed * speedScalar), Constants.kCANTimeoutMs);
                 setAngle(angle);
             }
             

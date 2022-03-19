@@ -242,7 +242,7 @@ public class Constants {
         public static final double kEncoderToTurretRatio = 1.0;
         public static final double kAngleTolerance = 2.0;
         public static final double kMinControlAngle = -270.0; //-250
-        public static final double kMaxControlAngle = 135.0;
+        public static final double kMaxControlAngle = 90.0;
         public static final double kMinInitialAngle = -180.0;
         public static final double kMaxInitialAngle = 180.0;
         
