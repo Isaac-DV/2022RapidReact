@@ -79,8 +79,8 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        if(intake.getBusVoltage() == 0)
-            DriverStation.reportError("INTAKE MOTOR NOT DETECTED", false);
+        /*if(intake.getBusVoltage() == 0)
+            DriverStation.reportError("INTAKE MOTOR NOT DETECTED", false);*/
     }
 
     @Override

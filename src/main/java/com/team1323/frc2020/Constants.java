@@ -271,7 +271,7 @@ public class Constants {
         public static final double kF = 1023.0 / kMaxSpeed;
 
         public static final double kHoodStartingAngle = 15.0;
-        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 321.116345 : 321.116345; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
+        public static final double kEncStartingAngle = Settings.kIsUsingCompBot ? 117.919974 : 117.919974; // The absolute angle (in degrees) of the mag encoder when the hood is at kHoodStartingAngle
 
         public static final double kTicksPerDegree = 2048.0 / 360.0 * kReduction;
 

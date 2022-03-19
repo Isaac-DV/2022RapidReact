@@ -336,15 +336,13 @@ public class DriverControls implements Loop {
         if(testController.aButton.wasActivated()) {
             turret.setAngle(-90);
             //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
-            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMaxControlHeight);
-            doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMaxControlHeight);
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.START);
         }
-        if(testController.xButton.wasActivated()) {
-            //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_RUNG);
-            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
+        if(testController.bButton.wasActivated()) {
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_WINCH);
         }
         if(testController.yButton.wasActivated()) {
-            
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_INITIAL_RELEASE);
         }
         if(testController.leftBumper.wasActivated()) {
             doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);

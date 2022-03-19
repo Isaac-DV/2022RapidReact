@@ -291,8 +291,8 @@ public class MotorizedHood extends Subsystem {
             SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));
             SmartDashboard.putNumber("Hood Velocity", hood.getSelectedSensorVelocity(0));
         }
-        if(hood.getBusVoltage() == 0)
-            DriverStation.reportError("HOOD MOTOR NOT DETECTED", false);
+        /*if(hood.getBusVoltage() == 0)
+            DriverStation.reportError("HOOD MOTOR NOT DETECTED", false);*/
     }
     public Request setAngleRequest(double angle) {
         return new Request() {

@@ -190,7 +190,14 @@ public class DoubleTelescopes extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            
+            if(liftModeEnabled) {
+                switch(currentLiftMode) {
+                    case SECOND_INITIAL_RELEASE:
+                        if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
+                            currentLiftMode = LiftMode.SECOND_FULL_RELEASE;
+                        }
+                }
+            }
         }
 
         @Override

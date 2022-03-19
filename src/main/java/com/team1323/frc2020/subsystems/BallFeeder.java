@@ -298,8 +298,8 @@ public class BallFeeder extends Subsystem {
             SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
             SmartDashboard.putString("Ball Eject Location", ballSplitter.bestSplitterState.toString());
         }
-        if(feeder.getBusVoltage() == 0)
-            DriverStation.reportError("FEEDER MOTOR NOT DETECTED", false);
+        /*if(feeder.getBusVoltage() == 0)
+            DriverStation.reportError("FEEDER MOTOR NOT DETECTED", false);*/
     }
 
 

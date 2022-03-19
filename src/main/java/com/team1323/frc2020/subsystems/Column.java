@@ -245,6 +245,7 @@ public class Column extends Subsystem {
                     }
                     break;
                 case MANUAL_FEED_BALLS:
+                    System.out.println("Column Banner : " + getBanner() + ", Ball Detected Timestamp finite : " + Double.isFinite(ballDetectedTimestamp) + ", within timestamp : " + ((timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay) + ", Shooter on Target : " + shooter.hasReachedSetpoint() + ", Hood on Target : " + motorizedHood.hasReachedAngle());
                     if (!getBanner()) {
                         setVelocity(Constants.Column.kQueueVelocitySpeed);
                     } else if(getBanner() && Double.isFinite(ballDetectedTimestamp) && (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay
@@ -318,8 +319,8 @@ public class Column extends Subsystem {
             SmartDashboard.putNumber("Column Loaded Ball Counter", loadedBallCount);
             smartTuner.update();
         }
-        if(column.getBusVoltage() == 0)
-            DriverStation.reportError("COLUMN MOTOR NOT DETECTED", false);
+        /*if(column.getBusVoltage() == 0)
+            DriverStation.reportError("COLUMN MOTOR NOT DETECTED", false);*/
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

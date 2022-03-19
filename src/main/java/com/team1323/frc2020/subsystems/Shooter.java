@@ -338,10 +338,10 @@ public class Shooter extends Subsystem {
             SmartDashboard.putNumber("Shooter Left Current", master.getOutputCurrent());
             SmartDashboard.putNumber("Shooter Right Current", slave.getOutputCurrent());
         }
-        if(master.getBusVoltage() == 0)
+        /*if(master.getBusVoltage() == 0)
             DriverStation.reportError("LEFT SHOOTER MOTOR NOT DETECTED", false);
         if(master.getBusVoltage() == 0)
-            DriverStation.reportError("RIGHT SHOOTER MOTOR NOT DETECTED", false);
+            DriverStation.reportError("RIGHT SHOOTER MOTOR NOT DETECTED", false);*/
         smartTuner.update();
         updateRPM();
         /*SmartDashboard.putNumber("Shooter Master Current", periodicIO.current);

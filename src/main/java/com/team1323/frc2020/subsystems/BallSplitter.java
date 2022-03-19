@@ -258,8 +258,8 @@ public class BallSplitter extends Subsystem {
             SmartDashboard.putNumber("Swerve Raw Theta",  Util.boundAngle0to360Degrees(translationVector.direction().getDegrees()));
             SmartDashboard.putString("Eject Mode", bestSplitterState.toString());
         }
-        if(splitter.getBusVoltage() == 0)
-            DriverStation.reportError("SPLITTER MOTOR NOT DETECTED", false);
+        /*if(splitter.getBusVoltage() == 0)
+            DriverStation.reportError("SPLITTER MOTOR NOT DETECTED", false);*/
         
     }
     @Override
