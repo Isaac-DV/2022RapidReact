@@ -335,7 +335,6 @@ public class DriverControls implements Loop {
 
         if(testController.aButton.wasActivated()) {
             turret.setAngle(-90);
-            //doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_RUNG);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.START);
         }
         if(testController.bButton.wasActivated()) {
@@ -343,6 +342,9 @@ public class DriverControls implements Loop {
         }
         if(testController.yButton.wasActivated()) {
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_INITIAL_RELEASE);
+        }
+        if(testController.xButton.wasActivated()) {
+            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
         }
         if(testController.leftBumper.wasActivated()) {
             doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);

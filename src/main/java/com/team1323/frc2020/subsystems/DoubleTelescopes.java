@@ -51,7 +51,7 @@ public class DoubleTelescopes extends Subsystem {
         rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT, "main");
 
         motors = Arrays.asList(leftTelescope, rightTelescope);
-        StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(true, 40, 40, 0.1);
+        StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(true, 50, 50, 0.1);
         for(LazyTalonFX motor : motors) {
             motor.configStatorCurrentLimit(statorLimit);
             motor.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
@@ -108,7 +108,7 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 12.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight);
+        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 12.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 12.0);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
@@ -137,6 +137,7 @@ public class DoubleTelescopes extends Subsystem {
 
     private LiftMode currentLiftMode = LiftMode.DISABLED;
     public void setLiftMode(LiftMode liftMode) {
+        liftModeEnabled = true;
         currentLiftMode = liftMode;
         setLeftHeight(liftMode.leftEndingHeight);
         setRightHeight(liftMode.rightEndingHeight);
@@ -164,7 +165,7 @@ public class DoubleTelescopes extends Subsystem {
         heightInches = Util.limit(heightInches, Constants.DoubleTelescopes.kMinControlHeight, Constants.DoubleTelescopes.kMaxControlHeight);
         periodicIO.rightDemand = inchesToEncUnits(heightInches);
         periodicIO.rightControlMode = ControlMode.MotionMagic;
-        System.out.println("The Right ran with a target height of :" + heightInches);
+        //System.out.println("The Right ran with a target height of :" + heightInches);
 
         rightTargetHeight = heightInches;
     }
@@ -192,10 +193,21 @@ public class DoubleTelescopes extends Subsystem {
         public void onLoop(double timestamp) {
             if(liftModeEnabled) {
                 switch(currentLiftMode) {
+                    case START:
+                        break;
+                    case FIRST_WINCH:
+                        break;
                     case SECOND_INITIAL_RELEASE:
                         if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
                             currentLiftMode = LiftMode.SECOND_FULL_RELEASE;
                         }
+                        break;
+                    case SECOND_FULL_RELEASE:
+                        break;
+                    case THIRD_INITIAL_HANG:
+                        break;
+                    default:
+                    break;
                 }
             }
         }
