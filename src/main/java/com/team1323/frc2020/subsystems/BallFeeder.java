@@ -49,7 +49,10 @@ public class BallFeeder extends Subsystem {
     public void setSentUpBall(boolean bool) {
         sentUpBall = bool;
     }
-
+    boolean printFeeder;
+    public void setPrintFeeder(boolean enabled) {
+        printFeeder = enabled;
+    }
     private boolean autoDetectEnabled = true;
     public boolean isAutoDetectEnabled() {
         return autoDetectEnabled;
@@ -174,7 +177,7 @@ public class BallFeeder extends Subsystem {
 
         if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
             if(detectedBallType != BallType.Team) {
-                System.out.println(DetectedBall.toString() + " Detected");
+                System.out.println(DetectedBall.toString() + " Detected" + ", Color Sensor : " + isColorSensorRed() + ", Is Feeder banner activated : " + banner.get());
             }
             detectedBallType = BallType.Team;
             setFeederOpenLoop(0);
@@ -190,7 +193,7 @@ public class BallFeeder extends Subsystem {
             
         } else if(DetectedBall != Ball.None) {//Detected opponents ball
             if(detectedBallType != BallType.Opponent) {
-                System.out.println(DetectedBall.toString() + " Detected");
+                System.out.println(DetectedBall.toString() + " Detected" + ", Color Sensor : " + isColorSensorRed() + ", Is Feeder banner activated : " + banner.get());
             }
             detectedBallType = BallType.Opponent;
             setFeederOpenLoop(1.0);
@@ -200,7 +203,7 @@ public class BallFeeder extends Subsystem {
             
         } else if (DetectedBall == Ball.None) { //There's no ball detected
             if(detectedBallType != BallType.None) {
-                System.out.println(DetectedBall.toString() + " Detected");
+                System.out.println(DetectedBall.toString() + " Detected" + ", Color Sensor : " + isColorSensorRed() + ", Is Feeder banner activated : " + banner.get());
             }
             detectedBallType = BallType.None;
             if(pendingShutdown) {
@@ -236,6 +239,8 @@ public class BallFeeder extends Subsystem {
         @Override
         public void onLoop(double timestamp) {
             updateSmartTuner();
+            if(printFeeder)
+                System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
             /*if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
             }*/
@@ -291,6 +296,9 @@ public class BallFeeder extends Subsystem {
     @Override
     public void outputTelemetry() {
         autoDetectEnabled = SmartDashboard.getBoolean("Auto Detect Balls", true);
+        SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
+        SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
+        SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
         if(Settings.debugFeeder()) {
             SmartDashboard.putString("Ball Feeder State", getState().toString()); 
             SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
@@ -298,6 +306,7 @@ public class BallFeeder extends Subsystem {
             SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
             SmartDashboard.putString("Ball Eject Location", ballSplitter.bestSplitterState.toString());
         }
+        
         /*if(feeder.getBusVoltage() == 0)
             DriverStation.reportError("FEEDER MOTOR NOT DETECTED", false);*/
     }

@@ -54,6 +54,9 @@ public class Turret extends Subsystem {
     private Translation2d turretManualVector = new Translation2d();
     public Rotation2d fieldCentricRotation = new Rotation2d();
     private double targetAngle = 0.0;
+    public double getTargetAngle() {
+        return targetAngle;
+    }
     private double maxAllowableAngle = Constants.Turret.kMaxControlAngle;
     public void setMaxAllowableAngle(double angle) {
         maxAllowableAngle = angle;
@@ -114,7 +117,7 @@ public class Turret extends Subsystem {
         turret.config_IntegralZone(0, degreesToEncUnits(2.0));
 
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
-        turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 0.5), Constants.kCANTimeoutMs);
+        turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 0.8), Constants.kCANTimeoutMs);
         turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs); // 3.0
         turret.configMotionSCurveStrength(0); // 0
         turret.configAllowableClosedloopError(0, degreesToEncUnits(0), Constants.kCANTimeoutMs);
@@ -266,6 +269,12 @@ public class Turret extends Subsystem {
         double robotVelocity = swerve.getVelocity().norm();
         double robotScaledAngleTolerance = Math.abs(T2O/5 * 40) + ((robotVelocity/120) * 6) + 1;
         turretTolerance = robotScaledAngleTolerance;
+        /*if(((Constants.Turret.kMaxControlAngle - 5) < getAngle()) && (getAngle() < Constants.Turret.kMaxControlAngle)){
+            turretTolerance = 1;
+        }
+        if((Constants.Turret.kMinControlAngle < getAngle()) && (getAngle() < Constants.Turret.kMinControlAngle + 5)) {
+            turretTolerance = 1;
+        }*/
     }
     
     @Override
@@ -310,7 +319,7 @@ public class Turret extends Subsystem {
                         if (hasReachedAngle() && targetInfo.get(3).getDouble(0) != 1.0) {
                             turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
                             turretAngle = boundToTurretScope(turretAngle);
-                            System.out.println("Aiming at center-field because target not seen");
+                            //System.out.println("Aiming at center-field because target not seen");
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
@@ -319,7 +328,7 @@ public class Turret extends Subsystem {
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
-                        System.out.println("Aiming at center-field because params not present");
+                        //System.out.println("Aiming at center-field because params not present");
                     }
                     break;
                 case ROBOT_STATE_VISION:
