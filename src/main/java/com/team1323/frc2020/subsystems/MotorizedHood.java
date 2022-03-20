@@ -12,6 +12,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -284,7 +285,7 @@ public class MotorizedHood extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
-        if(true) {
+        if(Settings.debugHood()) {
             SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
             SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
             SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000

@@ -120,7 +120,7 @@ public class DriverControls implements Loop {
             driver.update();
 			coDriver.update();
             //singleController.update();
-            //testController.update();
+            testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -313,15 +313,17 @@ public class DriverControls implements Loop {
         }
 
 
-        /*double singleLeftY = -testController.getLeftY();
-        double singleRightY = -testController.getRightY();        
+        double singleLeftY = -testController.getRightY();
+        double singleRightY = -testController.getLeftY();        
 
         if(singleRightY != 0) {
+            turret.setAngle(-90);
             doubleTelescopes.setLeftOpenLoop(singleRightY);
         } else if(doubleTelescopes.getLeftTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
             doubleTelescopes.lockLeftHeight();
         }
         if(singleLeftY != 0) {
+            turret.setAngle(-90);
             doubleTelescopes.setRightOpenLoop(singleLeftY);
         } else if(doubleTelescopes.getRightTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
             doubleTelescopes.lockRightHeight();
@@ -351,7 +353,7 @@ public class DriverControls implements Loop {
         }
         if(testController.rightBumper.wasActivated()) {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }*/
+        }
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);

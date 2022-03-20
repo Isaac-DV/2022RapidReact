@@ -43,7 +43,7 @@ public class DoubleTelescopes extends Subsystem {
 
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
-    private boolean liftModeEnabled = false;
+    private boolean liftModeEnabled = true;
 
     public DoubleTelescopes() {
         pigeon = Pigeon.getInstance();
@@ -108,7 +108,7 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 12.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 12.0);
+        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 2.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 2.0), THIRD_FULL_RELEASE((maxHeight - (maxHeight / 2)),minHeight + 2.0);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
@@ -199,12 +199,15 @@ public class DoubleTelescopes extends Subsystem {
                         break;
                     case SECOND_INITIAL_RELEASE:
                         if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
-                            currentLiftMode = LiftMode.SECOND_FULL_RELEASE;
+                            setLiftMode(LiftMode.SECOND_FULL_RELEASE);
                         }
                         break;
                     case SECOND_FULL_RELEASE:
                         break;
                     case THIRD_INITIAL_HANG:
+                        if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
+                            setLiftMode(LiftMode.THIRD_FULL_RELEASE);
+                        }
                         break;
                     default:
                     break;
@@ -271,6 +274,8 @@ public class DoubleTelescopes extends Subsystem {
         SmartDashboard.putNumber("Telescope Right Target", rightTargetHeight);
         SmartDashboard.putString("Telescope Right State", rightTelescopeState.toString());
         SmartDashboard.putString("Telescope Left State", leftTelescopeState.toString());
+        SmartDashboard.putBoolean("Telescope Left On Target", leftTelescopeOnTarget());
+        SmartDashboard.putBoolean("Telescope Right On Target", rightTelescopeOnTarget());
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {
