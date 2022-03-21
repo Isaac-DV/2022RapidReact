@@ -303,14 +303,15 @@ public class Swerve extends Subsystem{
 		
 		/* Scale x and y by applying a power to the magnitude of the vector they create, in order
 		to make the controls less sensitive at the lower end. */
-		double deadband = 0.025;
-		inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, deadband);
+		double translationalDeadband = 0.025;
+		inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, translationalDeadband);
 		final double power = (lowPower) ? 1.75 : 1.5;
 		inputMagnitude = Math.pow(inputMagnitude, power);
 		inputMagnitude = Util.deadBand(inputMagnitude, 0.05);
 		translationalInput = Translation2d.fromPolar(translationalInput.direction(), inputMagnitude);
 		
-		rotate = Util.scaledDeadband(rotate, 1.0, deadband);
+		double rotationalDeadband = 0.1;
+		rotate = Util.scaledDeadband(rotate, 1.0, rotationalDeadband);
 		rotate = Math.pow(Math.abs(rotate), 1.75)*Math.signum(rotate);
 		
 		translationalInput = translationalInput.scale(maxSpeedFactor);
