@@ -106,7 +106,7 @@ public class Column extends Subsystem {
         AsynchronousInterrupt interrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
 
             @Override
-            public void accept(Boolean arg0, Boolean arg1) {
+            public void accept(Boolean risingEdge, Boolean fallingEdge) {
                 if(getState() == ControlState.INDEX_BALLS) {
                     if(getBanner()) {
                         //column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
@@ -116,10 +116,12 @@ public class Column extends Subsystem {
                 if(getBanner()) {
                     ballDetectedTimestamp = Timer.getFPGATimestamp();
                     detectedBall = true;
+                    System.out.println("Column banner detected ball");
                 } else {
                     ballDetectedTimestamp = Double.POSITIVE_INFINITY;
                     detectedBall = false;
                     shootingCurrentBall = false;
+                    System.out.println("Column banner stopped detecting ball");
                 }
             }        
         });
@@ -134,8 +136,8 @@ public class Column extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), FEED_BALLS(Constants.Column.kFeedBallSpeed), MANUAL_FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
-        INDEX_BALLS(0.5), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
+        OFF(0.0), FEED_BALLS(0.0), MANUAL_FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
+        INDEX_BALLS(0.0), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
         double speed;
         ControlState(double speed) {
             this.speed = speed;

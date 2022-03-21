@@ -90,12 +90,9 @@ public class LazyTalonFX extends TalonFX {
 
     @Override
     public ErrorCode setSelectedSensorPosition(double sensorPos, int pidIdx, int timeout) {
-        if (sensorPos != mLastSetPosition || mLastSetPositionErrorCode != ErrorCode.OK) {
-            mLastSetPosition = sensorPos;
-            mLastSetPositionErrorCode = super.setSelectedSensorPosition(sensorPos, pidIdx, timeout);
-            return mLastSetPositionErrorCode;
-        }
-        return ErrorCode.OK;
+        mLastSetPosition = sensorPos;
+        mLastSetPositionErrorCode = super.setSelectedSensorPosition(sensorPos, pidIdx, timeout);
+        return mLastSetPositionErrorCode;
     }
 
     @Override

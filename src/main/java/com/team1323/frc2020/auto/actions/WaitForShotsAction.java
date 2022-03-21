@@ -31,7 +31,16 @@ public class WaitForShotsAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return (ballsFired >= targetBallCount && !column.isShootingCurrentBall()) || ((Timer.getFPGATimestamp() - startTimestamp) >= timeout);
+        if (ballsFired >= targetBallCount && !column.isShootingCurrentBall()) {
+            System.out.println("WaitForShotsAction finished because we shot " + ballsFired + " balls");
+            return true;
+        }
+        if ((Timer.getFPGATimestamp() - startTimestamp) >= timeout) {
+            System.out.println("WaitForShotsAction timed out");
+            return true;
+        }
+
+        return false;
     }
 
     @Override

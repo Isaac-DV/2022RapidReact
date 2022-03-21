@@ -44,21 +44,28 @@ public class TwoBallTwoEjectMode extends AutoModeBase {
     }
     @Override
     protected void routine() throws AutoModeEndedException {
+        // Startup
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoLeftStartingPose));
         s.intake.conformToState(Intake.ControlState.EJECT);
-        s.turret.startVision();
+        s.turret.setCOFState();
         s.motorizedHood.setState(MotorizedHood.State.VISION);
         s.column.setState(Column.ControlState.OFF);
-        s.shooter.setState(Shooter.State.VISION); 
+        s.shooter.setState(Shooter.State.VISION);
+
+        // Pick up first ball
         runAction(new SetTrajectoryAction(trajectories.thirdBallBackup, -135.0, 1.0));
         runAction(new WaitAction(0.5));
         s.intakeState();
         runAction(new WaitToFinishPathAction(4));
+
+        // Shoot first balls
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));
-        runAction(new SetTrajectoryAction(trajectories.thirdBallToSecondOpponentBall, -261, 1.0));
+
+        // Pick up second ball and eject it
+        runAction(new SetTrajectoryAction(trajectories.thirdBallToSecondOpponentBall, -261, 0.6));
         s.turret.startVision();
         s.intakeState();
         runAction(new WaitAction(0.5));
@@ -67,11 +74,15 @@ public class TwoBallTwoEjectMode extends AutoModeBase {
         runAction(new WaitAction(0.5));
         s.wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         s.intake.conformToState(Intake.ControlState.OFF);
+
+        // Pick up third ball and eject it
         runAction(new SetTrajectoryAction(trajectories.secondOpponentBallToThirdOpponentBall, -98, 0.5));
         runAction(new WaitToPassYCoordinateAction(-70));
         s.intakeState();
         runAction(new WaitToFinishPathAction(10.0));
         runAction(new WaitAction(1.0));
+
+        // Rotate to face forward
         s.swerve.rotate(0);
         System.out.println("Auto mode finished in " + currentTime() + " seconds");
 

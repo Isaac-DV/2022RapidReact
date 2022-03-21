@@ -45,6 +45,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
 
     @Override
     protected void routine() throws AutoModeEndedException {
+        // Startup 
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoRightStartingPose));
         s.intake.conformToState(Intake.ControlState.EJECT);
@@ -52,27 +53,41 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         s.column.conformToState(Column.ControlState.OFF);
         s.motorizedHood.setState(MotorizedHood.State.VISION);
         s.shooter.setState(Shooter.State.VISION); 
+
+        // Pick up first ball
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));
         runAction(new WaitAction(0.5));
         s.intakeState();
         runAction(new WaitToFinishPathAction(7));
+
+        // Shoot first two balls
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));
         s.turret.startVision();
         s.intakeState();
-        runAction(new SetTrajectoryAction(trajectories.firstBallToSecondBall, 180, 1));
+
+        // Pick up third ball
+        runAction(new SetTrajectoryAction(trajectories.firstBallToSecondBall, 180, 0.5));
         runAction(new WaitToFinishPathAction(7));
+
+        // Shoot third ball
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(1.5, 1));
         s.turret.startVision();
         s.intakeState();
+
+        // Pick up two human player balls
         runAction(new SetTrajectoryAction(trajectories.secondBallToHumanPlayer, 135.0, 1));
         runAction(new WaitToFinishPathAction(7));
         runAction(new WaitForTwoBallsAction(2.0));
+
+        // Go back to shooting spot
         runAction(new SetTrajectoryAction(trajectories.humanPlayerToSecondBall, 90.0, 1));
         runAction(new WaitToFinishPathAction(7));
+
+        // Shoot last two balls
         s.wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         s.intake.conformToState(Intake.ControlState.OFF);
         s.visionShotState();

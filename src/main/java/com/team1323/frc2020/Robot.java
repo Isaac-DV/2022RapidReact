@@ -12,6 +12,7 @@ import java.util.Set;
 import com.team1323.frc2020.auto.AutoModeBase;
 import com.team1323.frc2020.auto.AutoModeExecuter;
 import com.team1323.frc2020.auto.SmartDashboardInteractions;
+import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
@@ -95,7 +96,7 @@ public class Robot extends TimedRobot {
 
 		generator.generateTrajectories();
 
-		AutoModeBase auto = new TwoBallTwoEjectMode();
+		AutoModeBase auto = new FiveBallOneEjectMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
 
@@ -196,7 +197,6 @@ public class Robot extends TimedRobot {
 			s.swerve.zeroModuleAngles();
 			Wrist.getInstance().resetToAbsolutePosition();
 			Turret.getInstance().resetToAbsolutePosition();
-			MotorizedHood.getInstance().resetToAbsolute();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

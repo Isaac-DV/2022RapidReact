@@ -87,7 +87,7 @@ public class TrajectoryGenerator {
 
     static final Pose2d firstBallPickupPose = new Pose2d(new Translation2d(297.7142857142857, 133.42857142857144), Rotation2d.fromDegrees(90));
     static final Pose2d firstOpponentBallPickupPose = new Pose2d(new Translation2d(360.0, 140.42857142857144), Rotation2d.fromDegrees(90));
-    static final Pose2d secondBallPickupPose = new Pose2d(new Translation2d(215.42857142857142, 100.0), Rotation2d.fromDegrees(180));
+    static final Pose2d secondBallPickupPose = new Pose2d(new Translation2d(215.42857142857142, 95.0), Rotation2d.fromDegrees(180));
     static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(174.0, 30.0), Rotation2d.fromDegrees(-90));
     static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0));
     static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(207.42857142857142, -70), Rotation2d.fromDegrees(-90));

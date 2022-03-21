@@ -70,6 +70,8 @@ public class Turret extends Subsystem {
     public double goalY = 0.0;
     private double turretTolerance = 2;
 
+    private boolean isWrapping = false;
+
     
     private static Turret instance = null;
     public static Turret getInstance() {
@@ -230,10 +232,15 @@ public class Turret extends Subsystem {
 
     public double boundToTurretScope(double turretAngle) {
         turretAngle = Util.placeInAppropriate0To360Scope(getAngle(), turretAngle);
-        if (turretAngle > Constants.Turret.kMaxControlAngle)
+        if (turretAngle > Constants.Turret.kMaxControlAngle) {
             turretAngle -= 360.0;
-        if (turretAngle < Constants.Turret.kMinControlAngle)
+            isWrapping = true;
+        } else if (turretAngle < Constants.Turret.kMinControlAngle) {
             turretAngle += 360.0;
+            isWrapping = true;
+        } else {
+            isWrapping = false;
+        }
 
         return turretAngle;
     }
@@ -267,7 +274,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O/5 * 40) + ((robotVelocity/120) * 6) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O * 4) + (robotVelocity * 0.05) + 1;
         turretTolerance = robotScaledAngleTolerance;
         /*if(((Constants.Turret.kMaxControlAngle - 5) < getAngle()) && (getAngle() < Constants.Turret.kMaxControlAngle)){
             turretTolerance = 1;
@@ -322,11 +329,21 @@ public class Turret extends Subsystem {
                             //System.out.println("Aiming at center-field because target not seen");
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
+                        if (isWrapping) {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                        } else {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                        }
                         setAngle(turretAngle);
                     } else {
                         double turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
+                        if (isWrapping) {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                        } else {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                        }
                         setAngle(turretAngle);
                         //System.out.println("Aiming at center-field because params not present");
                     }
@@ -350,7 +367,11 @@ public class Turret extends Subsystem {
                                 System.out.println("Turret vision angle = " + turretAngle + "; offsetAngle = " + offsetAngle);
                             }
                         }*/
-         
+                        if (isWrapping) {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                        } else {
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                        }
                         setAngle(turretAngle);
                     }
 

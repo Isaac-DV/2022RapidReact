@@ -47,15 +47,18 @@ public class MotorizedHood extends Subsystem {
     public double angleInput = 0;
     private boolean isEncoderFlipped = false;
     private boolean zeroedAbsolutely = false;
+    private boolean isFirstEnable = true;
     public enum State {
-        POSITION, VISION, ROBOT_POSITION
+        ZEROING, POSITION, VISION, ROBOT_POSITION
     }
     private State currentState = State.POSITION;
     public State getState() {
         return currentState;
     }
     public void setState(State desiredState) {
-        currentState = desiredState;
+        if (currentState != State.ZEROING) {
+            currentState = desiredState;
+        }
     }
     public PeriodicIO periodicIO = new PeriodicIO();
 
@@ -85,19 +88,22 @@ public class MotorizedHood extends Subsystem {
 
         hood.configForwardSoftLimitThreshold(hoodAngleToEncUnits(Constants.MotorizedHood.kMaxControlAngle), Constants.kCANTimeoutMs);
         hood.configReverseSoftLimitThreshold(hoodAngleToEncUnits(Constants.MotorizedHood.kMinControlAngle), Constants.kCANTimeoutMs);
-        hood.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
-        hood.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
+        enableLimits(true);
 
         hood.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20);
         hood.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 50);
         
         hood.setSelectedSensorPosition(degreesToEncUnits(15.0));
-        resetToAbsolute();
         //hood.setSelectedSensorPosition(0);
 
         setOpenLoop(0.0);
         smartTuner = new SmartTuner(hood, "hood");
         smartTuner.enabled(true);
+    }
+
+    private void enableLimits(boolean enable) {
+        hood.configForwardSoftLimitEnable(enable, Constants.kCANTimeoutMs);
+        hood.configReverseSoftLimitEnable(enable, Constants.kCANTimeoutMs);
     }
 
     private void setCurrentLimit(double amps) {
@@ -153,19 +159,25 @@ public class MotorizedHood extends Subsystem {
     }
 
     public void setAngle(double angle) {
-        angle = Util.limit(angle, Constants.MotorizedHood.kMinControlAngle, Constants.MotorizedHood.kMaxControlAngle);
+        if (currentState != State.ZEROING) {
+            angle = Util.limit(angle, Constants.MotorizedHood.kMinControlAngle, Constants.MotorizedHood.kMaxControlAngle);
 
-        periodicIO.controlMode = ControlMode.MotionMagic;
-        periodicIO.demand = hoodAngleToEncUnits(angle);
+            periodicIO.controlMode = ControlMode.MotionMagic;
+            periodicIO.demand = hoodAngleToEncUnits(angle);
+        }
     }
     public void setAngleState(double angle) {
-        setState(State.POSITION);
-        setAngle(angle);
+        if (currentState != State.ZEROING) {
+            setState(State.POSITION);
+            setAngle(angle);
+        }
     }
     public void lockAngle() {
-        setState(State.POSITION);
-        periodicIO.controlMode = ControlMode.MotionMagic;
-        periodicIO.demand = periodicIO.position;
+        if (currentState != State.ZEROING) {
+            setState(State.POSITION);
+            periodicIO.controlMode = ControlMode.MotionMagic;
+            periodicIO.demand = periodicIO.position;
+        }
     }
 
     public boolean hasReachedAngle() {
@@ -181,7 +193,11 @@ public class MotorizedHood extends Subsystem {
 
         @Override
         public void onStart(double timestamp) {
-            hood.setNeutralMode(NeutralMode.Brake);            
+            hood.setNeutralMode(NeutralMode.Brake);
+            if (isFirstEnable) {
+                zeroWithHardStop();
+                isFirstEnable = false;
+            } 
         }
 
         @Override
@@ -200,6 +216,16 @@ public class MotorizedHood extends Subsystem {
                     if (poseAim.isPresent()) {
                         setAngle(poseAim.get().getHoodAngle().getDegrees());
                     }
+                    break;
+                case ZEROING:
+                    if (hood.getOutputCurrent() > Constants.MotorizedHood.kZeroingCurrent) {
+                        stop();
+                        hood.setSelectedSensorPosition(degreesToEncUnits(Constants.MotorizedHood.kHoodStartingAngle), 0, 0);
+                        System.out.println("Zeroed el hood");
+                        enableLimits(true);
+                        currentState = State.VISION;
+                    }
+                    break;
                 default:
                     break;
             }       
@@ -247,6 +273,12 @@ public class MotorizedHood extends Subsystem {
     @Override
     public void writePeriodicOutputs() {
         hood.set(periodicIO.controlMode, periodicIO.demand);
+    }
+
+    private void zeroWithHardStop() {
+        setState(State.ZEROING);
+        enableLimits(false);
+        setOpenLoop(-0.1);
     }
 
     public void resetToAbsolute() {

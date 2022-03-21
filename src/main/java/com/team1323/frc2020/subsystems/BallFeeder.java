@@ -43,6 +43,7 @@ public class BallFeeder extends Subsystem {
     boolean intakeFeedEnabled = false;
     boolean isIntakeOpenLoop = false;
     boolean sentUpBall = false;
+    boolean canChangeDetectedBall = true;
     public boolean hasSentUpBall() {
         return sentUpBall;
     }
@@ -87,7 +88,20 @@ public class BallFeeder extends Subsystem {
         banner = new DigitalInput(Ports.FEEDER_BANNER);
         colorSensor = new DigitalInput(Ports.COLOR_SENSOR);
 
-        AsynchronousInterrupt interrupt = new AsynchronousInterrupt(colorSensor, new BiConsumer<Boolean,Boolean>() {
+        AsynchronousInterrupt bannerInterrupt = new AsynchronousInterrupt(banner, new BiConsumer<Boolean,Boolean>() {
+
+            @Override
+            public void accept(Boolean arg0, Boolean arg1) {
+                if (!banner.get()) {
+                    canChangeDetectedBall = true;
+                }
+            }        
+
+        });
+        bannerInterrupt.setInterruptEdges(true, true);
+        bannerInterrupt.enable();
+
+        AsynchronousInterrupt colorSensorInterrupt = new AsynchronousInterrupt(colorSensor, new BiConsumer<Boolean,Boolean>() {
 
             @Override
             public void accept(Boolean arg0, Boolean arg1) {
@@ -98,8 +112,8 @@ public class BallFeeder extends Subsystem {
             }        
 
         });
-        interrupt.setInterruptEdges(true, true);
-        interrupt.enable();
+        colorSensorInterrupt.setInterruptEdges(true, true);
+        colorSensorInterrupt.enable();
 
         smartTuner = new SmartTuner(feeder, "ballFeeder");
         smartTuner.enabled(false);
@@ -131,11 +145,14 @@ public class BallFeeder extends Subsystem {
     }
     public void updateDetectedBall() {
         if(banner.get() && !isColorSensorRed()) { //detected a blue ball
-            DetectedBall = Ball.Blue;
+            if (canChangeDetectedBall)
+                DetectedBall = Ball.Blue;
         } else if(isColorSensorRed()) { //detected a red ball
             DetectedBall = Ball.Red;
+            canChangeDetectedBall = false;
         } else if(!banner.get()) { //does not detect a ball
-            DetectedBall = Ball.None;
+            if (canChangeDetectedBall)
+                DetectedBall = Ball.None;
         }
     }
 
@@ -172,7 +189,7 @@ public class BallFeeder extends Subsystem {
         pendingShutdown = shutdown;
     }
 
-    private void updateDetectionLogic(double timestamp) {
+    private synchronized void updateDetectionLogic(double timestamp) {
         updateDetectedBall();
 
         if(DSAlliance.toString() == DetectedBall.toString()) {//Detected ball is in our favor
@@ -234,6 +251,7 @@ public class BallFeeder extends Subsystem {
         public void onStart(double timestamp) {
             setState(State.DETECT);
             setDSAlliance(/*DriverStation.Alliance.Red*/DriverStation.getAlliance());
+            setFeederOpenLoop(1.0);
         }
 
         @Override

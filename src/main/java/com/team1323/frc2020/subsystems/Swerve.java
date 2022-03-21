@@ -325,7 +325,7 @@ public class Swerve extends Subsystem{
 			rotate *= 0.8;
 		}
 		
-		if(!Util.epsilonEquals(rotate, 0.0) && Util.epsilonEquals(rotationalInput, 0.0)){
+		if(!Util.epsilonEquals(rotate, 0.0) /*&& Util.epsilonEquals(rotationalInput, 0.0)*/){
 			headingController.disable();
 		}else if(Util.epsilonEquals(rotate, 0.0) && !Util.epsilonEquals(rotationalInput, 0.0)){
 			headingController.temporarilyDisable();
