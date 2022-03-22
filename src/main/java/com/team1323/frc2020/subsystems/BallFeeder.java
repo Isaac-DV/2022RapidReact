@@ -227,6 +227,7 @@ public class BallFeeder extends Subsystem {
                 //setFeederOpenLoop(0.0);
                 pendingShutdown = false;
             }
+            setFeederOpenLoop(1.0);
         }
         if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
             ballSplitter.conformToState(BallSplitter.ControlState.OFF);

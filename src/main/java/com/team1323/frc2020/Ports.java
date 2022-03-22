@@ -61,8 +61,8 @@ public class Ports {
     // Pneumatics
     public static final int PCM = 41;
     public static final int TELESCOPE = 2;
-    public static final int TELESCOPE_LEFT = 40;
-    public static final int TELESCOPE_RIGHT = 41;
+    public static final int TELESCOPE_LEFT = 41;
+    public static final int TELESCOPE_RIGHT = 40;
     public static final int CLAW = 3;
 
     //Canifier

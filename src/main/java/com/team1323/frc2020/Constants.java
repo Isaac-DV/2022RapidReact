@@ -351,14 +351,14 @@ public class Constants {
         public static final double kMinControlHeight = 0.0;
         public static final double kLowestPoint = 0.0;
         public static final double kMaxControlHeight = 29.0;
-        public static final double kTicksPerInch = 198212.0 / 16.62500; //-3.000000
-
-        public static final double kLeftP = 0.1;
+        public static final double kTicksPerInch = 173180.0 / 17.375; //-3.000000
+        
+        public static final double kLeftP = 0.4;
         public static final double kLeftI = 0.0;
         public static final double kLeftD = 6.0;
         public static final double kLeftF = 1023.0 / kMaxSpeed;
 
-        public static final double kRightP = 0.1;
+        public static final double kRightP = 0.4;
         public static final double kRightI = 0.0;
         public static final double kRightD = 0.0;
         public static final double kRightF = 1023.0 / kMaxSpeed;

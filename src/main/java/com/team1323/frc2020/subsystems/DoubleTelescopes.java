@@ -51,8 +51,10 @@ public class DoubleTelescopes extends Subsystem {
         rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT, "main");
 
         motors = Arrays.asList(leftTelescope, rightTelescope);
-        StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(true, 50, 50, 0.1);
+        SupplyCurrentLimitConfiguration currentLimit = new SupplyCurrentLimitConfiguration(false, 50, 50, 0.1);
+        StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(false, 0, 0, 0.1);
         for(LazyTalonFX motor : motors) {
+            motor.configSupplyCurrentLimit(currentLimit);
             motor.configStatorCurrentLimit(statorLimit);
             motor.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
             motor.enableVoltageCompensation(true);
@@ -108,7 +110,7 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 2.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 2.0), THIRD_FULL_RELEASE((maxHeight - (maxHeight / 2)),minHeight + 2.0);
+        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 1.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 1.0), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + 1.0);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
