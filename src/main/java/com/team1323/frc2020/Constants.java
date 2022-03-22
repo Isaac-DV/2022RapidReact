@@ -369,6 +369,13 @@ public class Constants {
         public static final double kSecondPitchAngle = 30.0;
         public static final double kHeightTolerance = 2.0;
 
+
+        //////////////////////////////////////
+        // This is how much the telescope goes up to let the other latch onto the next bar.
+        public static final double kPreFullReleaseHeight = 1.0;
+        /////////////////////////////////////
+
+
         public static final double kZeroingCurrent = 3.0;
     }
 

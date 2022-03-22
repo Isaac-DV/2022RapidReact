@@ -112,7 +112,7 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + 1.0, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + 1.0), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + 1.0);
+        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
