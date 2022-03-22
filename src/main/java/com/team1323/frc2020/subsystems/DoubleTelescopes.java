@@ -46,6 +46,12 @@ public class DoubleTelescopes extends Subsystem {
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = true;
     private boolean isFirstEnable = true;
+    private boolean autoLiftMode = false;
+
+    private double previousPitchAngle = 0;
+    public void enableAutoLiftMode(boolean enable) {
+        autoLiftMode = enable;
+    }
 
     public DoubleTelescopes() {
         pigeon = Pigeon.getInstance();
@@ -112,7 +118,11 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), START(maxHeight, maxHeight), FIRST_WINCH(minHeight, maxHeight), SECOND_INITIAL_RELEASE(minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), THIRD_INITIAL_HANG(maxHeight, minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight);
+        DISABLED(0, 0), 
+        START(maxHeight, maxHeight), 
+        FIRST_WINCH(minHeight, maxHeight), 
+        SECOND_INITIAL_RELEASE(minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), 
+        THIRD_INITIAL_HANG(maxHeight, minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight);
         public double leftEndingHeight;
         public double rightEndingHeight;
         LiftMode(double leftTargetHeight, double rightTargetHeight) {
@@ -197,6 +207,21 @@ public class DoubleTelescopes extends Subsystem {
             rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
         }
     }
+    public double getPitchVelocity() {
+        double pitchVelocity = (getRobotPitch() - previousPitchAngle) * 100;
+        previousPitchAngle = getRobotPitch();
+        return pitchVelocity;
+    }
+    public boolean isRobotTiltingUp() {
+        return getPitchVelocity() > 0;
+    }
+    public double getRobotPitch() {
+        return -pigeon.getRoll();
+    }
+    public boolean isRobotPitchWithinAngle(double targetAngle) {
+        return Util.epsilonEquals(targetAngle, getRobotPitch(), Constants.DoubleTelescopes.kRobotPitchAngleTolerance);
+    }
+
     Loop loop = new Loop() {
 
         @Override
@@ -248,6 +273,11 @@ public class DoubleTelescopes extends Subsystem {
                     case START:
                         break;
                     case FIRST_WINCH:
+                        if(autoLiftMode) {
+                            if(leftTelescopeOnTarget() && rightTelescopeOnTarget() && isRobotTiltingUp() && isRobotPitchWithinAngle(Constants.DoubleTelescopes.kFirstPitchAngle)) {
+                                setLiftMode(LiftMode.SECOND_INITIAL_RELEASE);
+                            }
+                        }
                         break;
                     case SECOND_INITIAL_RELEASE:
                         if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {

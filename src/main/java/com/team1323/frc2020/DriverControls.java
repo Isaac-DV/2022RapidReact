@@ -119,7 +119,7 @@ public class DriverControls implements Loop {
             driver.update();
 			coDriver.update();
             //singleController.update();
-            //testController.update();
+            testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -311,21 +311,21 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
-        /*
+        
         double singleLeftY = -testController.getRightY();
         double singleRightY = -testController.getLeftY();        
 
         if(singleRightY != 0) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
             turret.setAngle(-90);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             doubleTelescopes.setLeftOpenLoop(singleRightY);
         } else if(doubleTelescopes.getLeftTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
             doubleTelescopes.lockLeftHeight();
         }
         if(singleLeftY != 0) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             turret.setAngle(-90);
             doubleTelescopes.setRightOpenLoop(singleLeftY);
         } else if(doubleTelescopes.getRightTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
@@ -341,13 +341,13 @@ public class DriverControls implements Loop {
 
         if(testController.aButton.wasActivated()) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             turret.setAngle(-90);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.START);
         }
         if(testController.bButton.wasActivated()) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             turret.setAngle(-90);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_WINCH);
         }
@@ -359,7 +359,7 @@ public class DriverControls implements Loop {
         }
         if(testController.xButton.wasActivated()) {
             motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             turret.setAngle(-90);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
         }
@@ -368,7 +368,7 @@ public class DriverControls implements Loop {
         }
         if(testController.rightBumper.wasActivated()) {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }*/
+        }
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);

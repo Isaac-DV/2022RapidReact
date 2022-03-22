@@ -66,7 +66,6 @@ public class Pigeon {
 		pigeon.getYawPitchRoll(ypr);
 		return ypr[1];
 	}
-
 	public double getRoll(){
 		double [] ypr = new double[3];
 		pigeon.getYawPitchRoll(ypr);

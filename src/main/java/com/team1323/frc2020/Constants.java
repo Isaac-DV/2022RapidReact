@@ -365,6 +365,7 @@ public class Constants {
         public static final double kRightI = 0.0;
         public static final double kRightD = 0.0;
         public static final double kRightF = 1023.0 / kMaxSpeed;
+        public static final double kRobotPitchAngleTolerance = 5;
         public static final double kFirstPitchAngle = 52.0;
         public static final double kSecondPitchAngle = 30.0;
         public static final double kHeightTolerance = 2.0;
@@ -372,7 +373,7 @@ public class Constants {
 
         //////////////////////////////////////
         // This is how much the telescope goes up to let the other latch onto the next bar.
-        public static final double kPreFullReleaseHeight = 1.0;
+        public static final double kPreFullReleaseHeight = 0.1;
         /////////////////////////////////////
 
 
