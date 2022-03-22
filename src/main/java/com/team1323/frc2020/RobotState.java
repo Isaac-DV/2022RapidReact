@@ -210,9 +210,11 @@ public class RobotState {
 				Rotation2d turretAngle = stationary_shot_vector.direction().interpolate(moving_shot_vector.direction(), 0.825);
 				Rotation2d hood_angle = Rotation2d.fromDegrees(MotorizedHood.empiricalAngleToPhysicalAngle(Math.toDegrees(Math.atan(initial_ball_velocity.y() / moving_shot_vector.norm()))));
 				double shooter_rpm = Shooter.initialBallVelocityToRPM(Math.hypot(moving_shot_vector.norm(), initial_ball_velocity.y()));
-				/*ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
-						new Rotation2d(latest_turret_fixed_to_goal.getTranslation().x(), latest_turret_fixed_to_goal.getTranslation().y(), true), 
-						latest_turret_fixed_to_goal.getTranslation(), report.latest_timestamp, report.stability);*/
+				if (hood_angle.getDegrees() > Constants.MotorizedHood.kMaxControlAngle) {
+					double old_rpm = shooter_rpm;
+					double corrected_rpm = Shooter.getCompensatedShooterRpm(moving_shot_vector.norm(), initial_ball_velocity.y());
+					shooter_rpm = old_rpm + (Math.abs(corrected_rpm - old_rpm) * 1.75);
+				}
 				ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
 						turretAngle, latest_turret_fixed_to_goal.getTranslation(), hood_angle, shooter_rpm, report.latest_timestamp, report.stability);
 				cached_shooter_aiming_params_ = params;

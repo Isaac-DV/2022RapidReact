@@ -151,8 +151,8 @@ public class BallFeeder extends Subsystem {
             DetectedBall = Ball.Red;
             canChangeDetectedBall = false;
         } else if(!banner.get()) { //does not detect a ball
-            if (canChangeDetectedBall)
-                DetectedBall = Ball.None;
+            DetectedBall = Ball.None;
+            canChangeDetectedBall = true;
         }
     }
 

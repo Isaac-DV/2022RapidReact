@@ -18,6 +18,7 @@ import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
+import com.team1323.frc2020.subsystems.BallFeeder.State;
 import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
@@ -44,6 +45,7 @@ public class DoubleTelescopes extends Subsystem {
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = true;
+    private boolean isFirstEnable = true;
 
     public DoubleTelescopes() {
         pigeon = Pigeon.getInstance();
@@ -119,7 +121,7 @@ public class DoubleTelescopes extends Subsystem {
         }
     }
     public enum TelescopeState {
-        OFF, OPEN_LOOP, POSITION;
+        OFF, OPEN_LOOP, POSITION, ZEROING;
     }
     private TelescopeState leftTelescopeState = TelescopeState.OFF;
     private TelescopeState rightTelescopeState = TelescopeState.OFF;
@@ -145,54 +147,102 @@ public class DoubleTelescopes extends Subsystem {
         setRightHeight(liftMode.rightEndingHeight);
     }
     public void setLeftOpenLoop(double demand) {
-        leftTelescopeState = TelescopeState.OPEN_LOOP;
-        periodicIO.leftDemand = demand * 0.33;
-        periodicIO.leftControlMode = ControlMode.PercentOutput;
+        if (leftTelescopeState != TelescopeState.ZEROING) {
+            leftTelescopeState = TelescopeState.OPEN_LOOP;
+            periodicIO.leftDemand = demand * 0.33;
+            periodicIO.leftControlMode = ControlMode.PercentOutput;
+        }
     }
     public void setRightOpenLoop(double demand) {
-        rightTelescopeState = TelescopeState.OPEN_LOOP;
-        periodicIO.rightDemand = demand * 0.33;
-        periodicIO.rightControlMode = ControlMode.PercentOutput;
+        if (rightTelescopeState != TelescopeState.ZEROING) {
+            rightTelescopeState = TelescopeState.OPEN_LOOP;
+            periodicIO.rightDemand = demand * 0.33;
+            periodicIO.rightControlMode = ControlMode.PercentOutput;
+        }
     }
 
     public void setLeftHeight(double heightInches) {
-        leftTelescopeState = TelescopeState.POSITION;
-        heightInches = Util.limit(heightInches, Constants.DoubleTelescopes.kMinControlHeight, Constants.DoubleTelescopes.kMaxControlHeight);
-        periodicIO.leftDemand = inchesToEncUnits(heightInches);
-        periodicIO.leftControlMode = ControlMode.MotionMagic;
-        leftTargetHeight = heightInches;
+        if (leftTelescopeState != TelescopeState.ZEROING) {
+            leftTelescopeState = TelescopeState.POSITION;
+            heightInches = Util.limit(heightInches, Constants.DoubleTelescopes.kMinControlHeight, Constants.DoubleTelescopes.kMaxControlHeight);
+            periodicIO.leftDemand = inchesToEncUnits(heightInches);
+            periodicIO.leftControlMode = ControlMode.MotionMagic;
+            leftTargetHeight = heightInches;
+        }
     }
     public void setRightHeight(double heightInches) {
-        rightTelescopeState = TelescopeState.POSITION;
-        heightInches = Util.limit(heightInches, Constants.DoubleTelescopes.kMinControlHeight, Constants.DoubleTelescopes.kMaxControlHeight);
-        periodicIO.rightDemand = inchesToEncUnits(heightInches);
-        periodicIO.rightControlMode = ControlMode.MotionMagic;
-        //System.out.println("The Right ran with a target height of :" + heightInches);
+        if (rightTelescopeState != TelescopeState.ZEROING) {
+            rightTelescopeState = TelescopeState.POSITION;
+            heightInches = Util.limit(heightInches, Constants.DoubleTelescopes.kMinControlHeight, Constants.DoubleTelescopes.kMaxControlHeight);
+            periodicIO.rightDemand = inchesToEncUnits(heightInches);
+            periodicIO.rightControlMode = ControlMode.MotionMagic;
+            //System.out.println("The Right ran with a target height of :" + heightInches);
 
-        rightTargetHeight = heightInches;
+            rightTargetHeight = heightInches;
+        }
     }
     public void lockLeftHeight() {
-        leftTelescopeState = TelescopeState.POSITION;
-        periodicIO.leftDemand = periodicIO.leftPosition;
-        periodicIO.leftControlMode = ControlMode.MotionMagic;
-        leftTargetHeight = encUnitsToInches(periodicIO.leftPosition);
+        if (leftTelescopeState != TelescopeState.ZEROING) {
+            leftTelescopeState = TelescopeState.POSITION;
+            periodicIO.leftDemand = periodicIO.leftPosition;
+            periodicIO.leftControlMode = ControlMode.MotionMagic;
+            leftTargetHeight = encUnitsToInches(periodicIO.leftPosition);
+        }
     }
     public void lockRightHeight() {
-        rightTelescopeState = TelescopeState.POSITION;
-        periodicIO.rightDemand = periodicIO.rightPosition;
-        periodicIO.rightControlMode = ControlMode.MotionMagic;
-        rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
+        if (rightTelescopeState != TelescopeState.ZEROING) {
+            rightTelescopeState = TelescopeState.POSITION;
+            periodicIO.rightDemand = periodicIO.rightPosition;
+            periodicIO.rightControlMode = ControlMode.MotionMagic;
+            rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
+        }
     }
     Loop loop = new Loop() {
 
         @Override
         public void onStart(double timestamp) {
-            setLeftOpenLoop(0.0);
-            setRightOpenLoop(0.0);
+            if (isFirstEnable) {
+                zeroWithHardStop();
+                isFirstEnable = false;
+            } else {
+                lockLeftHeight();
+                lockRightHeight();
+            }
         }
 
         @Override
         public void onLoop(double timestamp) {
+            switch (leftTelescopeState) {
+                case ZEROING:
+                    if (leftTelescope.getOutputCurrent() > Constants.DoubleTelescopes.kZeroingCurrent) {
+                        leftTelescope.setSelectedSensorPosition(0);
+                        leftTelescope.configForwardSoftLimitEnable(true);
+                        leftTelescope.configReverseSoftLimitEnable(true);
+                        leftTelescopeState = TelescopeState.POSITION;
+                        periodicIO.leftDemand = inchesToEncUnits(0.1);
+                        periodicIO.leftControlMode = ControlMode.MotionMagic;
+                        leftTargetHeight = encUnitsToInches(periodicIO.leftPosition);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            switch (rightTelescopeState) {
+                case ZEROING:
+                    if (rightTelescope.getOutputCurrent() > Constants.DoubleTelescopes.kZeroingCurrent) {
+                        rightTelescope.setSelectedSensorPosition(0);
+                        rightTelescope.configForwardSoftLimitEnable(true);
+                        rightTelescope.configReverseSoftLimitEnable(true);
+                        rightTelescopeState = TelescopeState.POSITION;
+                        periodicIO.rightDemand = inchesToEncUnits(0.1);
+                        periodicIO.rightControlMode = ControlMode.MotionMagic;
+                        rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
+                    }
+                    break;
+                default:
+                    break;
+            }
             if(liftModeEnabled) {
                 switch(currentLiftMode) {
                     case START:
@@ -210,6 +260,8 @@ public class DoubleTelescopes extends Subsystem {
                         if(leftTelescopeOnTarget() && rightTelescopeOnTarget()) {
                             setLiftMode(LiftMode.THIRD_FULL_RELEASE);
                         }
+                        break;
+                    case THIRD_FULL_RELEASE:
                         break;
                     default:
                     break;
@@ -236,6 +288,15 @@ public class DoubleTelescopes extends Subsystem {
         return encUnits / Constants.DoubleTelescopes.kTicksPerInch;
     }
 
+    public void zeroWithHardStop() {
+        enableLimits(false);
+        setLeftOpenLoop(-0.3);
+        setRightOpenLoop(-0.3);
+        leftTelescopeState = TelescopeState.ZEROING;
+        rightTelescopeState = TelescopeState.ZEROING;
+        System.out.println("Zeroing telescopes");
+    }
+
     @Override
     public void readPeriodicInputs() {
         periodicIO.rightPosition = rightTelescope.getSelectedSensorPosition();
@@ -247,12 +308,12 @@ public class DoubleTelescopes extends Subsystem {
     }
     @Override
     public void writePeriodicOutputs() {
-        if(leftTelescopeState == TelescopeState.OPEN_LOOP) {
+        if(leftTelescopeState == TelescopeState.OPEN_LOOP || leftTelescopeState == TelescopeState.ZEROING) {
             leftTelescope.set(ControlMode.PercentOutput, periodicIO.leftDemand);
         } else if(leftTelescopeState == TelescopeState.POSITION) {
             leftTelescope.set(ControlMode.MotionMagic, periodicIO.leftDemand);
         }
-        if(rightTelescopeState == TelescopeState.OPEN_LOOP) {
+        if(rightTelescopeState == TelescopeState.OPEN_LOOP || rightTelescopeState == TelescopeState.ZEROING) {
             rightTelescope.set(ControlMode.PercentOutput, periodicIO.rightDemand);
         } else if(rightTelescopeState == TelescopeState.POSITION) {
             rightTelescope.set(ControlMode.MotionMagic, periodicIO.rightDemand);

@@ -20,6 +20,7 @@ import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
+import com.team254.lib.geometry.Rotation2d;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -176,6 +177,24 @@ public class Shooter extends Subsystem {
         double bottom_wheel_rpm = motor_rpm * Constants.Shooter.kBottomToMotorRatio;
 
         return bottom_wheel_rpm;
+    }
+
+    private static double getTimeToGoal(double vertical_velocity) {
+        double determinant = Math.sqrt(vertical_velocity * vertical_velocity - (4 * -193.11 * /*-Constants.kVisionTargetRelativeHeight*/0.0));
+        double time1 = (-vertical_velocity + determinant) / (2 * -193.11);
+        double time2 = (-vertical_velocity - determinant) / (2 * -193.11);
+
+        return Math.max(time1, time2);
+    }
+
+    public static double getCompensatedShooterRpm(double horizontal_velocity, double vertical_velocity) {
+        double horizontal_distance = horizontal_velocity * getTimeToGoal(vertical_velocity);
+        double corrected_time = Math.sqrt((Constants.kVisionTargetRelativeHeight - (Math.tan(Math.toRadians(Constants.MotorizedHood.kMinEmpiricalAngle)) * horizontal_distance)) / -193.11);
+        double corrected_horizontal_velocity = horizontal_distance / corrected_time;
+        double corrected_vertical_velocity = Math.tan(Math.toRadians(Constants.MotorizedHood.kMinEmpiricalAngle)) * corrected_horizontal_velocity;
+        double corrected_velocity = Math.hypot(corrected_horizontal_velocity, corrected_vertical_velocity);
+
+        return initialBallVelocityToRPM(corrected_velocity);
     }
 
     public Loop loop = new Loop() {

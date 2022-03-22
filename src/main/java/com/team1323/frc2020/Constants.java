@@ -45,6 +45,7 @@ public class Constants {
     */
     public static final double kVisionTargetHeight = 104.625; //81.0 to bottom
     public static final double kVisionTargetRadius = 26.6875;
+    public static final double kVisionTargetRelativeHeight = 38.25; // From opening of shooter to bottom of goal
     
     //Swerve Calculations Constants (measurements are in inches)
     public static final double kWheelbaseLength = 24.75;
@@ -254,6 +255,8 @@ public class Constants {
         // Turret pose with respect to the robot's center
         public static final double kXOffset = 0.0;
         public static final double kYOffset = 0.0;
+
+        public static final double kWrapSettlingTime = 0.75;
     
     }
 
@@ -353,18 +356,20 @@ public class Constants {
         public static final double kMaxControlHeight = 29.0;
         public static final double kTicksPerInch = 173180.0 / 17.375; //-3.000000
         
-        public static final double kLeftP = 0.4;
+        public static final double kLeftP = 0.1;
         public static final double kLeftI = 0.0;
         public static final double kLeftD = 6.0;
         public static final double kLeftF = 1023.0 / kMaxSpeed;
 
-        public static final double kRightP = 0.4;
+        public static final double kRightP = 0.1;
         public static final double kRightI = 0.0;
         public static final double kRightD = 0.0;
         public static final double kRightF = 1023.0 / kMaxSpeed;
         public static final double kFirstPitchAngle = 52.0;
         public static final double kSecondPitchAngle = 30.0;
         public static final double kHeightTolerance = 2.0;
+
+        public static final double kZeroingCurrent = 3.0;
     }
 
     public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();

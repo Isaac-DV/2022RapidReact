@@ -81,6 +81,7 @@ public class Intake extends Subsystem {
     public void outputTelemetry() {
         /*if(intake.getBusVoltage() == 0)
             DriverStation.reportError("INTAKE MOTOR NOT DETECTED", false);*/
+        SmartDashboard.putString("Intake State", currentState.toString());
     }
 
     @Override

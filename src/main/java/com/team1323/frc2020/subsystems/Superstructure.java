@@ -339,7 +339,7 @@ public class Superstructure extends Subsystem {
 				//shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
-					if (newRobotPose.isPresent()) {
+					if (newRobotPose.isPresent() && turret.seesTarget()) {
 						swerve.resetPosition(newRobotPose.get());
 					} else {
 						System.out.println("Vision target not present when trying to update robot position!");

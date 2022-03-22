@@ -89,7 +89,8 @@ public class TrajectoryGenerator {
     static final Pose2d firstOpponentBallPickupPose = new Pose2d(new Translation2d(360.0, 140.42857142857144), Rotation2d.fromDegrees(90));
     static final Pose2d secondBallPickupPose = new Pose2d(new Translation2d(215.42857142857142, 95.0), Rotation2d.fromDegrees(180));
     static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(174.0, 30.0), Rotation2d.fromDegrees(-90));
-    static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0));
+    static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0)).transformBy(Pose2d.fromTranslation(new Translation2d(6,0)));
+    static final Pose2d humanPlayerBackupPose = humanPlayerPickupPose.transformBy(Pose2d.fromTranslation(new Translation2d(-24.0, 0)));
     static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(207.42857142857142, -70), Rotation2d.fromDegrees(-90));
     static final Pose2d thirdOpponentBallPickupPose = new Pose2d(new Translation2d(236, -107.71428571428572), Rotation2d.fromDegrees(-90));
 
@@ -118,6 +119,8 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> secondBallToHumanPlayer;
         public final Trajectory<TimedState<Pose2dWithCurvature>> secondBallToOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> humanPlayerToSecondBall;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> terminalToBackupPoint;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> backupPointToSecondBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> firstBallToOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> opponentBallToHumanPlayer;
         public final Trajectory<TimedState<Pose2dWithCurvature>> humanPlayerToSecondOpponentBall;
@@ -138,6 +141,8 @@ public class TrajectoryGenerator {
             firstBallToSecondBall = getFirstBallToSecondBall();
             secondBallToHumanPlayer = getSecondBallToHumanPlayer();
             humanPlayerToSecondBall = getHumanPlayerToSecondBall();
+            terminalToBackupPoint = getTerminalBackup();
+            backupPointToSecondBall = getTerminalBackupPointToSecondBall();
             secondBallToOpponentBall = getSecondBallToOpponentBall();
             firstBallToOpponentBall = getFirstBallToOpponentBall();
             opponentBallToHumanPlayer = getOpponentBallToHumanPlayer();
@@ -181,6 +186,20 @@ public class TrajectoryGenerator {
             
             return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
         }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getTerminalBackup() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(humanPlayerPickupPose.getTranslation(), Rotation2d.fromDegrees(-45.0)));
+            waypoints.add(new Pose2d(humanPlayerBackupPose.getTranslation(), Rotation2d.fromDegrees(-45)));
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+
+        }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getTerminalBackupPointToSecondBall() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(humanPlayerBackupPose.getTranslation(), Rotation2d.fromDegrees(0.0)));
+            waypoints.add(new Pose2d(secondBallPickupPose.getTranslation(), Rotation2d.fromDegrees(0.0)));
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+        }
+        
         private Trajectory<TimedState<Pose2dWithCurvature>> getHumanPlayerToSecondBall(){
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(humanPlayerPickupPose.getTranslation(), Rotation2d.fromDegrees(-45.0)));

@@ -119,7 +119,7 @@ public class DriverControls implements Loop {
             driver.update();
 			coDriver.update();
             //singleController.update();
-            testController.update();
+            //testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -311,7 +311,7 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
-
+        /*
         double singleLeftY = -testController.getRightY();
         double singleRightY = -testController.getLeftY();        
 
@@ -368,7 +368,7 @@ public class DriverControls implements Loop {
         }
         if(testController.rightBumper.wasActivated()) {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }
+        }*/
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);

@@ -13,6 +13,7 @@ import com.team1323.frc2020.auto.AutoModeEndedException;
 import com.team1323.frc2020.auto.actions.ResetPoseAction;
 import com.team1323.frc2020.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2020.auto.actions.WaitAction;
+import com.team1323.frc2020.auto.actions.WaitForOneBallAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitForTwoBallsAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
@@ -35,7 +36,8 @@ public class FiveBallOneEjectMode extends AutoModeBase {
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.firstBallBackup, trajectories.firstBallToSecondBall, 
                 trajectories.secondBallToHumanPlayer,
-                trajectories.humanPlayerToSecondBall,
+                trajectories.terminalToBackupPoint,
+                trajectories.backupPointToSecondBall,
                 trajectories.secondBallToOpponentBall
                 );
     }
@@ -80,7 +82,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
 
         // Pick up two human player balls
         runAction(new SetTrajectoryAction(trajectories.secondBallToHumanPlayer, 135.0, 1));
-        runAction(new WaitToFinishPathAction(7));
+        runAction(new WaitForOneBallAction(7.0));
         runAction(new WaitForTwoBallsAction(2.0));
 
         // Go back to shooting spot

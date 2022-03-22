@@ -36,6 +36,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -71,6 +72,7 @@ public class Turret extends Subsystem {
     private double turretTolerance = 2;
 
     private boolean isWrapping = false;
+    private double finishedWrappingTimestamp = 0.0;
 
     
     private static Turret instance = null;
@@ -222,12 +224,17 @@ public class Turret extends Subsystem {
     public boolean isOpenLoop() {
         return currentState == ControlState.OPEN_LOOP;
     }
+
+    public boolean seesTarget() {
+        return targetInfo.get(3).getDouble(0) == 1.0;
+    }
     
     public boolean hasReachedAngle() {
         return Math.abs(getAngle() - targetAngle) < turretTolerance;
     }
     public boolean isReady() {
-        return targetInfo.get(3).getDouble(0) == 1.0 && visionAngleInRange && hasReachedAngle();
+        return seesTarget() && visionAngleInRange && 
+                hasReachedAngle() && !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime;
     }
 
     public double boundToTurretScope(double turretAngle) {
@@ -238,8 +245,6 @@ public class Turret extends Subsystem {
         } else if (turretAngle < Constants.Turret.kMinControlAngle) {
             turretAngle += 360.0;
             isWrapping = true;
-        } else {
-            isWrapping = false;
         }
 
         return turretAngle;
@@ -291,7 +296,7 @@ public class Turret extends Subsystem {
             SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
             SmartDashboard.putNumber("Turret Setpoint", targetAngle);
-            SmartDashboard.putBoolean("Turret TargetInfo", targetInfo.get(3).getDouble(0) == 1.0);
+            SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
             SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
             SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
             SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
@@ -315,6 +320,11 @@ public class Turret extends Subsystem {
             if (periodicIO.current > Constants.Turret.kMaxCurrent) {
                 DriverStation.reportError("Turret current exceeded max allowed current", false);
             }
+
+            if (isWrapping && hasReachedAngle()) {
+                isWrapping = false;
+                finishedWrappingTimestamp = timestamp;
+            }
             
             switch(currentState) {
                 case VISION:
@@ -323,7 +333,7 @@ public class Turret extends Subsystem {
                         // Aim directly at the vision target
                         double turretAngle = params.get().getTurretToGoal().direction().getDegrees();
                         turretAngle = boundToTurretScope(turretAngle);
-                        if (hasReachedAngle() && targetInfo.get(3).getDouble(0) != 1.0) {
+                        if (hasReachedAngle() && !seesTarget()) {
                             turretAngle = robotState.getTurretToCenterOfField().direction().getDegrees();
                             turretAngle = boundToTurretScope(turretAngle);
                             //System.out.println("Aiming at center-field because target not seen");
