@@ -16,10 +16,11 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
-import com.team1323.frc2020.subsystems.BallFeeder.State;
-import com.team1323.lib.util.SmartTuner;
+import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.lib.util.CircularBuffer;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
 
@@ -27,8 +28,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class DoubleTelescopes extends Subsystem {
-    SmartTuner leftTuner;
-    SmartTuner rightTuner;
+    Wrist wrist;
 
     LazyTalonFX leftTelescope;
     LazyTalonFX rightTelescope;
@@ -46,14 +46,20 @@ public class DoubleTelescopes extends Subsystem {
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = true;
     private boolean isFirstEnable = true;
-    private boolean autoLiftMode = false;
+    private boolean autoLiftMode = true;
 
-    private double previousPitchAngle = 0;
+    private CircularBuffer previousPitchAngle = new CircularBuffer(5);
+    private double robotPitchVelocity = 0;
+    public double getRobotPitchVelocity() {
+        return robotPitchVelocity;
+    }
     public void enableAutoLiftMode(boolean enable) {
         autoLiftMode = enable;
     }
 
     public DoubleTelescopes() {
+        wrist = Wrist.getInstance();
+
         pigeon = Pigeon.getInstance();
         leftTelescope = new LazyTalonFX(Ports.TELESCOPE_LEFT, "main");
         rightTelescope = new LazyTalonFX(Ports.TELESCOPE_RIGHT, "main");
@@ -78,10 +84,6 @@ public class DoubleTelescopes extends Subsystem {
 
             motor.setSelectedSensorPosition(0);
         }
-        leftTuner = new SmartTuner(leftTelescope, "leftTelescope");
-        leftTuner.enabled(false);
-        rightTuner = new SmartTuner(rightTelescope, "rightTelescope");
-        rightTuner.enabled(false);
         configPID();
     }
 
@@ -121,7 +123,7 @@ public class DoubleTelescopes extends Subsystem {
         DISABLED(0, 0), 
         START(maxHeight, maxHeight), 
         FIRST_WINCH(minHeight, maxHeight), 
-        SECOND_INITIAL_RELEASE(minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight, maxHeight), SECOND_FULL_RELEASE(maxHeight, minHeight), 
+        SECOND_INITIAL_RELEASE(minHeight, maxHeight - 3.0), SECOND_FULL_RELEASE(maxHeight, minHeight), 
         THIRD_INITIAL_HANG(maxHeight, minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight), THIRD_FULL_RELEASE(maxHeight - 7.0 ,minHeight + Constants.DoubleTelescopes.kPreFullReleaseHeight);
         public double leftEndingHeight;
         public double rightEndingHeight;
@@ -207,19 +209,18 @@ public class DoubleTelescopes extends Subsystem {
             rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
         }
     }
-    public double getPitchVelocity() {
-        double pitchVelocity = (getRobotPitch() - previousPitchAngle) * 100;
-        previousPitchAngle = getRobotPitch();
-        return pitchVelocity;
+    public void updatePitchVelocity() {
+        robotPitchVelocity = (getRobotPitch() - previousPitchAngle.getAverage()) * 100.0;
+        previousPitchAngle.addValue(getRobotPitch());
     }
     public boolean isRobotTiltingUp() {
-        return getPitchVelocity() > 0;
+        return getRobotPitchVelocity() > 0;
     }
     public double getRobotPitch() {
-        return -pigeon.getRoll();
+        return pigeon.getRoll();
     }
     public boolean isRobotPitchWithinAngle(double targetAngle) {
-        return Util.epsilonEquals(targetAngle, getRobotPitch(), Constants.DoubleTelescopes.kRobotPitchAngleTolerance);
+        return Math.abs(targetAngle - getRobotPitch()) <= Constants.DoubleTelescopes.kRobotPitchAngleTolerance;
     }
 
     Loop loop = new Loop() {
@@ -237,6 +238,7 @@ public class DoubleTelescopes extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
+            updatePitchVelocity();
             switch (leftTelescopeState) {
                 case ZEROING:
                     if (leftTelescope.getOutputCurrent() > Constants.DoubleTelescopes.kZeroingCurrent) {
@@ -275,6 +277,7 @@ public class DoubleTelescopes extends Subsystem {
                     case FIRST_WINCH:
                         if(autoLiftMode) {
                             if(leftTelescopeOnTarget() && rightTelescopeOnTarget() && isRobotTiltingUp() && isRobotPitchWithinAngle(Constants.DoubleTelescopes.kFirstPitchAngle)) {
+                                wrist.setWristAngle(Constants.Wrist.kStowedAngle);
                                 setLiftMode(LiftMode.SECOND_INITIAL_RELEASE);
                             }
                         }
@@ -326,7 +329,14 @@ public class DoubleTelescopes extends Subsystem {
         rightTelescopeState = TelescopeState.ZEROING;
         System.out.println("Zeroing telescopes");
     }
-
+    public Request setLiftModeRequest(LiftMode desiredLiftMode) {
+        return new Request() {
+            @Override
+            public void act() {
+                setLiftMode(desiredLiftMode);
+            }
+        };
+    }
     @Override
     public void readPeriodicInputs() {
         periodicIO.rightPosition = rightTelescope.getSelectedSensorPosition();
@@ -351,24 +361,25 @@ public class DoubleTelescopes extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        rightTuner.update();
-        leftTuner.update();
-        SmartDashboard.putNumber("Telescope Right Height Inches", encUnitsToInches(rightTelescope.getSelectedSensorPosition()));
-        SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
-        SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
-        SmartDashboard.putNumber("Telescope Right  Units", rightTelescope.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Telescope Left Units", leftTelescope.getSelectedSensorPosition());
-        SmartDashboard.putNumber("Robot Pitch", pigeon.getPitch());
-        SmartDashboard.putNumber("Robot Roll", pigeon.getRoll());
-        SmartDashboard.putNumber("Robot Yaw", pigeon.getYaw().getDegrees());
-        SmartDashboard.putNumber("Telescope Left Current", leftTelescope.getOutputCurrent());
-        SmartDashboard.putNumber("Telescope Right Current", rightTelescope.getOutputCurrent());
-        SmartDashboard.putNumber("Telescope Left Target", leftTargetHeight);
-        SmartDashboard.putNumber("Telescope Right Target", rightTargetHeight);
-        SmartDashboard.putString("Telescope Right State", rightTelescopeState.toString());
-        SmartDashboard.putString("Telescope Left State", leftTelescopeState.toString());
-        SmartDashboard.putBoolean("Telescope Left On Target", leftTelescopeOnTarget());
-        SmartDashboard.putBoolean("Telescope Right On Target", rightTelescopeOnTarget());
+        if(Settings.debugTelescopes()) {
+            SmartDashboard.putNumber("Telescope Right Height Inches", encUnitsToInches(rightTelescope.getSelectedSensorPosition()));
+            SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
+            SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
+            SmartDashboard.putNumber("Telescope Right  Units", rightTelescope.getSelectedSensorPosition());
+            SmartDashboard.putNumber("Telescope Left Units", leftTelescope.getSelectedSensorPosition());
+            SmartDashboard.putNumber("Robot Pitch", pigeon.getPitch());
+            SmartDashboard.putNumber("Robot Roll", pigeon.getRoll());
+            SmartDashboard.putNumber("Robot Yaw", pigeon.getYaw().getDegrees());
+            SmartDashboard.putNumber("Robot Pitch Velocity", getRobotPitchVelocity());
+            SmartDashboard.putNumber("Telescope Left Current", leftTelescope.getOutputCurrent());
+            SmartDashboard.putNumber("Telescope Right Current", rightTelescope.getOutputCurrent());
+            SmartDashboard.putNumber("Telescope Left Target", leftTargetHeight);
+            SmartDashboard.putNumber("Telescope Right Target", rightTargetHeight);
+            SmartDashboard.putString("Telescope Right State", rightTelescopeState.toString());
+            SmartDashboard.putString("Telescope Left State", leftTelescopeState.toString());
+            SmartDashboard.putBoolean("Telescope Left On Target", leftTelescopeOnTarget());
+            SmartDashboard.putBoolean("Telescope Right On Target", rightTelescopeOnTarget());
+        }
     }
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {

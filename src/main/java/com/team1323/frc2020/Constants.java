@@ -176,8 +176,8 @@ public class Constants {
     public static class Wrist {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
-        public static final double kWristStartingAngle = -25.47;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 155.541091;
+        public static final double kWristStartingAngle = -19.5;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 192.918614;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -365,8 +365,8 @@ public class Constants {
         public static final double kRightI = 0.0;
         public static final double kRightD = 0.0;
         public static final double kRightF = 1023.0 / kMaxSpeed;
-        public static final double kRobotPitchAngleTolerance = 5;
-        public static final double kFirstPitchAngle = 52.0;
+        public static final double kRobotPitchAngleTolerance = 2.0;
+        public static final double kFirstPitchAngle = -44.0;
         public static final double kSecondPitchAngle = 30.0;
         public static final double kHeightTolerance = 2.0;
 

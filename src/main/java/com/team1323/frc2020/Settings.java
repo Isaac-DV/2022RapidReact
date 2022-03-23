@@ -34,6 +34,8 @@ public class Settings {
     private boolean kDebugHanger = false;
     private boolean kDebugHood = false;
     private boolean kDebugColumn = false;
+    private boolean kDebugTelescopes = false;
+    private boolean kDebugWrist = false;
 
     private NetworkTableEntry swerveToggle;
     private NetworkTableEntry turretToggle;
@@ -43,6 +45,8 @@ public class Settings {
     private NetworkTableEntry hangerToggle;
     private NetworkTableEntry hoodToggle;
     private NetworkTableEntry columnToggle;
+    private NetworkTableEntry telescopesToggle;
+    private NetworkTableEntry wristToggle;
 
     private final String TAB = "Settings";
 
@@ -55,7 +59,8 @@ public class Settings {
         hangerToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Hanger", kDebugHanger).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         hoodToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Hood", kDebugHood).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
         columnToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Column", kDebugColumn).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-
+        telescopesToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Telescopes", kDebugTelescopes).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+        wristToggle = Shuffleboard.getTab(TAB).addPersistent("Debug Wrist", kDebugWrist).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     }
 
     private void updateSettings() {
@@ -67,6 +72,8 @@ public class Settings {
         instance.kDebugHanger = hangerToggle.getBoolean(instance.kDebugHanger);
         instance.kDebugHood = hoodToggle.getBoolean(instance.kDebugHood);
         instance.kDebugColumn = columnToggle.getBoolean(instance.kDebugColumn);
+        instance.kDebugTelescopes = telescopesToggle.getBoolean(instance.kDebugTelescopes);
+        instance.kDebugWrist = wristToggle.getBoolean(instance.kDebugWrist);
     }
 
     public static void initializeToggles() {
@@ -85,5 +92,7 @@ public class Settings {
     public static boolean debugHanger(){ return instance.kDebugHanger ;}
     public static boolean debugHood(){ return instance.kDebugHood ;}
     public static boolean debugColumn(){ return instance.kDebugColumn ;}
+    public static boolean debugTelescopes() { return instance.kDebugTelescopes ;}
+    public static boolean debugWrist() { return instance.kDebugWrist ;}
 
 }

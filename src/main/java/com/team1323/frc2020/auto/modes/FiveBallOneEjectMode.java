@@ -83,10 +83,11 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         // Pick up two human player balls
         runAction(new SetTrajectoryAction(trajectories.secondBallToHumanPlayer, 135.0, 1));
         runAction(new WaitForOneBallAction(7.0));
+        runAction(new SetTrajectoryAction(trajectories.terminalToBackupPoint, 135.0, 1.0));
         runAction(new WaitForTwoBallsAction(2.0));
 
         // Go back to shooting spot
-        runAction(new SetTrajectoryAction(trajectories.humanPlayerToSecondBall, 90.0, 1));
+        runAction(new SetTrajectoryAction(trajectories.backupPointToSecondBall, 90.0, 1));
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot last two balls

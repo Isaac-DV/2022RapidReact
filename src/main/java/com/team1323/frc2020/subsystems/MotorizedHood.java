@@ -238,32 +238,8 @@ public class MotorizedHood extends Subsystem {
         
     };
 
-    public Request angleRequest(double angle) {
-        return new Request(){
-        
-            @Override
-            public void act() {
-                setAngle(angle);
-            }
 
-            @Override
-            public boolean isFinished() {
-                return hasReachedAngle();
-            }
-            
-        };
-    }
-
-    public Request openLoopRequest(double percentOutput) {
-        return new Request(){
-        
-            @Override
-            public void act() {
-                setOpenLoop(percentOutput);
-            }
-
-        };
-    }
+    
 
     @Override
     public void readPeriodicInputs() {
@@ -327,6 +303,18 @@ public class MotorizedHood extends Subsystem {
         /*if(hood.getBusVoltage() == 0)
             DriverStation.reportError("HOOD MOTOR NOT DETECTED", false);*/
     }
+
+    public Request openLoopRequest(double percentOutput) {
+        return new Request(){
+        
+            @Override
+            public void act() {
+                setOpenLoop(percentOutput);
+            }
+
+        };
+    }
+    
     public Request setAngleRequest(double angle) {
         return new Request() {
             @Override

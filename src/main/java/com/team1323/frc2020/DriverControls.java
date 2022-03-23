@@ -340,27 +340,18 @@ public class DriverControls implements Loop {
         
 
         if(testController.aButton.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            turret.setAngle(-90);
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.START);
+            s.startHangSequence();
         }
         if(testController.bButton.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            turret.setAngle(-90);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_WINCH);
         }
         if(testController.yButton.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
-            turret.setAngle(-90);
+            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_INITIAL_RELEASE);
+            System.out.println("Robot Pitch = " + doubleTelescopes.getRobotPitch() + " : Robot Pitch Velocity = " + doubleTelescopes.getRobotPitchVelocity());
         }
         if(testController.xButton.wasActivated()) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
             wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            turret.setAngle(-90);
             doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
         }
         if(testController.leftBumper.wasActivated()) {

@@ -14,6 +14,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.SensorCheck;
 import com.team1323.lib.util.Util;
@@ -222,7 +223,7 @@ public class Wrist extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
-        if(false) {
+        if(Settings.debugWrist()) {
             SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
             SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
             SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());

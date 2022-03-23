@@ -38,6 +38,7 @@ public class LEDs extends Subsystem {
     }
     public enum LEDColors {
         OFF(0,0,0, LEDMode.SOLID), RED(255,0,0, LEDMode.SOLID), GREEN(0,255,0, LEDMode.SOLID), BLUE(0,0,255, LEDMode.SOLID),
+        DISABLED(255,30,20, LEDMode.SOLID), ENABLED(0,0,255, LEDMode.SOLID),
         RAINBOW(0,0,0, LEDMode.RAINBOW);
         int r;
         int g;
@@ -78,7 +79,6 @@ public class LEDs extends Subsystem {
     }
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
-        
+        candle.setLEDs(255, 20, 30);
     }
 }

@@ -34,6 +34,7 @@ public class Superstructure extends Subsystem {
     public Turret turret;
     public Shooter shooter;
 	public MotorizedHood motorizedHood;
+	public DoubleTelescopes doubleTelescopes;
 	public RobotState robotState;
 	
 	public Superstructure(){
@@ -48,6 +49,7 @@ public class Superstructure extends Subsystem {
         turret = Turret.getInstance();
         shooter = Shooter.getInstance();
 		motorizedHood = MotorizedHood.getInstance();
+		doubleTelescopes = DoubleTelescopes.getInstance();
 
 		robotState = RobotState.getInstance();
 		
@@ -385,6 +387,18 @@ public class Superstructure extends Subsystem {
 				intake.stateRequest(Intake.ControlState.EJECT),
 				ballFeeder.openLoopRequest(0.5),
 				column.stateRequest(Column.ControlState.EJECT)
+			)
+		);
+	}
+	public void startHangSequence() {
+		request(
+			new SequentialRequest(
+				new ParallelRequest(
+					turret.angleRequest(-90),
+					wrist.setWristAngleRequest(Constants.Wrist.kLowestAngle),
+					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle)
+				),
+				doubleTelescopes.setLiftModeRequest(DoubleTelescopes.LiftMode.START)
 			)
 		);
 	}
