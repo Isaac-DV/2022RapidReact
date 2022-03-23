@@ -293,8 +293,9 @@ public class MotorizedHood extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
+        SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
+
         if(Settings.debugHood()) {
-            SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
             SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
             SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
             SmartDashboard.putNumber("Hood Error", encUnitsToDegrees(periodicIO.demand - periodicIO.position));

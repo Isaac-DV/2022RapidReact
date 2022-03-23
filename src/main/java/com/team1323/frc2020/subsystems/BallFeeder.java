@@ -259,7 +259,7 @@ public class BallFeeder extends Subsystem {
         public void onLoop(double timestamp) {
             updateSmartTuner();
             if(printFeeder)
-                System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
+                //System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
             /*if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
             }*/

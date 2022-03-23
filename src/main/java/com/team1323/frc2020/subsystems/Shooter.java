@@ -344,6 +344,7 @@ public class Shooter extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Shooter RPM", getLeftRPM());
+        SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
         if(Settings.debugShooter()) {
             SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
@@ -353,7 +354,6 @@ public class Shooter extends Subsystem {
             SmartDashboard.putNumber("Shooter Left Commanded Input", master.getMotorOutputPercent());
             SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
             SmartDashboard.putString("Shooter State", currentState.toString());
-            SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
             SmartDashboard.putNumber("Shooter Left Current", master.getOutputCurrent());
             SmartDashboard.putNumber("Shooter Right Current", slave.getOutputCurrent());
         }

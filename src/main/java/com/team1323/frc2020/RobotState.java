@@ -213,7 +213,7 @@ public class RobotState {
 				if (hood_angle.getDegrees() > Constants.MotorizedHood.kMaxControlAngle) {
 					double old_rpm = shooter_rpm;
 					double corrected_rpm = Shooter.getCompensatedShooterRpm(moving_shot_vector.norm(), initial_ball_velocity.y());
-					shooter_rpm = old_rpm + (Math.abs(corrected_rpm - old_rpm) * 1.75);
+					shooter_rpm = old_rpm + (Math.abs(corrected_rpm - old_rpm) * 1.25);
 				}
 				ShooterAimingParameters params = new ShooterAimingParameters(latest_turret_fixed_to_goal.getTranslation().norm(), 
 						turretAngle, latest_turret_fixed_to_goal.getTranslation(), hood_angle, shooter_rpm, report.latest_timestamp, report.stability);

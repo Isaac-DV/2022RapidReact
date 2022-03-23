@@ -259,6 +259,7 @@ public class Column extends Subsystem {
                         if (!shootingCurrentBall)
                             setOpenLoop(0.0);
                     }
+                    break;
                 case INDEX_BALLS:
                     if(!getBanner() && !detectedBall) {
                         //column.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
@@ -279,6 +280,9 @@ public class Column extends Subsystem {
             
             if(ballFeeder.hasSentUpBall() && getBanner()) {
                 ballFeeder.setSentUpBall(false);
+            }
+            if(banner.get() && ballFeeder.detectedBallType == BallFeeder.BallType.Team) {
+                notifyDrivers = true;
             }
             
         }

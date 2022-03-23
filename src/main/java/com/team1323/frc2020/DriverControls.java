@@ -26,6 +26,8 @@ import com.team1323.frc2020.subsystems.Wrist;
 import com.team1323.io.Xbox;
 import com.team254.lib.geometry.Pose2d;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * A class to assign controller inputs to robot actions
  */
@@ -119,7 +121,7 @@ public class DriverControls implements Loop {
             driver.update();
 			coDriver.update();
             //singleController.update();
-            testController.update();
+            //testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -180,6 +182,9 @@ public class DriverControls implements Loop {
         } else if(driver.rightTrigger.wasReleased()) {
             swerve.useSlewLimiter(false);
             swerve.setMaxSpeed(1.0);
+        }
+        if(driver.POV180.wasActivated()) {
+            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
 
 		////// Official Controls //////
@@ -261,7 +266,7 @@ public class DriverControls implements Loop {
             s.postShotState();
         }
         if(coDriver.xButton.wasActivated()) {
-            s.manualShotState(1800, 12);
+            s.manualShotState(1900, 14);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }
@@ -283,8 +288,10 @@ public class DriverControls implements Loop {
         }
 
         if(coDriver.rightTrigger.wasActivated()) {
+            SmartDashboard.putBoolean("Vision Shot is activated", true);
             s.visionShotState();
         } else if(coDriver.rightTrigger.wasReleased()) {
+            SmartDashboard.putBoolean("Vision Shot is activated", false);
             s.postShotState();
         }
 
@@ -311,7 +318,7 @@ public class DriverControls implements Loop {
             s.disableState();
         }
 
-        
+        /*
         double singleLeftY = -testController.getRightY();
         double singleRightY = -testController.getLeftY();        
 
@@ -359,7 +366,7 @@ public class DriverControls implements Loop {
         }
         if(testController.rightBumper.wasActivated()) {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }
+        }*/
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);

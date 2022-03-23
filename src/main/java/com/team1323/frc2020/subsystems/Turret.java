@@ -292,6 +292,12 @@ public class Turret extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Turret Angle", getAngle());
+        SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
+        SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
+        SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
+        SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
+        SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
+        SmartDashboard.putNumber("Turret tolerance", turretTolerance);
         if(Settings.debugTurret()) {
             SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
@@ -303,7 +309,7 @@ public class Turret extends Subsystem {
             SmartDashboard.putNumber("Turret tolerance", turretTolerance);
             SmartDashboard.putNumber("Turret Current", periodicIO.current);
             SmartDashboard.putNumber("Turret COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
-
+            SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
         }
         updateTurretTuning();
         

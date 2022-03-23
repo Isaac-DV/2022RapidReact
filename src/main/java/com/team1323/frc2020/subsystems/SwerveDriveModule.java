@@ -400,8 +400,8 @@ public class SwerveDriveModule extends Subsystem{
 	public void readPeriodicInputs() {
 		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
-		periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
+		if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
 
 		if (Settings.debugSwerve()) {
 			periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();

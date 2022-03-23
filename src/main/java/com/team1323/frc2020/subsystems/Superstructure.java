@@ -284,7 +284,7 @@ public class Superstructure extends Subsystem {
 					shooter.velocityRequest(shooterRPM) //2200 - Mid //2100 - Close //2400
 				),
 				//intake.stateRequest(Intake.ControlState.INTAKE),
-				new LambdaRequest(()-> column.setVelocityState(Constants.Column.kFeedVelocitySpeed))
+				column.stateRequest(Column.ControlState.MANUAL_FEED_BALLS)
 				
 			)
 		);
