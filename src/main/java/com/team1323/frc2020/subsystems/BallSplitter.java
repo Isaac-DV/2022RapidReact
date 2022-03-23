@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
@@ -253,7 +254,7 @@ public class BallSplitter extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
-        if(false) {
+        if(Settings.debugFeeder()) {
             SmartDashboard.putNumber("Swerve Rotation to BEL", targetSwerveTheta);
             SmartDashboard.putNumber("Swerve Raw Theta",  Util.boundAngle0to360Degrees(translationVector.direction().getDegrees()));
             SmartDashboard.putString("Eject Mode", bestSplitterState.toString());

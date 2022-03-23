@@ -9,7 +9,7 @@ public class Ports {
     public static final int FRONT_RIGHT_DRIVE   = 0;
 
     public static final int FRONT_LEFT_ROTATION = 17;
-    public static final int FRONT_LEFT_DRIVE    = 18; 
+    public static final int FRONT_LEFT_DRIVE    = 18;
 
     public static final int REAR_LEFT_ROTATION  = 11;
     public static final int REAR_LEFT_DRIVE     = 10;
@@ -21,26 +21,23 @@ public class Ports {
     public static final int INTAKE = 2;
     public static final int WRIST = 3;
     public static final int BALL_SPLITTER = 12;
-    public static final int BALL_EJECTOR = 39;
     public static final int BALL_FEEDER = 13;
     public static final int COLUMN = 5;
-    public static final int TURRET = 14;    
+    public static final int TURRET = 14;
     //public static final int SHOOTER_TOP = 7;
     public static final int HOOD_TALON = 15;
     public static final int SHOOTER_LEFT = 20;
     public static final int SHOOTER_RIGHT = 7;
-    public static final int ELEVATOR = 16;
 
-
-
-    public static final int HANGER_WRIST = 20;
+    public static final int TELESCOPE_LEFT = 41;
+    public static final int TELESCOPE_RIGHT = 40;
 
     // MISC CAN
     public static final int PIGEON = 45;
+    public static final int CANDLE = 46;
     
     //PWM
-    public static final int HOOD_RIGHT_SERVO = 0;
-    public static final int HOOD_LEFT_SERVO = 1;
+
 
     //Digital Inputs
     public static final int FRONT_RIGHT_ENCODER = 30;
@@ -59,11 +56,6 @@ public class Ports {
     public static final int ELEVATOR_ENCODER = 3;
 
     // Pneumatics
-    public static final int PCM = 41;
-    public static final int TELESCOPE = 2;
-    public static final int TELESCOPE_LEFT = 41;
-    public static final int TELESCOPE_RIGHT = 40;
-    public static final int CLAW = 3;
 
     //Canifier
     public static final int CANIFIER = 30;

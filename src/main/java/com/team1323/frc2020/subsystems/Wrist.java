@@ -146,6 +146,9 @@ public class Wrist extends Subsystem {
 
             if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
                 DriverStation.reportError("Wrist angle is out of bounds", false);
+                hasEmergency = true;
+            } else {
+                hasEmergency = false;
             }
 
             wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, 0);
@@ -223,10 +226,11 @@ public class Wrist extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
+        SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
+
         if(Settings.debugWrist()) {
             SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
             SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
-            SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
         }
     }
 

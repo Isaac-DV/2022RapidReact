@@ -298,8 +298,9 @@ public class Turret extends Subsystem {
         SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
         SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
         SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+        SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
+
         if(Settings.debugTurret()) {
-            SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
             SmartDashboard.putNumber("Turret Setpoint", targetAngle);
             SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
@@ -541,6 +542,9 @@ public class Turret extends Subsystem {
 
             if (absoluteTurretAngle > Constants.Turret.kMaxInitialAngle || absoluteTurretAngle < Constants.Turret.kMinInitialAngle) {
                 DriverStation.reportError("Turret angle is out of bounds", false);
+                hasEmergency = true;
+            } else {
+                hasEmergency = false;
             }
 
             turret.setSelectedSensorPosition(degreesToEncUnits(absoluteTurretAngle), 0, 0);

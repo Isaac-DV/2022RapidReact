@@ -46,7 +46,7 @@ public class DoubleTelescopes extends Subsystem {
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = true;
     private boolean isFirstEnable = true;
-    private boolean autoLiftMode = true;
+    private boolean autoLiftMode = false;
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);
     private double robotPitchVelocity = 0;
@@ -217,7 +217,7 @@ public class DoubleTelescopes extends Subsystem {
         return getRobotPitchVelocity() > 0;
     }
     public double getRobotPitch() {
-        return pigeon.getRoll();
+        return Settings.kIsUsingCompBot ? pigeon.getPitch() : pigeon.getRoll();
     }
     public boolean isRobotPitchWithinAngle(double targetAngle) {
         return Math.abs(targetAngle - getRobotPitch()) <= Constants.DoubleTelescopes.kRobotPitchAngleTolerance;
@@ -361,14 +361,14 @@ public class DoubleTelescopes extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber("Telescope Right Height Inches", encUnitsToInches(rightTelescope.getSelectedSensorPosition()));
+        SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
+        SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
+        SmartDashboard.putNumber("Robot Roll", pigeon.getRoll());
         if(Settings.debugTelescopes()) {
-            SmartDashboard.putNumber("Telescope Right Height Inches", encUnitsToInches(rightTelescope.getSelectedSensorPosition()));
-            SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
-            SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
             SmartDashboard.putNumber("Telescope Right  Units", rightTelescope.getSelectedSensorPosition());
             SmartDashboard.putNumber("Telescope Left Units", leftTelescope.getSelectedSensorPosition());
             SmartDashboard.putNumber("Robot Pitch", pigeon.getPitch());
-            SmartDashboard.putNumber("Robot Roll", pigeon.getRoll());
             SmartDashboard.putNumber("Robot Yaw", pigeon.getYaw().getDegrees());
             SmartDashboard.putNumber("Robot Pitch Velocity", getRobotPitchVelocity());
             SmartDashboard.putNumber("Telescope Left Current", leftTelescope.getOutputCurrent());

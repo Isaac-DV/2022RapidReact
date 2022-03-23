@@ -18,11 +18,13 @@ import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
 import com.team1323.frc2020.loops.QuinticPathTransmitter;
 import com.team1323.frc2020.loops.RobotStateEstimator;
+import com.team1323.frc2020.subsystems.LEDs;
 import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.SubsystemManager;
 import com.team1323.frc2020.subsystems.Superstructure;
 import com.team1323.frc2020.subsystems.Turret;
 import com.team1323.frc2020.subsystems.Wrist;
+import com.team1323.frc2020.subsystems.LEDs.LEDColors;
 import com.team1323.lib.util.CrashTracker;
 import com.team1323.lib.util.Logger;
 import com.team254.lib.geometry.Pose2d;
@@ -47,6 +49,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends TimedRobot {
 
+	private LEDs leds;
 	private Superstructure s;
 	private SubsystemManager subsystems;
 
@@ -72,6 +75,7 @@ public class Robot extends TimedRobot {
 		
 	
 		//pigeon = Pigeon.getInstance();
+		leds = LEDs.getInstance();
 		s = Superstructure.getInstance();
 		subsystems = driverControls.getSubsystems();
 
@@ -181,6 +185,7 @@ public class Robot extends TimedRobot {
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
+			leds.configLEDs(LEDColors.RAINBOW);
 			
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -197,6 +202,9 @@ public class Robot extends TimedRobot {
 			s.swerve.zeroModuleAngles();
 			Wrist.getInstance().resetToAbsolutePosition();
 			Turret.getInstance().resetToAbsolutePosition();
+			if (subsystems.haveEmergency()) {
+				leds.configLEDs(LEDColors.RED);
+			}
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;

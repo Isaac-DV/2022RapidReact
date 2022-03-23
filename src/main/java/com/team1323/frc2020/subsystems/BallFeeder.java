@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Controls the ball ejector and feeder motor*/
 public class BallFeeder extends Subsystem {
-    SmartTuner smartTuner;
 
     BallSplitter ballSplitter;
     Intake intake;
@@ -114,9 +113,6 @@ public class BallFeeder extends Subsystem {
         });
         colorSensorInterrupt.setInterruptEdges(true, true);
         colorSensorInterrupt.enable();
-
-        smartTuner = new SmartTuner(feeder, "ballFeeder");
-        smartTuner.enabled(false);
 
         initializeDashboardValues();
     }
@@ -243,9 +239,6 @@ public class BallFeeder extends Subsystem {
     public void shiftPower(boolean shiftToRollers) {
         rollersShifted = shiftToRollers;
     }
-    public void updateSmartTuner() {
-        smartTuner.update();
-    }
     Loop loop = new Loop() {
 
         @Override
@@ -257,7 +250,6 @@ public class BallFeeder extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
-            updateSmartTuner();
             if(printFeeder)
                 //System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
             /*if(!isAutoDetectEnabled()) {
@@ -318,8 +310,9 @@ public class BallFeeder extends Subsystem {
         SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
         SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
         SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
+        SmartDashboard.putString("Ball Feeder State", getState().toString()); 
+        
         if(Settings.debugFeeder()) {
-            SmartDashboard.putString("Ball Feeder State", getState().toString()); 
             SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());
             SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
             SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());

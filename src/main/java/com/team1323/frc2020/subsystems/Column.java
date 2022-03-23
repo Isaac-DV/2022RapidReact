@@ -96,10 +96,10 @@ public class Column extends Subsystem {
         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
         column.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
 
-        column.config_kP(0, 0.2, Constants.kCANTimeoutMs); //0.2
+        column.config_kP(0, 0.0, Constants.kCANTimeoutMs); //0.2
         column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0
-        column.config_kD(0, 4.0, Constants.kCANTimeoutMs); //4.0
-        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.052
+        column.config_kD(0, 0.0, Constants.kCANTimeoutMs); //4.0
+        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
         column.selectProfileSlot(0, 0);
         column.config_IntegralZone(0, getRPMToEncVelocity(100));
 
@@ -316,8 +316,8 @@ public class Column extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putBoolean("Column Banner Sensor", getBanner());
+        SmartDashboard.putString("Column State", getState().toString());
         if(Settings.debugColumn()) {
-            SmartDashboard.putString("Column State", getState().toString());
             SmartDashboard.putNumber("Column banner detected timestamp", (Timer.getFPGATimestamp() - ballDetectedTimestamp));
             SmartDashboard.putNumber("Column RPM", encVelocityToRPM(column.getSelectedSensorVelocity()));
             SmartDashboard.putNumber("Column RPM Target", targetRPM);

@@ -7,6 +7,7 @@ package com.team1323.frc2020.subsystems;
 import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.RainbowAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.team1323.frc2020.Ports;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -26,8 +27,9 @@ public class LEDs extends Subsystem {
     }
 
     public LEDs() {
-        candle = new CANdle(0, "main");
+        candle = new CANdle(Ports.CANDLE);
         candle.configLEDType(LEDStripType.RGB);
+        configLEDs(LEDColors.RAINBOW);
     }
     public enum LEDMode {
         SOLID, RAINBOW;
@@ -38,7 +40,7 @@ public class LEDs extends Subsystem {
     }
     public enum LEDColors {
         OFF(0,0,0, LEDMode.SOLID), RED(255,0,0, LEDMode.SOLID), GREEN(0,255,0, LEDMode.SOLID), BLUE(0,0,255, LEDMode.SOLID),
-        DISABLED(255,30,20, LEDMode.SOLID), ENABLED(0,0,255, LEDMode.SOLID),
+        DISABLED(255,0,0, LEDMode.SOLID), ENABLED(0,0,255, LEDMode.SOLID),
         RAINBOW(0,0,0, LEDMode.RAINBOW);
         int r;
         int g;
@@ -79,6 +81,6 @@ public class LEDs extends Subsystem {
     }
     @Override
     public void stop() {
-        candle.setLEDs(255, 20, 30);
+        configLEDs(LEDColors.RAINBOW);
     }
 }

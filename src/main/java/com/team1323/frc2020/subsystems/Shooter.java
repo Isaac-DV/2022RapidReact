@@ -181,6 +181,9 @@ public class Shooter extends Subsystem {
 
     private static double getTimeToGoal(double vertical_velocity) {
         double determinant = Math.sqrt(vertical_velocity * vertical_velocity - (4 * -193.11 * /*-Constants.kVisionTargetRelativeHeight*/0.0));
+        if (Double.isNaN(determinant)) {
+            return 0.0;
+        }
         double time1 = (-vertical_velocity + determinant) / (2 * -193.11);
         double time2 = (-vertical_velocity - determinant) / (2 * -193.11);
 
@@ -190,6 +193,9 @@ public class Shooter extends Subsystem {
     public static double getCompensatedShooterRpm(double horizontal_velocity, double vertical_velocity) {
         double horizontal_distance = horizontal_velocity * getTimeToGoal(vertical_velocity);
         double corrected_time = Math.sqrt((Constants.kVisionTargetRelativeHeight - (Math.tan(Math.toRadians(Constants.MotorizedHood.kMinEmpiricalAngle)) * horizontal_distance)) / -193.11);
+        if (Double.isNaN(corrected_time)) {
+            return 0.0;
+        }
         double corrected_horizontal_velocity = horizontal_distance / corrected_time;
         double corrected_vertical_velocity = Math.tan(Math.toRadians(Constants.MotorizedHood.kMinEmpiricalAngle)) * corrected_horizontal_velocity;
         double corrected_velocity = Math.hypot(corrected_horizontal_velocity, corrected_vertical_velocity);
@@ -346,6 +352,7 @@ public class Shooter extends Subsystem {
         SmartDashboard.putNumber("Shooter RPM", getLeftRPM());
         SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
+        SmartDashboard.putString("Shooter State", currentState.toString());
         if(Settings.debugShooter()) {
             SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
             SmartDashboard.putNumber("Shooter Right RPM", getRightRPM());
@@ -353,7 +360,6 @@ public class Shooter extends Subsystem {
             SmartDashboard.putString("Shooter State", getState().toString());
             SmartDashboard.putNumber("Shooter Left Commanded Input", master.getMotorOutputPercent());
             SmartDashboard.putNumber("Shooter Right Commanded Input", slave.getMotorOutputPercent());
-            SmartDashboard.putString("Shooter State", currentState.toString());
             SmartDashboard.putNumber("Shooter Left Current", master.getOutputCurrent());
             SmartDashboard.putNumber("Shooter Right Current", slave.getOutputCurrent());
         }

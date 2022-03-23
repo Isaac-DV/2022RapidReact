@@ -102,10 +102,10 @@ public class Constants {
     * Enter angle read by the absolute encoder. Insert as degrees and subtract or add 90° to the value
     * based on where the bevel ended up.
     */
-    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -322.2 : -188.701172; //Module 0 - Front Right -3.52 | -7.91 | 5.71
-    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -141.5 : -312.275391; //Module 1 - Front Left -109.97 | -109.95
-    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -22.64 : -174.462891; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
-    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -12.54 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
+    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -312.539062 : -188.701172; //Module 0 - Front Right -3.52 | -7.91 | 5.71
+    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -17.402344 : -312.275391; //Module 1 - Front Left -109.97 | -109.95
+    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -218.759766 : -174.462891; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
+    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -199.687500 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
     public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength / 2, kWheelbaseWidth / 2);
@@ -177,7 +177,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -19.5;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 0.0 : 192.918614;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 266.444404 : 192.918614;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -237,15 +237,15 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? 349.987509 : 349.987509;
+        public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? 108.118146 : 349.987509;
         public static final double kTurretStartingAngle = 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
-        public static final double kEncoderToTurretRatio = 1.0;
+        public static final double kEncoderToTurretRatio = Settings.kIsUsingCompBot ? 2.0 : 1.0;
         public static final double kAngleTolerance = 2.0;
         public static final double kMinControlAngle = -270.0; //-250
         public static final double kMaxControlAngle = 135.0;
         public static final double kMinInitialAngle = -270.0;
-        public static final double kMaxInitialAngle = 90.0;
+        public static final double kMaxInitialAngle = Settings.kIsUsingCompBot ? 135.0 : 90.0;
         
         public static final double kP = 0.5; // 0.25
         public static final double kI = 0.001;
