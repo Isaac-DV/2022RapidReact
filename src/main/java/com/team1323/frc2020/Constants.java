@@ -57,7 +57,7 @@ public class Constants {
     public static final double kCameraXOffset = 7.236; //8.5 //9.586
     public static final double kCameraZOffset = 44.467; //26.776 24.524 //42.095
     public static final double kCameraYawAngleDegrees = 0.0;//-12.7
-    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 38.0 : 38.0; //37.5
+    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.5 : 38.0; //37.5
 
     //Limelight
     public static final double kHorizontalFOV = 59.6; // degrees
@@ -244,8 +244,8 @@ public class Constants {
         public static final double kAngleTolerance = 2.0;
         public static final double kMinControlAngle = -270.0; //-250
         public static final double kMaxControlAngle = 135.0;
-        public static final double kMinInitialAngle = -270.0;
-        public static final double kMaxInitialAngle = Settings.kIsUsingCompBot ? 135.0 : 90.0;
+        public static final double kMinInitialAngle = Settings.kIsUsingCompBot ? -90 : -270.0;
+        public static final double kMaxInitialAngle = Settings.kIsUsingCompBot ? 90.0 : 90.0;
         
         public static final double kP = 0.5; // 0.25
         public static final double kI = 0.001;
@@ -285,7 +285,7 @@ public class Constants {
         public static final double kMaxControlAngle = 45.0;
 
         // Measured upward from the ground; corresponds to kMinControlAngle
-        public static final double kMaxEmpiricalAngle = 65.12195 + 23.0;
+        public static final double kMaxEmpiricalAngle = Settings.kIsUsingCompBot ? 68.9747 + 26.0 : 65.12195 + 23.0;
         public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
 
         public static final double kAngleTolerance = 1.0; // degrees
@@ -324,7 +324,7 @@ public class Constants {
         public static final double kShooterRPMTolerance = 150.0; //50 //150
         public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
-        public static final double kBallVelocityScrubFactor = 290.570415188 / 426.73300175;
+        public static final double kBallVelocityScrubFactor = Settings.kIsUsingCompBot ? 305.966 / 417.0345 : 290.570415188 / 426.73300175;
 
 
         public static final Translation2d closeShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 2), 2500.0);

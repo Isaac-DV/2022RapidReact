@@ -311,6 +311,7 @@ public class BallFeeder extends Subsystem {
         SmartDashboard.putBoolean("Ball Color Sensor", isColorSensorRed());
         SmartDashboard.putString("Ball Feeder Detected Ball", DetectedBall.toString());
         SmartDashboard.putString("Ball Feeder State", getState().toString()); 
+        //SmartDashboard.putString("Selected Alliance", DSAlliance.toString());
         
         if(Settings.debugFeeder()) {
             SmartDashboard.putBoolean("Ball Feeder Banner Sensor", banner.get());

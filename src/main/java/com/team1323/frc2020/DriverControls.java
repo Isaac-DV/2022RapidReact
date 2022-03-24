@@ -258,7 +258,7 @@ public class DriverControls implements Loop {
             wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         }
         if(coDriver.yButton.wasActivated()) {
-            s.manualShotState(2250.0, 19);
+            s.manualShotState(2150.0, 26); //2250, 19
         } else if(coDriver.yButton.wasReleased()) {
             s.postShotState();
         }

@@ -96,9 +96,9 @@ public class Column extends Subsystem {
         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
         column.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
 
-        column.config_kP(0, 0.0, Constants.kCANTimeoutMs); //0.2
+        column.config_kP(0, 0.1, Constants.kCANTimeoutMs); //0.2
         column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0
-        column.config_kD(0, 0.0, Constants.kCANTimeoutMs); //4.0
+        column.config_kD(0, 1.0, Constants.kCANTimeoutMs); //4.0
         column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
         column.selectProfileSlot(0, 0);
         column.config_IntegralZone(0, getRPMToEncVelocity(100));

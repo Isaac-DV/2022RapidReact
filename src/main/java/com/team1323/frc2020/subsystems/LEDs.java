@@ -69,7 +69,7 @@ public class LEDs extends Subsystem {
         if(selectedLEDType == LEDMode.SOLID) {
             candle.setLEDs(mRed, mGreen, mBlue);
         } else if(selectedLEDType == LEDMode.RAINBOW) {
-            RainbowAnimation animation = new RainbowAnimation(0.75, 1, 1690);
+            RainbowAnimation animation = new RainbowAnimation(0.25, 1, 1690);
             candle.animate(animation);
         }
     }
