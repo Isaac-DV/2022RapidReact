@@ -197,7 +197,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(humanPlayerBackupPose.getTranslation(), Rotation2d.fromDegrees(0.0)));
             waypoints.add(new Pose2d(secondBallPickupPose.getTranslation(), Rotation2d.fromDegrees(0.0)));
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 36.0, 1);
         }
         
         private Trajectory<TimedState<Pose2dWithCurvature>> getHumanPlayerToSecondBall(){

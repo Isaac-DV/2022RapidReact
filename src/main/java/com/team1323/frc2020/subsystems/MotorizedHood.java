@@ -71,7 +71,7 @@ public class MotorizedHood extends Subsystem {
         hood.setInverted(TalonFXInvertType.Clockwise);
         setEncoderPhase(false);
 
-        hood.setNeutralMode(NeutralMode.Coast);
+        hood.setNeutralMode(NeutralMode.Brake);
 
         hood.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 
@@ -233,7 +233,7 @@ public class MotorizedHood extends Subsystem {
 
         @Override
         public void onStop(double timestamp) {
-            hood.setNeutralMode(NeutralMode.Coast);
+            hood.setNeutralMode(NeutralMode.Brake);
         }
         
     };
