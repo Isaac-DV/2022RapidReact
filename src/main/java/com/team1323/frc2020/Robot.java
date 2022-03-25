@@ -119,7 +119,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void robotPeriodic() {
 		subsystems.outputToSmartDashboard();
-		//robotState.outputToSmartDashboard();
+		robotState.outputToSmartDashboard();
 		SmartDashboard.putBoolean("Enabled", DriverStation.isEnabled());
 		SmartDashboard.putNumber("Match time", DriverStation.getMatchTime());
 	}
@@ -185,7 +185,7 @@ public class Robot extends TimedRobot {
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
-			leds.configLEDs(LEDColors.RAINBOW);
+			leds.configLEDs(LEDColors.GREEN);
 			
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);

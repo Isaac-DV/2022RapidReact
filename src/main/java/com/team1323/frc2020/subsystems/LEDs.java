@@ -29,7 +29,7 @@ public class LEDs extends Subsystem {
     public LEDs() {
         candle = new CANdle(Ports.CANDLE);
         candle.configLEDType(LEDStripType.RGB);
-        configLEDs(LEDColors.RAINBOW);
+        configLEDs(LEDColors.GREEN);
     }
     public enum LEDMode {
         SOLID, RAINBOW;
@@ -73,7 +73,6 @@ public class LEDs extends Subsystem {
             candle.animate(animation);
         }
     }
-
     @Override
     public void outputTelemetry() {
         SmartDashboard.putString("LED Mode", selectedLEDType.toString());
@@ -81,6 +80,6 @@ public class LEDs extends Subsystem {
     }
     @Override
     public void stop() {
-        configLEDs(LEDColors.RAINBOW);
+        configLEDs(LEDColors.GREEN);
     }
 }

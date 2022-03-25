@@ -51,6 +51,7 @@ public class Turret extends Subsystem {
 
     RobotState robotState;
     Swerve swerve;
+    DoubleTelescopes doubleTelescopes;
     
     private Translation2d turretManualVector = new Translation2d();
     public Rotation2d fieldCentricRotation = new Rotation2d();
@@ -101,6 +102,7 @@ public class Turret extends Subsystem {
     private Turret() {
         robotState = RobotState.getInstance();
         swerve = Swerve.getInstance();
+        doubleTelescopes = DoubleTelescopes.getInstance();
         
         turret = new LazyTalonFX(Ports.TURRET, "main");
         encoder = new DutyCycle(new DigitalInput(Ports.TURRET_ENCODER));
@@ -153,10 +155,12 @@ public class Turret extends Subsystem {
             targetAngle = Constants.Turret.kMinControlAngle;
         else
             targetAngle = angle;
-        
-        periodicIO.demand = degreesToEncUnits(targetAngle);
-        if (currentState == ControlState.OPEN_LOOP)
-            currentState = ControlState.POSITION;
+        if(doubleTelescopes.bothTelescopesZeroed()) {
+            periodicIO.demand = degreesToEncUnits(targetAngle);
+            periodicIO.controlMode = ControlMode.MotionMagic;
+            if (currentState == ControlState.OPEN_LOOP)
+                currentState = ControlState.POSITION;
+        }
     }
     
     public void lockAngle() {
@@ -218,6 +222,7 @@ public class Turret extends Subsystem {
 
     public void setOpenLoop(double output) {
         periodicIO.demand = output * 0.5;
+        periodicIO.controlMode = ControlMode.PercentOutput;
         currentState = ControlState.OPEN_LOOP;
     }
     
@@ -230,7 +235,7 @@ public class Turret extends Subsystem {
     }
     
     public boolean hasReachedAngle() {
-        return Math.abs(getAngle() - targetAngle) < turretTolerance;
+        return Math.abs(getAngle() - targetAngle) < turretTolerance && periodicIO.controlMode == ControlMode.MotionMagic;
     }
     public boolean isReady() {
         return seesTarget() && visionAngleInRange && 
@@ -265,11 +270,7 @@ public class Turret extends Subsystem {
     
     @Override
     public void writePeriodicOutputs() {
-        if (currentState == ControlState.OPEN_LOOP) {
-            turret.set(ControlMode.PercentOutput, periodicIO.demand);
-        } else {
-            turret.set(ControlMode.MotionMagic, periodicIO.demand);
-        }
+        turret.set(periodicIO.controlMode, periodicIO.demand);
     }
 
     public void updateTurretTuning() {
@@ -279,7 +280,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O * 4) + (robotVelocity * 0.05) + 1;
+        double robotScaledAngleTolerance = Math.abs(T2O * 3.5) + (robotVelocity * 0.045) + 1;
         turretTolerance = robotScaledAngleTolerance;
         /*if(((Constants.Turret.kMaxControlAngle - 5) < getAngle()) && (getAngle() < Constants.Turret.kMaxControlAngle)){
             turretTolerance = 1;
@@ -347,7 +348,7 @@ public class Turret extends Subsystem {
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         if (isWrapping) {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 2.0), 0);
                         } else {
                             turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
                         }
@@ -564,7 +565,8 @@ public class Turret extends Subsystem {
         public double current;
         
         //Outputs
-        public double demand;
+        public double demand = 0;
+        public ControlMode controlMode = ControlMode.PercentOutput;
     }
     
 }

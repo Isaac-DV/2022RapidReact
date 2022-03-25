@@ -77,6 +77,7 @@ public class BallFeeder extends Subsystem {
 
         feeder = new LazyTalonFX(Ports.BALL_FEEDER, "main");
 
+        feeder.configOpenloopRamp(0.0);
         feeder.setNeutralMode(NeutralMode.Brake);
         feeder.configVoltageCompSaturation(12, Constants.kCANTimeoutMs);
         feeder.enableVoltageCompensation(true);
@@ -252,9 +253,9 @@ public class BallFeeder extends Subsystem {
         public void onLoop(double timestamp) {
             if(printFeeder)
                 //System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
-            /*if(!isAutoDetectEnabled()) {
+            if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
-            }*/
+            }
             switch(currentState) {
                 case OFF:
                     setFeederOpenLoop(0.0);

@@ -113,18 +113,19 @@ public class DriverControls implements Loop {
             swerve.set10VoltRotationMode(false);
         }
         wrist.setWristLocked();
+        leds.configLEDs(LEDs.LEDColors.OFF);
     }
 
     @Override
     public void onLoop(double timestamp) {
-        RobotState.getInstance().outputToSmartDashboard();
+        //RobotState.getInstance().outputToSmartDashboard();
         if(inAuto) {
             // Any auto-specific LED controls can go here
         } else {
             driver.update();
 			coDriver.update();
             //singleController.update();
-            testController.update();
+            //testController.update();
             if(oneControllerMode)
                 singleController.update();
             if(oneControllerMode) oneControllerMode();
@@ -166,9 +167,6 @@ public class DriverControls implements Loop {
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_TERMINAL.location));
         else if(driver.leftBumper.isBeingPressed())
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));*/
-        if(driver.rightCenterClick.wasActivated()) {
-            turret.setAngle(0.0);
-        }
 
         if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
@@ -228,48 +226,92 @@ public class DriverControls implements Loop {
         }
         
 
-        if(coDriver.aButton.isBeingPressed()) {
-            if(column.getState() != Column.ControlState.FEED_BALLS) {
-                column.setState(Column.ControlState.INDEX_BALLS);
-            }
-        }
         
-        if(coDriver.aButton.wasActivated()) {
-            intake.conformToState(Intake.ControlState.INTAKE);
-            wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
-            ballFeeder.setState(BallFeeder.State.DETECT);
-            if(column.getState() != Column.ControlState.FEED_BALLS) {
-                column.setState(Column.ControlState.INDEX_BALLS);
+        if(!doubleTelescopes.liftModeEnabled()) {
+            if(driver.rightCenterClick.wasActivated()) {
+                turret.setAngle(0.0);
             }
 
-            ballFeeder.setPrintFeeder(true);
-        } else if(coDriver.aButton.wasReleased()) {
-            intake.conformToState(Intake.ControlState.OFF);
-            ballFeeder.queueShutdown(true);
-            wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
-            column.shutDownIfUnused();
-            ballFeeder.setPrintFeeder(false);
+            if(coDriver.rightCenterClick.wasActivated()) {
+                turret.setAngle(0.0);
+            }
+
+            if(coDriver.leftCenterClick.wasActivated()) {
+                turret.setCOFState();
+            }
+
+            if(coDriver.aButton.isBeingPressed()) {
+                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                    column.setState(Column.ControlState.INDEX_BALLS);
+                }
+            }
+            if(coDriver.aButton.wasActivated()) {
+                intake.conformToState(Intake.ControlState.INTAKE);
+                wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+                ballFeeder.setState(BallFeeder.State.DETECT);
+                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                    column.setState(Column.ControlState.INDEX_BALLS);
+                }
+
+                ballFeeder.setPrintFeeder(true);
+            } else if(coDriver.aButton.wasReleased()) {
+                intake.conformToState(Intake.ControlState.OFF);
+                ballFeeder.queueShutdown(true);
+                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+                column.shutDownIfUnused();
+                ballFeeder.setPrintFeeder(false);
+            }
+
+            if(coDriver.bButton.wasActivated()) {
+                wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+            }
+
+            if(coDriver.yButton.wasActivated()) {
+                s.manualShotState(2150.0, 26); //2250, 19
+            } else if(coDriver.yButton.wasReleased()) {
+                s.postShotState();
+            }
+            if(coDriver.xButton.wasActivated()) {
+                s.manualShotState(1900, 14);
+            } else if(coDriver.xButton.wasReleased()) {
+                s.postShotState();
+            }
+            if(coDriver.rightTrigger.wasActivated()) {
+                SmartDashboard.putBoolean("Vision Shot is activated", true);
+                s.visionShotState();
+            } else if(coDriver.rightTrigger.wasReleased()) {
+                SmartDashboard.putBoolean("Vision Shot is activated", false);
+                s.postShotState();
+            }
+
+            if(coDriver.startButton.wasActivated()) {
+                //turret.lockAngle();
+                turret.startVision();
+                motorizedHood.setState(MotorizedHood.State.VISION);
+            }
+
+        } else {
+            if(coDriver.aButton.wasActivated()) {
+                doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_WINCH);
+            }
+            if(coDriver.bButton.wasActivated()) {
+                if(doubleTelescopes.leftTelescopeOnTarget() && doubleTelescopes.rightTelescopeOnTarget())
+                    doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
+            }
+        }
+
+        if(coDriver.POV180.wasActivated()) {
+            doubleTelescopes.disableLiftMode();
+        }
+        if(coDriver.POV0.wasActivated()) {
+            s.startHangSequence();
         }
 
         if (coDriver.leftTrigger.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
-        if(coDriver.bButton.wasActivated()) {
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
-        }
-        if(coDriver.yButton.wasActivated()) {
-            s.manualShotState(2150.0, 26); //2250, 19
-        } else if(coDriver.yButton.wasReleased()) {
-            s.postShotState();
-        }
-        if(coDriver.xButton.wasActivated()) {
-            s.manualShotState(1900, 14);
-        } else if(coDriver.xButton.wasReleased()) {
-            s.postShotState();
-        }
-        if(coDriver.POV180.wasActivated()) {
-            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
-        }
+        
+       
         
 
         if(coDriver.rightBumper.wasActivated()) {
@@ -284,29 +326,9 @@ public class DriverControls implements Loop {
             ballFeeder.setState(BallFeeder.State.DETECT);
         }
 
-        if(coDriver.rightTrigger.wasActivated()) {
-            SmartDashboard.putBoolean("Vision Shot is activated", true);
-            s.visionShotState();
-        } else if(coDriver.rightTrigger.wasReleased()) {
-            SmartDashboard.putBoolean("Vision Shot is activated", false);
-            s.postShotState();
-        }
-
-        if(coDriver.rightCenterClick.wasActivated()) {
-            turret.setAngle(0.0);
-        }
-        if(coDriver.leftCenterClick.wasActivated()) {
-            turret.setCOFState();
-        }
-
         if(column.needsToNotifyDrivers()) {
             coDriver.rumble(2.0, 1.0);
             driver.rumble(2.0, 1.0);
-        }
-        if(coDriver.startButton.wasActivated()) {
-            //turret.lockAngle();
-            turret.startVision();
-            motorizedHood.setState(MotorizedHood.State.VISION);
         }
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
@@ -316,7 +338,7 @@ public class DriverControls implements Loop {
         }
 
         
-        double singleLeftY = -testController.getRightY();
+        /*double singleLeftY = -testController.getRightY();
         double singleRightY = -testController.getLeftY();        
 
         if(singleRightY != 0) {
@@ -363,7 +385,7 @@ public class DriverControls implements Loop {
         }
         if(testController.rightBumper.wasActivated()) {
             doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }
+        }*/
         
         /*if(coDriver.xButton.wasActivated()) {
             motorizedHood.setState(MotorizedHood.State.POSITION);

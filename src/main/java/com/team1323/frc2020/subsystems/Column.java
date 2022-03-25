@@ -251,7 +251,7 @@ public class Column extends Subsystem {
                     if (!getBanner()) {
                         setVelocity(Constants.Column.kQueueVelocitySpeed);
                     } else if(getBanner() && Double.isFinite(ballDetectedTimestamp) && (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay
-                                /*&& shooter.hasReachedSetpoint() && motorizedHood.hasReachedAngle()*/) {
+                                && shooter.hasReachedSetpoint() && motorizedHood.hasReachedAngle()) {
                         columnStartTimestamp = timestamp;
                         shootingCurrentBall = true;
                         setVelocity(Constants.Column.kFeedVelocitySpeed);

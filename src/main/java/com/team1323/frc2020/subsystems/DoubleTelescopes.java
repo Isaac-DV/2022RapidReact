@@ -44,9 +44,15 @@ public class DoubleTelescopes extends Subsystem {
 
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
-    private boolean liftModeEnabled = true;
+    private boolean liftModeEnabled = false;
     private boolean isFirstEnable = true;
-    private boolean autoLiftMode = false;
+    private boolean autoLiftMode = true;
+
+    private boolean leftTelescopeZeroed = false;
+    private boolean rightTelescopeZeroed = false;
+    public boolean bothTelescopesZeroed() {
+        return leftTelescopeZeroed && rightTelescopeZeroed;
+    }
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);
     private double robotPitchVelocity = 0;
@@ -55,6 +61,17 @@ public class DoubleTelescopes extends Subsystem {
     }
     public void enableAutoLiftMode(boolean enable) {
         autoLiftMode = enable;
+    }
+    public void startLiftMode() {
+        liftModeEnabled = true;
+        setLiftMode(LiftMode.START);
+    }
+    public void disableLiftMode() {
+        liftModeEnabled = false;
+        setLiftMode(LiftMode.DISABLED);
+    }
+    public boolean liftModeEnabled() {
+        return liftModeEnabled;
     }
 
     public DoubleTelescopes() {
@@ -67,6 +84,8 @@ public class DoubleTelescopes extends Subsystem {
         motors = Arrays.asList(leftTelescope, rightTelescope);
         SupplyCurrentLimitConfiguration currentLimit = new SupplyCurrentLimitConfiguration(false, 50, 50, 0.1);
         StatorCurrentLimitConfiguration statorLimit = new StatorCurrentLimitConfiguration(false, 0, 0, 0.1);
+        leftTelescope.setNeutralMode(NeutralMode.Brake);
+        rightTelescope.setNeutralMode(NeutralMode.Brake);
         for(LazyTalonFX motor : motors) {
             motor.configSupplyCurrentLimit(currentLimit);
             motor.configStatorCurrentLimit(statorLimit);
@@ -120,7 +139,7 @@ public class DoubleTelescopes extends Subsystem {
     static double minHeight = Constants.DoubleTelescopes.kMinControlHeight;
     static double maxHeight = Constants.DoubleTelescopes.kMaxControlHeight;
     public enum LiftMode {
-        DISABLED(0, 0), 
+        DISABLED(0.1, 0.1), 
         START(maxHeight, maxHeight), 
         FIRST_WINCH(minHeight, maxHeight), 
         SECOND_INITIAL_RELEASE(minHeight, maxHeight - 3.0), SECOND_FULL_RELEASE(maxHeight, minHeight), 
@@ -153,7 +172,6 @@ public class DoubleTelescopes extends Subsystem {
 
     private LiftMode currentLiftMode = LiftMode.DISABLED;
     public void setLiftMode(LiftMode liftMode) {
-        liftModeEnabled = true;
         currentLiftMode = liftMode;
         setLeftHeight(liftMode.leftEndingHeight);
         setRightHeight(liftMode.rightEndingHeight);
@@ -249,6 +267,7 @@ public class DoubleTelescopes extends Subsystem {
                         periodicIO.leftDemand = inchesToEncUnits(0.1);
                         periodicIO.leftControlMode = ControlMode.MotionMagic;
                         leftTargetHeight = encUnitsToInches(periodicIO.leftPosition);
+                        leftTelescopeZeroed = true;
                     }
                     break;
                 default:
@@ -265,6 +284,7 @@ public class DoubleTelescopes extends Subsystem {
                         periodicIO.rightDemand = inchesToEncUnits(0.1);
                         periodicIO.rightControlMode = ControlMode.MotionMagic;
                         rightTargetHeight = encUnitsToInches(periodicIO.rightPosition);
+                        rightTelescopeZeroed = true;
                     }
                     break;
                 default:
@@ -365,6 +385,8 @@ public class DoubleTelescopes extends Subsystem {
         SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
         SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
         SmartDashboard.putNumber("Robot Roll", pigeon.getRoll());
+        SmartDashboard.putNumber("Robot Pitch", pigeon.getPitch());
+
         if(Settings.debugTelescopes()) {
             SmartDashboard.putNumber("Telescope Right  Units", rightTelescope.getSelectedSensorPosition());
             SmartDashboard.putNumber("Telescope Left Units", leftTelescope.getSelectedSensorPosition());
