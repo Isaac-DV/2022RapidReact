@@ -394,7 +394,7 @@ public class Superstructure extends Subsystem {
 		request(
 			new SequentialRequest(
 				new ParallelRequest(
-					turret.angleRequest(-90),
+					turret.setAngleStateRequest(-90),
 					wrist.setWristAngleRequest(Constants.Wrist.kIntakeAngle),
 					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle)
 				),

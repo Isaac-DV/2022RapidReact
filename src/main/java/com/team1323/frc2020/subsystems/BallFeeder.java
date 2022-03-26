@@ -105,9 +105,10 @@ public class BallFeeder extends Subsystem {
 
             @Override
             public void accept(Boolean arg0, Boolean arg1) {
-                updateDetectionLogic(Timer.getFPGATimestamp());
+                if(currentState == State.DETECT)
+                    updateDetectionLogic(Timer.getFPGATimestamp());
                 if (isColorSensorRed()) {
-                    System.out.println("Interrupt detected a red ball");
+                    //System.out.println("Interrupt detected a red ball");
                 }
             }        
 
@@ -255,6 +256,7 @@ public class BallFeeder extends Subsystem {
                 //System.out.println("Detected Ball : " + DetectedBall.toString() + ", Get Banner : " + banner.get() + ", Get Color Sensor : " + isColorSensorRed());
             if(!isAutoDetectEnabled()) {
                 setState(State.OFF);
+                ballSplitter.setOpenLoop(0.0);
             }
             switch(currentState) {
                 case OFF:

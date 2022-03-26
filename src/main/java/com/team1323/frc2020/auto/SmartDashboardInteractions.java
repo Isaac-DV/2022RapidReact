@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class SmartDashboardInteractions {
     private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
     
-    private static final AutoOption DEFAULT_MODE = AutoOption.STAND_STILL;
+    private static final AutoOption DEFAULT_MODE = AutoOption.FIVE_BALL_ONE_EJECT_MODE;
 
     private SendableChooser<AutoOption> modeChooser;
 
@@ -20,9 +20,9 @@ public class SmartDashboardInteractions {
     public void initWithDefaults(){
     	modeChooser = new SendableChooser<AutoOption>();
         modeChooser.setDefaultOption(DEFAULT_MODE.name, DEFAULT_MODE);
-        modeChooser.addOption(AutoOption.TEST_MODE.name, AutoOption.TEST_MODE);
-        modeChooser.addOption(AutoOption.FIVE_BALL_ONE_EJECT_MODE.name, AutoOption.FIVE_BALL_ONE_EJECT_MODE);
+        //modeChooser.addOption(AutoOption.TEST_MODE.name, AutoOption.TEST_MODE);
         modeChooser.addOption(AutoOption.TWO_BALL_TWO_EJECT_MODE.name, AutoOption.TWO_BALL_TWO_EJECT_MODE);
+        modeChooser.addOption(AutoOption.STAND_STILL.name, AutoOption.STAND_STILL);
 
         SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);

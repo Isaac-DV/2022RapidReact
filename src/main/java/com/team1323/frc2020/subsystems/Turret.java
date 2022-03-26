@@ -162,7 +162,10 @@ public class Turret extends Subsystem {
                 currentState = ControlState.POSITION;
         }
     }
-    
+    public void setAngleState(double angle) {
+        currentState = ControlState.POSITION;
+        setAngle(angle);
+    }
     public void lockAngle() {
         setAngle(getAngle());
 
@@ -448,6 +451,19 @@ public class Turret extends Subsystem {
     
     public Request angleRequest(double angle, double speedScalar) {
         return angleRequest(angle, speedScalar, true);
+    }
+    public Request setAngleStateRequest(double angle) {
+        return new Request() {
+            @Override
+            public void act() {
+                setAngleState(angle);
+            }
+
+            @Override
+            public boolean isFinished() {
+                return hasReachedAngle();
+            }
+        };
     }
     
     public Request lockAngleRequest() {

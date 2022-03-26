@@ -221,6 +221,8 @@ public class DriverControls implements Loop {
         }*/
         if(coDriverRightX != 0) {
             turret.setOpenLoop(coDriverRightX);
+        } else if (!doubleTelescopes.bothTelescopesZeroed()) {
+            turret.setOpenLoop(0.0);
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
         }

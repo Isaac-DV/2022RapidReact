@@ -63,6 +63,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot first two balls
+        runAction(new WaitAction(0.75));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));
