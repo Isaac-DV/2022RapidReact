@@ -94,6 +94,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         // Shoot last two balls
         s.wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         s.intake.conformToState(Intake.ControlState.OFF);
+        runAction(new WaitAction(0.5));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));

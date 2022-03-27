@@ -213,6 +213,7 @@ public class Column extends Subsystem {
             System.out.println("Turret -> current angle: " + turret.getAngle() + ", vision angle: " + aim.get().getTurretAngle().getDegrees());
             System.out.println("Shooter -> current RPM: " + shooter.getLeftRPM() + ", vision RPM: " + aim.get().getShooterRPM());
             System.out.println("Hood -> current angle: " + motorizedHood.getAngle() + ", vision angle: " + aim.get().getHoodAngle().getDegrees());
+            System.out.println("Match Time: " + DriverStation.getMatchTime());
         } else {
             System.out.println("SHOOTING BALL BUT NO TARGET PRESENT");
         }

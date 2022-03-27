@@ -128,6 +128,10 @@ public class DoubleTelescopes extends Subsystem {
 
 
     }
+    public void setTelescopesBrakeMode() {
+        leftTelescope.setNeutralMode(NeutralMode.Brake);
+        rightTelescope.setNeutralMode(NeutralMode.Brake);
+    }
     PeriodicIO periodicIO = new PeriodicIO();
     public void enableLimits(boolean enable) {
         rightTelescope.configForwardSoftLimitEnable(enable);

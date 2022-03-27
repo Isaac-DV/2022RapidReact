@@ -18,6 +18,7 @@ import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
 import com.team1323.frc2020.loops.QuinticPathTransmitter;
 import com.team1323.frc2020.loops.RobotStateEstimator;
+import com.team1323.frc2020.subsystems.DoubleTelescopes;
 import com.team1323.frc2020.subsystems.LEDs;
 import com.team1323.frc2020.subsystems.MotorizedHood;
 import com.team1323.frc2020.subsystems.SubsystemManager;
@@ -186,7 +187,7 @@ public class Robot extends TimedRobot {
 			subsystems.stop();
 			disabledLooper.start();
 			leds.configLEDs(LEDColors.GREEN);
-			
+			DoubleTelescopes.getInstance().setTelescopesBrakeMode();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
 			throw t;
