@@ -40,6 +40,8 @@ public class PracticeBotRegularBallProfile extends ShootingProfile {
 
     private static final double kRpmCompensationScalar = 1.25;
 
+    private static final double kMaxEmpiricalHoodAngle = 65.12195 + 23.0;
+
     @Override
     public InterpolatingTreeMap<InterpolatingDouble, Translation2d> getDistanceToShotVectorMap() {
         return kDistanceToShotVectorMap;
@@ -63,6 +65,11 @@ public class PracticeBotRegularBallProfile extends ShootingProfile {
     @Override
     public double getRpmCompensationScalar() {
         return kRpmCompensationScalar;
+    }
+
+    @Override
+    public double getMaxEmpiricalHoodAngle() {
+        return kMaxEmpiricalHoodAngle;
     }
     
 }

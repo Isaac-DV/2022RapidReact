@@ -15,4 +15,6 @@ public abstract class ShootingProfile {
     public abstract double getTurretAngleInterpolation();
 
     public abstract double getRpmCompensationScalar();
+
+    public abstract double getMaxEmpiricalHoodAngle();
 }
