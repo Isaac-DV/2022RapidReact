@@ -7,6 +7,9 @@
 
 package com.team1323.frc2020;
 
+import com.team1323.frc2020.subsystems.shooting.CompBotRegularBallProfile;
+import com.team1323.frc2020.subsystems.shooting.ShootingProfile;
+
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -19,6 +22,7 @@ public class Settings {
     private static Settings instance = new Settings(); 
 
     public static final boolean kIsUsingCompBot = true;
+    public static final ShootingProfile kShootingProfile = new CompBotRegularBallProfile();
 	public static final boolean kIsUsingTractionWheels = true;
 
     public static final boolean kSimulate = false;

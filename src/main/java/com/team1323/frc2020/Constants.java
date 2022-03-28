@@ -324,8 +324,7 @@ public class Constants {
         public static final double kShooterRPMTolerance = 150.0; //50 //150
         public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
-        public static final double kBallVelocityScrubFactor = Settings.kIsUsingCompBot ? 305.966 / 417.0345 : 290.570415188 / 426.73300175;
-
+        public static final double kBallVelocityScrubFactor = Settings.kShootingProfile.getBallVelocityScrubFactor();
 
         public static final Translation2d closeShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 2), 2500.0);
         public static final Translation2d farShotVector = Translation2d.fromPolar(new Rotation2d(Constants.MotorizedHood.kMinControlAngle + 10), 3500.0);
@@ -382,28 +381,5 @@ public class Constants {
 
     public static final double kRPMOffset = -100.0;
 
-    public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
-    static {
-        // Key: distance from the vision target, in inches
-        // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(60.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 12.0), 1750.0 + kRPMOffset)); //
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(72.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.0), 1850.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(84.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 15.0), 1950.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(96.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 19.0), 2000.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(108.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 19.0), 2150.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(120.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 23.0), 1950.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(132.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 24.0), 1950.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(144.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 26.0), 2125.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(156.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 2225.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(168.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 2350.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(180.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 2625.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(192.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 3125.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(204.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 3225.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(216.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 3260.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(228.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 3225.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(240.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3425.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(252.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3425.0 + kRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(264.0 + kVisionTargetRadius), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3425.0 + kRPMOffset));
-
-    }
+    public static InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = Settings.kShootingProfile.getDistanceToShotVectorMap();
 }
