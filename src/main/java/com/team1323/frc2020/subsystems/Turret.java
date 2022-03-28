@@ -21,6 +21,7 @@ import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.ILooper;
+import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
@@ -240,9 +241,10 @@ public class Turret extends Subsystem {
     public boolean hasReachedAngle() {
         return Math.abs(getAngle() - targetAngle) < turretTolerance && periodicIO.controlMode == ControlMode.MotionMagic;
     }
+
     public boolean isReady() {
-        return seesTarget() && visionAngleInRange && 
-                hasReachedAngle() && !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime;
+        return seesTarget() && visionAngleInRange &&
+                hasReachedAngle() && !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime && !willTurretWrapSoon();
     }
 
     public double boundToTurretScope(double turretAngle) {
@@ -250,9 +252,11 @@ public class Turret extends Subsystem {
         if (turretAngle > Constants.Turret.kMaxControlAngle) {
             turretAngle -= 360.0;
             isWrapping = true;
+            LimelightProcessor.getInstance().enableUpdates(false);
         } else if (turretAngle < Constants.Turret.kMinControlAngle) {
             turretAngle += 360.0;
             isWrapping = true;
+            LimelightProcessor.getInstance().enableUpdates(false);
         }
 
         return turretAngle;
@@ -291,6 +295,16 @@ public class Turret extends Subsystem {
         if((Constants.Turret.kMinControlAngle < getAngle()) && (getAngle() < Constants.Turret.kMinControlAngle + 5)) {
             turretTolerance = 1;
         }*/
+    }
+    public boolean willTurretWrapSoon() {
+        double T2O = swerve.getVelocity().dtheta;
+        double rotationsPerSecond = T2O * 2 * Math.PI * Constants.Column.kColumnActivationShotime;
+        double rotationsToDegrees = 360.0 * rotationsPerSecond;
+        double estimatedTurretAngle = getAngle() + rotationsToDegrees;
+
+        return (Math.abs(Constants.Turret.kMaxControlAngle - estimatedTurretAngle) < 5.0 && T2O < 0.0) ||
+                (Math.abs(Constants.Turret.kMinControlAngle - estimatedTurretAngle) < 5.0 && T2O > 0.0);
+        
     }
     
     @Override
@@ -335,11 +349,12 @@ public class Turret extends Subsystem {
             if (isWrapping && hasReachedAngle()) {
                 isWrapping = false;
                 finishedWrappingTimestamp = timestamp;
+                LimelightProcessor.getInstance().enableUpdates(true);
             }
             
             switch(currentState) {
                 case VISION:
-                    Optional<ShooterAimingParameters> params = robotState.getAimingParameters();
+                    Optional<ShooterAimingParameters> params = robotState.getCachedAimingParameters();
                     if (params.isPresent()) {
                         // Aim directly at the vision target
                         double turretAngle = params.get().getTurretToGoal().direction().getDegrees();
@@ -370,7 +385,7 @@ public class Turret extends Subsystem {
                     }
                     break;
                 case ROBOT_STATE_VISION:
-                    Optional<ShooterAimingParameters> aim = robotState.getAimingParameters();
+                    Optional<ShooterAimingParameters> aim = robotState.getCachedAimingParameters();
                     if (aim.isPresent()) {
                         // Compensate for the robot's velocity when aiming
                         double turretAngle = aim.get().getTurretAngle().getDegrees();
@@ -403,7 +418,7 @@ public class Turret extends Subsystem {
                         startVision();
                     }
                 case ROBOT_POSITION:
-                    Optional<ShooterAimingParameters> poseAim = robotState.getAimingParameters();
+                    Optional<ShooterAimingParameters> poseAim = robotState.getCachedAimingParameters();
                     if (poseAim.isPresent()) {
                         // Compensate for the robot's velocity when aiming
                         double turretAngle = poseAim.get().getTurretAngle().getDegrees();

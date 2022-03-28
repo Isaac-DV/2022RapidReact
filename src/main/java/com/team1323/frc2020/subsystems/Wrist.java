@@ -74,7 +74,7 @@ public class Wrist extends Subsystem {
 
         wrist.config_IntegralZone(0, (int)degreesToEncUnits(5), 10);
         wrist.configMotionCruiseVelocity((int)(Constants.Wrist.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 2.5), Constants.kCANTimeoutMs);
+        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * 5.0), Constants.kCANTimeoutMs);
         wrist.configMotionSCurveStrength(0);
 
     }

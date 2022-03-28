@@ -187,7 +187,7 @@ public class Column extends Subsystem {
     }
 
     private double getFeedingDelay() {
-        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
         if (aim.isPresent()) {
             if (aim.get().getRange() > Constants.Column.kMaxDistance) {
                 return Constants.Column.kMinFeedDelay;
@@ -206,7 +206,7 @@ public class Column extends Subsystem {
     }
 
     private void printVisionSubsystemInfo() {
-        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+        Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
         if (aim.isPresent()) {
             System.out.println("SHOOTING BALL:");
             System.out.println("Distance to goal: " + aim.get().getRange() + ", robot velocity: " + Swerve.getInstance().getVelocity().toString());

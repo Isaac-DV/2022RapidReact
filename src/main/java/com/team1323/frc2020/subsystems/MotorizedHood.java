@@ -206,13 +206,13 @@ public class MotorizedHood extends Subsystem {
             angleInput = smartTuner.getValue();
             switch (currentState) {
                 case VISION:
-                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
                     if (aim.isPresent()) {
                         setAngle(aim.get().getHoodAngle().getDegrees());
                     }
                     break;
                 case ROBOT_POSITION:
-                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getAimingParameters(true);
+                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getCachedAimingParameters();
                     if (poseAim.isPresent()) {
                         setAngle(poseAim.get().getHoodAngle().getDegrees());
                     }

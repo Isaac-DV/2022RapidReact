@@ -227,10 +227,12 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
-        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.5; //0.4
+        public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
 
         public static final double kColumnRunTime = 0.5;
+
+        public static final double kColumnActivationShotime = 0.4; //The time from which the column is activated to the shot
     }
 
     public static class Turret {
@@ -285,7 +287,7 @@ public class Constants {
         public static final double kMaxControlAngle = 45.0;
 
         // Measured upward from the ground; corresponds to kMinControlAngle
-        public static final double kMaxEmpiricalAngle = Settings.kIsUsingCompBot ? 68.9747 + 26.0 : 65.12195 + 23.0;
+        public static final double kMaxEmpiricalAngle = Settings.kShootingProfile.getMaxEmpiricalHoodAngle();
         public static final double kMinEmpiricalAngle = kMaxEmpiricalAngle - (kMaxControlAngle - kMinControlAngle);
 
         public static final double kAngleTolerance = 1.0; // degrees
@@ -297,7 +299,7 @@ public class Constants {
         public static final double kEncToOutputRatio = 18.0 / 12.0;
 
         public static final double kBottomToMotorRatio = 12.0 / 18.0; //1 : Falcon = 12 -> Bottom = 18
-        public static final double kTopToBottomRatio = 30.0 / 22.0; //24/18 : 22 -> 30
+        public static final double kTopToBottomRatio = 24.0 / 28.0; //24/18 : 22 -> 30
 
         public static final double kBottomWheelRadius = 2.0; // inches //2
         public static final double kTopWheelRadius = 1.25; // inches //1

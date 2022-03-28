@@ -174,6 +174,7 @@ public class DriverControls implements Loop {
         }
         if(driver.leftTrigger.wasActivated()) {
             swerve.setMaxSpeed(0.5);
+            //motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         } else if(driver.leftTrigger.wasReleased()) {
             swerve.setMaxSpeed(1.0);
         }
@@ -185,6 +186,9 @@ public class DriverControls implements Loop {
             swerve.setMaxSpeed(1.0);
         }
         if(driver.POV180.wasActivated()) {
+            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
+        }
+        if(driver.leftBumper.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
 
@@ -273,11 +277,11 @@ public class DriverControls implements Loop {
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
-            if(coDriver.xButton.wasActivated()) {
+            /*if(coDriver.xButton.wasActivated()) {
                 s.manualShotState(1900, 14);
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
-            }
+            }*/
             if(coDriver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
                 s.visionShotState();
@@ -338,67 +342,12 @@ public class DriverControls implements Loop {
         if(singleController.backButton.wasActivated()) {
             s.disableState();
         }
-
         
-        /*double singleLeftY = -testController.getRightY();
-        double singleRightY = -testController.getLeftY();        
-
-        if(singleRightY != 0) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            turret.setAngle(-90);
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            doubleTelescopes.setLeftOpenLoop(singleRightY);
-        } else if(doubleTelescopes.getLeftTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
-            doubleTelescopes.lockLeftHeight();
-        }
-        if(singleLeftY != 0) {
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle);
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            turret.setAngle(-90);
-            doubleTelescopes.setRightOpenLoop(singleLeftY);
-        } else if(doubleTelescopes.getRightTelescopeState() == DoubleTelescopes.TelescopeState.OPEN_LOOP) {
-            doubleTelescopes.lockRightHeight();
-        }
-
-        if(testController.leftTrigger.wasActivated()) {
-            doubleTelescopes.enableLimits(false);
-        } else if(testController.leftTrigger.wasReleased()) {
-            doubleTelescopes.enableLimits(true);
-        }
-        
-
-        if(testController.aButton.wasActivated()) {
-            s.startHangSequence();
-        }
-        if(testController.bButton.wasActivated()) {
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.FIRST_WINCH);
-        }
-        if(testController.yButton.wasActivated()) {
-            wrist.setWristAngle(Constants.Wrist.kStowedAngle);
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_INITIAL_RELEASE);
-            System.out.println("Robot Pitch = " + doubleTelescopes.getRobotPitch() + " : Robot Pitch Velocity = " + doubleTelescopes.getRobotPitchVelocity());
-        }
-        if(testController.xButton.wasActivated()) {
-            wrist.setWristAngle(Constants.Wrist.kLowestAngle);
-            doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
-        }
-        if(testController.leftBumper.wasActivated()) {
-            doubleTelescopes.setRightHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }
-        if(testController.rightBumper.wasActivated()) {
-            doubleTelescopes.setLeftHeight(Constants.DoubleTelescopes.kMinControlHeight);
-        }*/
-        
-        /*if(coDriver.xButton.wasActivated()) {
-            motorizedHood.setState(MotorizedHood.State.POSITION);
-            motorizedHood.setAngle(Constants.MotorizedHood.kMinControlAngle + motorizedHood.angleInput); //25.0
-            shooter.setVelocity(shooter.dashboardRPMInput); //2100
-            turret.startVision();
-            column.setState(Column.ControlState.FEED_BALLS);
-            turret.startVision();
+        if(coDriver.xButton.wasActivated()) {
+            s.manualShotState(shooter.dashboardRPMInput, motorizedHood.angleInput);
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }*/
+        }
     }
 
     private void oneControllerMode() {

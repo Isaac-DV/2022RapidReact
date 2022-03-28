@@ -192,7 +192,7 @@ public class RobotState {
 
 			return Optional.of(params);
 		}*/
-		public synchronized Optional<ShooterAimingParameters> getAimingParameters(boolean useRobotPose) {
+		public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
 				TrackReport report = reports.get(0);
@@ -200,8 +200,7 @@ public class RobotState {
 						.transformBy(kVehicleToTurretFixed).inverse();
 				Pose2d latest_turret_fixed_to_goal = latest_turret_fixed_to_field
 						.transformBy(Pose2d.fromTranslation(report.field_to_goal));
-				/*if(useRobotPose)
-					latest_turret_fixed_to_goal = Pose2d.fromTranslation(getTurretToCenterOfField().translateBy(Translation2d.fromPolar(getTurretToCenterOfField().direction(), 10).inverse()));*/
+
 				Translation2d unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm()));
 				Translation2d initial_ball_velocity = Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.physicalAngleToEmpiricalAngle(unmodified_shot_vector.direction().getDegrees())), Shooter.rpmToInitialBallVelocity(unmodified_shot_vector.norm()));
 				Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
@@ -223,9 +222,6 @@ public class RobotState {
 			} else {
 				return Optional.empty();
 			}
-		}
-		public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
-			return getAimingParameters(false);
 		}
 		public synchronized Optional<Pose2d> getEstimatedRobotPosition() {
 			List<TrackReport> reports = goal_tracker_.getTracks();
@@ -323,7 +319,7 @@ public class RobotState {
 					
 					break;
 				}
-				Optional<ShooterAimingParameters> aiming_params = /*getCachedAimingParameters();*/getAimingParameters();
+				Optional<ShooterAimingParameters> aiming_params = getCachedAimingParameters();
 				if (aiming_params.isPresent()) {
 					SmartDashboard.putNumber("goal_range", aiming_params.get().getRange());
 					SmartDashboard.putNumber("goal_theta", aiming_params.get().getTurretAngle().getDegrees());

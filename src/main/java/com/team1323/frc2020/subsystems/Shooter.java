@@ -220,7 +220,7 @@ public class Shooter extends Subsystem {
             }
             switch (currentState) {
                 case VISION:
-                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getAimingParameters();
+                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
                     if (aim.isPresent()) {
                         double rpm = aim.get().getShooterRPM();
                         periodicIO.demand = rpmToEncVelocity(rpm);
@@ -231,7 +231,7 @@ public class Shooter extends Subsystem {
                     }
                     break;
                 case POSITION:
-                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getAimingParameters(true);
+                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getCachedAimingParameters();
                     if (poseAim.isPresent()) {
                         double rpm = poseAim.get().getShooterRPM();
                         periodicIO.demand = rpmToEncVelocity(rpm);

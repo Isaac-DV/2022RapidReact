@@ -365,7 +365,7 @@ public class DoubleTelescopes extends Subsystem {
     public void readPeriodicInputs() {
         periodicIO.rightPosition = rightTelescope.getSelectedSensorPosition();
         periodicIO.leftPosition = leftTelescope.getSelectedSensorPosition();
-        if(liftModeEnabled) {
+        if(liftModeEnabled && false) {
             periodicIO.rightCurrent = rightTelescope.getOutputCurrent();
             periodicIO.leftCurrent = leftTelescope.getOutputCurrent();
         }
