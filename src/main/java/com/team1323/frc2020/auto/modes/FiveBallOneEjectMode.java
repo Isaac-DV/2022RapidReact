@@ -37,8 +37,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         return Arrays.asList(trajectories.firstBallBackup, trajectories.firstBallToSecondBall, 
                 trajectories.secondBallToHumanPlayer,
                 trajectories.terminalToBackupPoint,
-                trajectories.backupPointToSecondBall,
-                trajectories.secondBallToOpponentBall
+                trajectories.backupPointToPostTerminalShotPose
                 );
     }
     public FiveBallOneEjectMode() {
@@ -63,11 +62,11 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot first two balls
-        runAction(new WaitAction(0.75));
+        runAction(new WaitAction(0.5));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));
-        s.turret.startVision();
+        s.turret.setCOFState();
         s.intakeState();
 
         // Pick up third ball
@@ -78,7 +77,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(1.5, 1));
-        s.turret.startVision();
+        s.turret.setCOFState();
         s.intakeState();
 
         // Pick up two human player balls
@@ -88,13 +87,13 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         runAction(new WaitForTwoBallsAction(2.0));
 
         // Go back to shooting spot
-        runAction(new SetTrajectoryAction(trajectories.backupPointToSecondBall, 90.0, 1));
+        runAction(new SetTrajectoryAction(trajectories.backupPointToPostTerminalShotPose, 90.0, 1));
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot last two balls
         s.wrist.setWristAngle(Constants.Wrist.kStowedAngle);
         s.intake.conformToState(Intake.ControlState.OFF);
-        runAction(new WaitAction(0.5));
+        //runAction(new WaitAction(0.5));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));

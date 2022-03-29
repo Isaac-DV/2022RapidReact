@@ -232,7 +232,7 @@ public class Constants {
 
         public static final double kColumnRunTime = 0.5;
 
-        public static final double kColumnActivationShotime = 0.4; //The time from which the column is activated to the shot
+        public static final double kColumnActivationShotTime = 0.4; //The time from which the column is activated to the shot
     }
 
     public static class Turret {
@@ -259,6 +259,8 @@ public class Constants {
         public static final double kYOffset = 0.0;
 
         public static final double kWrapSettlingTime = 0.75;
+        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 2.0 : 1.0;
+        public static final double kMaxAccelerationScalar = 3.0;
     
     }
 
@@ -319,7 +321,7 @@ public class Constants {
 
         public static final double kShooterP = 0.01; // 0.01
         public static final double kShooterI = 0.0; //0.0001 : 0.0 : 0.0 : 0.00005
-        public static final double kShooterD = 2.0; //0.1
+        public static final double kShooterD = 2.5; //0.1
         public static final double kShooterF = 0.046; //0.048
         
 

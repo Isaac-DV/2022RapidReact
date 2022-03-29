@@ -125,7 +125,7 @@ public class Turret extends Subsystem {
 
         //turret.setSelectedSensorPosition(0.0, 0, Constants.kCANTimeoutMs);
         turret.configMotionCruiseVelocity((Constants.Turret.kMaxSpeed * 0.8), Constants.kCANTimeoutMs);
-        turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), Constants.kCANTimeoutMs); // 3.0
+        turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), Constants.kCANTimeoutMs); // 3.0
         turret.configMotionSCurveStrength(0); // 0
         turret.configAllowableClosedloopError(0, degreesToEncUnits(0), Constants.kCANTimeoutMs);
         
@@ -268,18 +268,6 @@ public class Turret extends Subsystem {
         setOpenLoop(0.0);
     }
 
-    @Override
-    public void readPeriodicInputs() {
-        periodicIO.position = turret.getSelectedSensorPosition();
-        periodicIO.velocity = turret.getSelectedSensorVelocity();
-        periodicIO.current = turret.getOutputCurrent();
-    }
-    
-    @Override
-    public void writePeriodicOutputs() {
-        turret.set(periodicIO.controlMode, periodicIO.demand);
-    }
-
     public void updateTurretTuning() {
         smartTuner.update();
         smartTunerValue = smartTuner.getValue();
@@ -287,7 +275,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.abs(T2O * 3.5) + (robotVelocity * 0.045) + 1;
+        double robotScaledAngleTolerance = Math.max(Math.abs(T2O * 3.5), (robotVelocity * 0.045)) + 1;
         turretTolerance = robotScaledAngleTolerance;
         /*if(((Constants.Turret.kMaxControlAngle - 5) < getAngle()) && (getAngle() < Constants.Turret.kMaxControlAngle)){
             turretTolerance = 1;
@@ -298,41 +286,14 @@ public class Turret extends Subsystem {
     }
     public boolean willTurretWrapSoon() {
         double T2O = swerve.getVelocity().dtheta;
-        double rotationsPerSecond = T2O * 2 * Math.PI * Constants.Column.kColumnActivationShotime;
+        double rotationsPerSecond = T2O * Constants.Column.kColumnActivationShotTime / (2.0 * Math.PI);
         double rotationsToDegrees = 360.0 * rotationsPerSecond;
-        double estimatedTurretAngle = getAngle() + rotationsToDegrees;
+        double estimatedTurretAngle = getAngle() - rotationsToDegrees;
 
-        return (Math.abs(Constants.Turret.kMaxControlAngle - estimatedTurretAngle) < 5.0 && T2O < 0.0) ||
-                (Math.abs(Constants.Turret.kMinControlAngle - estimatedTurretAngle) < 5.0 && T2O > 0.0);
-        
+        return estimatedTurretAngle < Constants.Turret.kMinControlAngle || estimatedTurretAngle > Constants.Turret.kMaxControlAngle;
     }
     
-    @Override
-    public void outputTelemetry() {
-        SmartDashboard.putNumber("Turret Angle", getAngle());
-        SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
-        SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
-        SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
-        SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
-        SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
-        SmartDashboard.putNumber("Turret tolerance", turretTolerance);
-        SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
 
-        if(Settings.debugTurret()) {
-            SmartDashboard.putBoolean("Turret Is Ready", isReady());
-            SmartDashboard.putNumber("Turret Setpoint", targetAngle);
-            SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
-            SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
-            SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
-            SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
-            SmartDashboard.putNumber("Turret tolerance", turretTolerance);
-            SmartDashboard.putNumber("Turret Current", periodicIO.current);
-            SmartDashboard.putNumber("Turret COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
-            SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
-        }
-        updateTurretTuning();
-        
-    }
     
     private final Loop loop = new Loop() {
         @Override
@@ -366,9 +327,9 @@ public class Turret extends Subsystem {
                         }
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         if (isWrapping) {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 2.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kWrapAccelerationScalar), 0);
                         } else {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), 0);
                         }
                         setAngle(turretAngle);
                     } else {
@@ -376,9 +337,9 @@ public class Turret extends Subsystem {
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         if (isWrapping) {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kWrapAccelerationScalar), 0);
                         } else {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), 0);
                         }
                         setAngle(turretAngle);
                         //System.out.println("Aiming at center-field because params not present");
@@ -414,9 +375,10 @@ public class Turret extends Subsystem {
                     break;
                 case AIM_TO_COF:
                     setAngle(boundToTurretScope(robotState.getTurretToCenterOfField().direction().getDegrees()));
-                    if(hasReachedAngle()) {
+                    /*if(hasReachedAngle()) {
                         startVision();
-                    }
+                    }*/
+                    break;
                 case ROBOT_POSITION:
                     Optional<ShooterAimingParameters> poseAim = robotState.getCachedAimingParameters();
                     if (poseAim.isPresent()) {
@@ -426,6 +388,7 @@ public class Turret extends Subsystem {
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         setAngle(turretAngle);
                     }
+                    break;
                 default:
                 break;
             }
@@ -550,6 +513,19 @@ public class Turret extends Subsystem {
         };
     }
 
+
+    @Override
+    public void readPeriodicInputs() {
+        periodicIO.position = turret.getSelectedSensorPosition();
+        periodicIO.velocity = turret.getSelectedSensorVelocity();
+        periodicIO.current = turret.getOutputCurrent();
+    }
+    
+    @Override
+    public void writePeriodicOutputs() {
+        turret.set(periodicIO.controlMode, periodicIO.demand);
+    }
+
     
     
     
@@ -583,6 +559,33 @@ public class Turret extends Subsystem {
         }
     }
     
+    @Override
+    public void outputTelemetry() {
+        SmartDashboard.putNumber("Turret Angle", getAngle());
+        SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
+        SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
+        SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
+        SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
+        SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
+        SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+        SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
+
+        if(Settings.debugTurret()) {
+            SmartDashboard.putBoolean("Turret Is Ready", isReady());
+            SmartDashboard.putNumber("Turret Setpoint", targetAngle);
+            SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());
+            SmartDashboard.putBoolean("Turret Vision angle in range", visionAngleInRange);
+            SmartDashboard.putBoolean("Turret Reached angle", hasReachedAngle());
+            SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
+            SmartDashboard.putNumber("Turret tolerance", turretTolerance);
+            SmartDashboard.putNumber("Turret Current", periodicIO.current);
+            SmartDashboard.putNumber("Turret COF Magnitude", RobotState.getInstance().getTurretToCenterOfField().scale(0.72).norm());
+            SmartDashboard.putBoolean("Turret not wrapping", !isWrapping && (Timer.getFPGATimestamp() - finishedWrappingTimestamp) >= Constants.Turret.kWrapSettlingTime);
+        }
+        updateTurretTuning();
+        
+    }
+
     @Override
     public void stop() {
         setOpenLoop(0.0);        

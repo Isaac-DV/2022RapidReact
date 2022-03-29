@@ -164,6 +164,7 @@ public class BallFeeder extends Subsystem {
     public void setState(State desiredState) {
         if (desiredState == State.DETECT) {
             pendingShutdown = false;
+            setFeederOpenLoop(1.0);
         }
         currentState = desiredState;
     }
@@ -196,7 +197,7 @@ public class BallFeeder extends Subsystem {
             }
             detectedBallType = BallType.Team;
             setFeederOpenLoop(0);
-            if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE) { //Ensures that the Intake is not in the Eject Mode
+            if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE && intake.getLastState() != Intake.ControlState.EJECT) { //Ensures that the Intake is not in the Eject Mode
                 intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
             }
             intakeStartTimestamp = timestamp;
@@ -222,10 +223,9 @@ public class BallFeeder extends Subsystem {
             }
             detectedBallType = BallType.None;
             if(pendingShutdown) {
-                //setFeederOpenLoop(0.0);
                 pendingShutdown = false;
+                setFeederOpenLoop(0.0);
             }
-            setFeederOpenLoop(1.0);
         }
         if (Double.isFinite(splitterStartTimestamp) && (timestamp - splitterStartTimestamp) > Constants.BallFeeder.kSplitterRunTime) {
             ballSplitter.conformToState(BallSplitter.ControlState.OFF);
@@ -247,7 +247,7 @@ public class BallFeeder extends Subsystem {
         public void onStart(double timestamp) {
             setState(State.DETECT);
             setDSAlliance(/*DriverStation.Alliance.Red*/DriverStation.getAlliance());
-            setFeederOpenLoop(1.0);
+            setFeederOpenLoop(0.0);
         }
 
         @Override

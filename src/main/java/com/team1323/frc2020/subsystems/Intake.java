@@ -27,7 +27,6 @@ public class Intake extends Subsystem {
             instance = new Intake();
         return instance;
     }
-
     public Intake() {
         intake = new LazyTalonFX(Ports.INTAKE, "main");
         intake.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
@@ -48,11 +47,16 @@ public class Intake extends Subsystem {
     }
     
     private ControlState currentState = ControlState.OFF;
+    private ControlState lastState = ControlState.OFF;
     public void setState(ControlState desiredState) {
+        lastState = currentState;
         currentState = desiredState;
     }
     public ControlState getState() {
         return currentState;
+    }
+    public ControlState getLastState() {
+        return lastState;
     }
 
     public void conformToState(ControlState desiredState) {
