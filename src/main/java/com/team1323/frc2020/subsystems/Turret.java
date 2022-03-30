@@ -303,9 +303,6 @@ public class Turret extends Subsystem {
         
         @Override
         public void onLoop(double timestamp) {
-            if (periodicIO.current > Constants.Turret.kMaxCurrent) {
-                DriverStation.reportError("Turret current exceeded max allowed current", false);
-            }
 
             if (isWrapping && hasReachedAngle()) {
                 isWrapping = false;
@@ -365,9 +362,9 @@ public class Turret extends Subsystem {
                             }
                         }*/
                         if (isWrapping) {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 1.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kWrapAccelerationScalar), 0);
                         } else {
-                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * 3.0), 0);
+                            turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), 0);
                         }
                         setAngle(turretAngle);
                     }
@@ -518,7 +515,7 @@ public class Turret extends Subsystem {
     public void readPeriodicInputs() {
         periodicIO.position = turret.getSelectedSensorPosition();
         periodicIO.velocity = turret.getSelectedSensorVelocity();
-        periodicIO.current = turret.getOutputCurrent();
+        //periodicIO.current = turret.getOutputCurrent();
     }
     
     @Override

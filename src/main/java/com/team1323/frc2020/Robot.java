@@ -101,7 +101,7 @@ public class Robot extends TimedRobot {
 
 		generator.generateTrajectories();
 
-		AutoModeBase auto = new FiveBallOneEjectMode();
+		AutoModeBase auto = new TwoBallTwoEjectMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
 

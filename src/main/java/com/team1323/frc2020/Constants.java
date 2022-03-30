@@ -195,7 +195,7 @@ public class Constants {
         public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = 107.0; //96.0
+        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 107.0 : 97.0; //96.0
         public static final double kStowedAngle = -10.0;
         public static final double kBallDebouncerAngle = 35.0; //65.0
         public static final double kLowestAngle = 135.0;
@@ -240,7 +240,7 @@ public class Constants {
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
         public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? 107.7 : 349.987509;
-        public static final double kTurretStartingAngle = -180.0; // Turret facing straight forward
+        public static final double kTurretStartingAngle = Settings.kIsUsingCompBot ? -180.0 : 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = Settings.kIsUsingCompBot ? 2.0 : 1.0;
         public static final double kAngleTolerance = 2.0;
@@ -261,6 +261,8 @@ public class Constants {
         public static final double kWrapSettlingTime = 0.75;
         public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 2.0 : 1.0;
         public static final double kMaxAccelerationScalar = 3.0;
+
+        public static final double kInterpolationCutoffDistance = 130.0; // inches
     
     }
 
@@ -301,7 +303,7 @@ public class Constants {
         public static final double kEncToOutputRatio = 18.0 / 12.0;
 
         public static final double kBottomToMotorRatio = 12.0 / 18.0; //1 : Falcon = 12 -> Bottom = 18
-        public static final double kTopToBottomRatio = 24.0 / 28.0; //24/18 : 22 -> 30
+        public static final double kTopToBottomRatio = Settings.kIsUsingCompBot ? 24.0 / 28.0 : 30.0 / 22.0; //24/18 : 22 -> 30
 
         public static final double kBottomWheelRadius = 2.0; // inches //2
         public static final double kTopWheelRadius = 1.25; // inches //1
@@ -319,13 +321,13 @@ public class Constants {
         public static final double kPostShotPercentOutput = 0.5;
         public static final double kPostShotRPM = 1500.0;
 
-        public static final double kShooterP = 0.01; // 0.01
-        public static final double kShooterI = 0.0; //0.0001 : 0.0 : 0.0 : 0.00005
-        public static final double kShooterD = 2.5; //0.1
-        public static final double kShooterF = 0.046; //0.048
+        public static final double kShooterP = Settings.kIsUsingCompBot ? 0.01 : 0.01; // 0.01
+        public static final double kShooterI = Settings.kIsUsingCompBot ? 0.0 : 0.0; //0.0001 : 0.0 : 0.0 : 0.00005
+        public static final double kShooterD = Settings.kIsUsingCompBot ? 2.5 : 0.1; //0.1
+        public static final double kShooterF = Settings.kIsUsingCompBot ? 0.046 : 0.048; //0.048
         
 
-        public static final double kShooterRPMTolerance = 150.0; //50 //150
+        public static final double kShooterRPMTolerance = 100.0; //50 //150
         public static final double kOnTargetDuration = 0.1;//Theoretical min is 0.1
 
         public static final double kBallVelocityScrubFactor = Settings.kShootingProfile.getBallVelocityScrubFactor();

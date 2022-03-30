@@ -262,8 +262,6 @@ public class SwerveDriveModule extends Subsystem{
 	}
 
 	private double getAbsoluteEncoderDegrees() {
-		if (!RobotBase.isReal())
-			return 0.0;
 		return (isRotationEncoderFlipped ? -1.0 : 1.0) * periodicIO.absoluteRotation;
 	}
 	
@@ -481,9 +479,7 @@ public class SwerveDriveModule extends Subsystem{
 	@Override
 	public void outputTelemetry() {
 		SmartDashboard.putNumber(name + "Angle", getModuleAngle().getDegrees());
-		if (RobotBase.isReal()) {
-			SmartDashboard.putNumber(name + "Absolute Angle", getAbsoluteEncoderDegrees());
-		}
+		SmartDashboard.putNumber(name + "Absolute Angle", getAbsoluteEncoderDegrees());
 		SmartDashboard.putNumber(name + "Inches Driven", getDriveDistanceInches());
 		//SmartDashboard.putBoolean(name + "Zeroed With Encoder", moduleZeroedWitoutMagEnc);
 		if(Settings.debugSwerve()){

@@ -12,7 +12,9 @@ public abstract class ShootingProfile {
 
     public abstract double getRobotVelocityScalar();
 
-    public abstract double getTurretAngleInterpolation();
+    public abstract double getCloseTurretAngleInterpolation();
+
+    public abstract double getFarTurretAngleInterpolation();
 
     public abstract double getRpmCompensationScalar();
 

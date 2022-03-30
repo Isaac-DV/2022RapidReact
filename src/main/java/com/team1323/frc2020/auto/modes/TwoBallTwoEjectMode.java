@@ -65,7 +65,7 @@ public class TwoBallTwoEjectMode extends AutoModeBase {
         runAction(new WaitForShotsAction(2.0));
 
         // Pick up second ball and eject it
-        runAction(new SetTrajectoryAction(trajectories.thirdBallToSecondOpponentBall, -261, 0.6));
+        runAction(new SetTrajectoryAction(trajectories.thirdBallToSecondOpponentBall, -261, 0.5));
         s.turret.startVision();
         s.intakeState();
         runAction(new WaitAction(0.5));

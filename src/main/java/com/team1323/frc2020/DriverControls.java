@@ -144,7 +144,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightBumper.isBeingPressed(), false);
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, robotCentric , false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -188,7 +188,7 @@ public class DriverControls implements Loop {
         if(driver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
-        if(driver.leftBumper.wasActivated()) {
+        if(driver.rightBumper.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
 
@@ -345,6 +345,7 @@ public class DriverControls implements Loop {
         
         if(coDriver.xButton.wasActivated()) {
             s.manualShotState(shooter.dashboardRPMInput, motorizedHood.angleInput);
+            turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
         }

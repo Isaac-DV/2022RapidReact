@@ -36,7 +36,9 @@ public class PracticeBotRegularBallProfile extends ShootingProfile {
 
     private static final double kRobotVelocityScalar = 0.8;
 
-    private static final double kTurretAngleInterpolation = 0.825;
+    private static final double kCloseTurretAngleInterpolation = 0.825;
+
+    private static final double kFarTurretAngleInterpolation = 0.825;
 
     private static final double kRpmCompensationScalar = 1.25;
 
@@ -58,8 +60,13 @@ public class PracticeBotRegularBallProfile extends ShootingProfile {
     }
 
     @Override
-    public double getTurretAngleInterpolation() {
-        return kTurretAngleInterpolation;
+    public double getCloseTurretAngleInterpolation() {
+        return kCloseTurretAngleInterpolation;
+    }
+
+    @Override
+    public double getFarTurretAngleInterpolation() {
+        return kFarTurretAngleInterpolation;
     }
 
     @Override
