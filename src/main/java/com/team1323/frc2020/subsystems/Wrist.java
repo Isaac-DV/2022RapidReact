@@ -108,6 +108,15 @@ public class Wrist extends Subsystem {
         setState(State.POSITION);
         setAngle(angle);
     }
+    public void setWristAngleWithAcceleration(double angle) {
+        if(angle > encUnitsToDegrees(periodicIO.position)) {
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 2.0 : 3.0)), Constants.kCANTimeoutMs);
+        } else if(angle < encUnitsToDegrees(periodicIO.position)) {
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 3.0)), Constants.kCANTimeoutMs);
+        }
+        setWristAngle(angle);
+    }
+    
     public void setWristLocked() {
         setState(State.LOCK);
         setAngle(encUnitsToDegrees(periodicIO.position));

@@ -253,23 +253,22 @@ public class DriverControls implements Loop {
             }
             if(coDriver.aButton.wasActivated()) {
                 intake.conformToState(Intake.ControlState.INTAKE);
-                wrist.setWristAngle(Constants.Wrist.kIntakeAngle);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
                 ballFeeder.setState(BallFeeder.State.DETECT);
                 if(column.getState() != Column.ControlState.FEED_BALLS) {
                     column.setState(Column.ControlState.INDEX_BALLS);
                 }
-
                 ballFeeder.setPrintFeeder(true);
             } else if(coDriver.aButton.wasReleased()) {
                 intake.conformToState(Intake.ControlState.OFF);
                 ballFeeder.queueShutdown(true);
-                wrist.setWristAngle(Constants.Wrist.kBallDebouncerAngle);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
                 column.shutDownIfUnused();
                 ballFeeder.setPrintFeeder(false);
             }
 
             if(coDriver.bButton.wasActivated()) {
-                wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kStowedAngle);
             }
 
             if(coDriver.yButton.wasActivated()) {

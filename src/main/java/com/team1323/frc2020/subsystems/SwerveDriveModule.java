@@ -27,7 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
 	LazyTalonFX rotationMotor, driveMotor;
-	CANCoder rotationEncoder;
+	//CANCoder rotationEncoder;
+	DutyCycle rotationEncoder;
 	int moduleID;
 	String name = "Module ";
 	int rotationSetpoint = 0;
@@ -56,7 +57,8 @@ public class SwerveDriveModule extends Subsystem{
 		rotationMotor = new LazyTalonFX(rotationSlot, "main");
 		driveMotor = new LazyTalonFX(driveSlot, "main");
 		if (RobotBase.isReal())
-			rotationEncoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
+			//rotationEncoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
+			rotationEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
 		this.encoderOffset = encoderOffset;
 		this.isRotationEncoderFlipped = flipMagEncoder;
 		configureMotors();
@@ -180,7 +182,8 @@ public class SwerveDriveModule extends Subsystem{
 	
 	private boolean isRotationSensorConnected(){
 		if(RobotBase.isReal()){
-			return rotationEncoder.getBusVoltage() > 0;
+			//return rotationEncoder.getBusVoltage() > 0;
+			return rotationEncoder.getFrequency() != 0;
 		}
 		return true;
 	}
@@ -399,7 +402,8 @@ public class SwerveDriveModule extends Subsystem{
 		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
-		if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
+		if(/*!rotationMotorZeroed*/true) periodicIO.absoluteRotation = rotationEncoder.getOutput() * 360.0;
+		//if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
 
 		if (Settings.debugSwerve()) {
 			periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();

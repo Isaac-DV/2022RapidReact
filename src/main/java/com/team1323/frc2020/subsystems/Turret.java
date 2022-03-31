@@ -146,7 +146,7 @@ public class Turret extends Subsystem {
     }
 
     public double getAbsoluteEncoderPosition() {
-        return encoder.getOutput() * 360.0;
+        return encoder.getOutput() * 360.0 * (Settings.kIsUsingCompBot ? -1.0 : 1.0);
     }
     
     public void setAngle(double angle) {
@@ -566,7 +566,7 @@ public class Turret extends Subsystem {
         SmartDashboard.putNumber("Turret Error", Math.abs(targetAngle - getAngle()));
         SmartDashboard.putNumber("Turret tolerance", turretTolerance);
         SmartDashboard.putNumber("Turret Absolute Position", getAbsoluteEncoderPosition());
-
+        SmartDashboard.putString("Turret State", currentState.toString());
         if(Settings.debugTurret()) {
             SmartDashboard.putBoolean("Turret Is Ready", isReady());
             SmartDashboard.putNumber("Turret Setpoint", targetAngle);

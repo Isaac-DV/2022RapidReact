@@ -52,6 +52,7 @@ public class DoubleTelescopes extends Subsystem {
     private boolean rightTelescopeZeroed = false;
     public boolean bothTelescopesZeroed() {
         return leftTelescopeZeroed && rightTelescopeZeroed;
+        //return true;
     }
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);
