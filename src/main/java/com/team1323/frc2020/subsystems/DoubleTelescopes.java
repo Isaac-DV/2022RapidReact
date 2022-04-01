@@ -51,8 +51,7 @@ public class DoubleTelescopes extends Subsystem {
     private boolean leftTelescopeZeroed = false;
     private boolean rightTelescopeZeroed = false;
     public boolean bothTelescopesZeroed() {
-        return leftTelescopeZeroed && rightTelescopeZeroed;
-        //return true;
+        return Settings.kIsUsingCompBot ? (leftTelescopeZeroed && rightTelescopeZeroed) : true;
     }
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);

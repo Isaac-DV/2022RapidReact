@@ -260,6 +260,7 @@ public class DriverControls implements Loop {
                 }
                 ballFeeder.setPrintFeeder(true);
             } else if(coDriver.aButton.wasReleased()) {
+                wrist.setLowStatorLimit(false);
                 intake.conformToState(Intake.ControlState.OFF);
                 ballFeeder.queueShutdown(true);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);

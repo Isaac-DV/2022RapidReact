@@ -7,6 +7,7 @@ package com.team1323.frc2020.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -15,6 +16,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.Ports;
 import com.team1323.frc2020.Settings;
+import com.team1323.frc2020.loops.ILooper;
+import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.lib.util.SensorCheck;
 import com.team1323.lib.util.Util;
@@ -34,8 +37,11 @@ public class Wrist extends Subsystem {
     SensorCheck encoderCheck;
 
     double wristTargetAngle = Constants.Wrist.kStowedAngle;
+    double onTargetTimestamp = Double.POSITIVE_INFINITY;
     private boolean encoderDisconected = false;
     private boolean zeroedAbsolutely = false;
+    private boolean weakPIDEnabled = false;
+    private boolean weakCurrentEnabled = false;
     private static Wrist instance = null;
     public static Wrist getInstance() {
         if (instance==null)
@@ -84,10 +90,19 @@ public class Wrist extends Subsystem {
 
     }
     public void setWeakPID(boolean enable) {
+        weakPIDEnabled = enable;
         if (enable)
             wrist.selectProfileSlot(1, 0);
         else
             wrist.selectProfileSlot(0, 0);
+    }
+    public void setLowStatorLimit(boolean enable) {
+        weakCurrentEnabled = enable;
+        if(enable)
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
+        else
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
+
     }
     public double getAbsoluteEncoderDegrees() {
         return encoder.getOutput() * 360.0 * 1.0;
@@ -151,6 +166,36 @@ public class Wrist extends Subsystem {
     public void zeroWrist() {
         zeroedAbsolutely = true;
     }
+    Loop loop = new Loop() {
+
+        @Override
+        public void onStart(double timestamp) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void onLoop(double timestamp) {
+            if((getState() == State.OPEN_LOOP) || ((getState() == State.POSITION || getState() == State.LOCK) &&
+            Math.abs(encUnitsToDegrees(periodicIO.demand) - encUnitsToDegrees(periodicIO.position)) <= 10.0) && Util.epsilonEquals(Constants.Wrist.kIntakeAngle, encUnitsToDegrees(periodicIO.demand), 0.01) && !weakCurrentEnabled) {
+                if (Double.isInfinite(onTargetTimestamp)) {
+                    onTargetTimestamp = timestamp;
+                }
+                if (timestamp - onTargetTimestamp >= 0.25) {
+                    setLowStatorLimit(true);
+                }
+            } else {
+                onTargetTimestamp = Double.POSITIVE_INFINITY;
+            }
+        }
+
+        @Override
+        public void onStop(double timestamp) {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    };
 
     public void resetToAbsolutePosition() {
         if(!zeroedAbsolutely) {
@@ -253,6 +298,10 @@ public class Wrist extends Subsystem {
             SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));
         }
     }
+    @Override
+	public void registerEnabledLoops(ILooper enabledLooper) {
+		enabledLooper.register(loop);
+	}
 
     @Override
     public void stop() {

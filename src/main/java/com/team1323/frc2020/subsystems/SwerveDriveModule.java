@@ -27,8 +27,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
 	LazyTalonFX rotationMotor, driveMotor;
-	//CANCoder rotationEncoder;
-	DutyCycle rotationEncoder;
+	CANCoder rotationCancoder;
+	DutyCycle rotationMagEncoder;
 	int moduleID;
 	String name = "Module ";
 	int rotationSetpoint = 0;
@@ -56,9 +56,14 @@ public class SwerveDriveModule extends Subsystem{
 		name += (moduleID + " ");
 		rotationMotor = new LazyTalonFX(rotationSlot, "main");
 		driveMotor = new LazyTalonFX(driveSlot, "main");
-		if (RobotBase.isReal())
-			//rotationEncoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
-			rotationEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
+		if (RobotBase.isReal()) {
+			if (Settings.kIsUsingCompBot) {
+				rotationMagEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
+			} else {
+				rotationCancoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
+			}
+		}
+			
 		this.encoderOffset = encoderOffset;
 		this.isRotationEncoderFlipped = flipMagEncoder;
 		configureMotors();
@@ -182,8 +187,11 @@ public class SwerveDriveModule extends Subsystem{
 	
 	private boolean isRotationSensorConnected(){
 		if(RobotBase.isReal()){
-			//return rotationEncoder.getBusVoltage() > 0;
-			return rotationEncoder.getFrequency() != 0;
+			if (Settings.kIsUsingCompBot) {
+				return rotationMagEncoder.getFrequency() != 0;
+			} else {
+				return rotationCancoder.getBusVoltage() > 0;
+			}
 		}
 		return true;
 	}
@@ -402,9 +410,11 @@ public class SwerveDriveModule extends Subsystem{
 		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
-		if(/*!rotationMotorZeroed*/true) periodicIO.absoluteRotation = rotationEncoder.getOutput() * 360.0;
-		//if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationEncoder.getAbsolutePosition();
-
+		if (Settings.kIsUsingCompBot) {
+			if(/*!rotationMotorZeroed*/true) periodicIO.absoluteRotation = rotationMagEncoder.getOutput() * 360.0;
+		} else {
+			if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationCancoder.getAbsolutePosition();
+		}
 		if (Settings.debugSwerve()) {
 			periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
 		}
