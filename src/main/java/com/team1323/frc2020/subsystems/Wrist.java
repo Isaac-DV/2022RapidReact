@@ -72,11 +72,22 @@ public class Wrist extends Subsystem {
         wrist.config_kD(0, Constants.Wrist.kD, Constants.kCANTimeoutMs);
         wrist.config_kF(0, Constants.Wrist.kF, Constants.kCANTimeoutMs);
 
+        wrist.config_kP(1, Constants.Wrist.kWeakP, Constants.kCANTimeoutMs);
+        wrist.config_kI(1, Constants.Wrist.kWeakI, Constants.kCANTimeoutMs);
+        wrist.config_kD(1, Constants.Wrist.kWeakD, Constants.kCANTimeoutMs);
+        wrist.config_kF(1, Constants.Wrist.kWeakF, Constants.kCANTimeoutMs);
+
         wrist.config_IntegralZone(0, (int)degreesToEncUnits(5), 10);
         wrist.configMotionCruiseVelocity((int)(Constants.Wrist.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
         wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 2.5)), Constants.kCANTimeoutMs);
         wrist.configMotionSCurveStrength(0);
 
+    }
+    public void setWeakPID(boolean enable) {
+        if (enable)
+            wrist.selectProfileSlot(1, 0);
+        else
+            wrist.selectProfileSlot(0, 0);
     }
     public double getAbsoluteEncoderDegrees() {
         return encoder.getOutput() * 360.0 * 1.0;
@@ -110,7 +121,7 @@ public class Wrist extends Subsystem {
     }
     public void setWristAngleWithAcceleration(double angle) {
         if(angle > encUnitsToDegrees(periodicIO.position)) {
-            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 2.0 : 3.0)), Constants.kCANTimeoutMs);
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 3.0 : 3.0)), Constants.kCANTimeoutMs);
         } else if(angle < encUnitsToDegrees(periodicIO.position)) {
             wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 3.0)), Constants.kCANTimeoutMs);
         }

@@ -195,6 +195,11 @@ public class Constants {
         public static final double kD = 12.5;
         public static final double kF = 1023.0/kMaxSpeed;
 
+        public static final double kWeakP = 0.01;
+        public static final double kWeakI = 0.0;
+        public static final double kWeakD = 0.0;
+        public static final double kWeakF = 1023.0/kMaxSpeed;
+
         public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 105.0 : 97.0; //96.0
         public static final double kStowedAngle = -2.0;
         public static final double kBallDebouncerAngle = 15.0; //65.0
@@ -262,7 +267,7 @@ public class Constants {
         public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 2.0 : 1.0;
         public static final double kMaxAccelerationScalar = 3.0;
 
-        public static final double kInterpolationCutoffDistance = 130.0; // inches
+        public static final double kInterpolationCutoffDistance = 137.5; // inches
     
     }
 

@@ -272,15 +272,15 @@ public class DriverControls implements Loop {
             }
 
             if(coDriver.yButton.wasActivated()) {
-                s.manualShotState(2150.0, 26); //2250, 19
+                s.manualShotState(2150.0, 20); //2250, 19
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
-            /*if(coDriver.xButton.wasActivated()) {
+            if(coDriver.xButton.wasActivated()) {
                 s.manualShotState(1900, 14);
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
-            }*/
+            }
             if(coDriver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
                 s.visionShotState();
@@ -342,12 +342,12 @@ public class DriverControls implements Loop {
             s.disableState();
         }
         
-        if(coDriver.xButton.wasActivated()) {
+        /*if(coDriver.xButton.wasActivated()) {
             s.manualShotState(shooter.dashboardRPMInput, motorizedHood.angleInput);
             turret.startVision();
         } else if(coDriver.xButton.wasReleased()) {
             s.postShotState();
-        }
+        }*/
     }
 
     private void oneControllerMode() {
