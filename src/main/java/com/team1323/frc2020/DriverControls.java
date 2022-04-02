@@ -10,6 +10,7 @@ package com.team1323.frc2020;
 import java.util.Arrays;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.BallSplitter;
@@ -112,6 +113,7 @@ public class DriverControls implements Loop {
             swerve.setNominalDriveOutput(0.0);
             swerve.set10VoltRotationMode(false);
         }
+        swerve.setDriveNeutralMode(NeutralMode.Brake);
         wrist.setWristLocked();
         leds.configLEDs(LEDs.LEDColors.OFF);
     }
@@ -251,7 +253,10 @@ public class DriverControls implements Loop {
                     column.setState(Column.ControlState.INDEX_BALLS);
                 }
             }
+
             if(coDriver.aButton.wasActivated()) {
+                wrist.setWeakIntakeState(false);
+                wrist.setLowStatorLimit(false);
                 intake.conformToState(Intake.ControlState.INTAKE);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
                 ballFeeder.setState(BallFeeder.State.DETECT);
@@ -260,6 +265,24 @@ public class DriverControls implements Loop {
                 }
                 ballFeeder.setPrintFeeder(true);
             } else if(coDriver.aButton.wasReleased()) {
+                intake.conformToState(Intake.ControlState.OFF);
+                ballFeeder.queueShutdown(true);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
+                column.shutDownIfUnused();
+                ballFeeder.setPrintFeeder(false);
+            }
+
+            if(coDriver.rightBumper.wasActivated()) {
+                wrist.setWeakIntakeState(true);
+                intake.conformToState(Intake.ControlState.INTAKE);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
+                ballFeeder.setState(BallFeeder.State.DETECT);
+                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                    column.setState(Column.ControlState.INDEX_BALLS);
+                }
+                ballFeeder.setPrintFeeder(true);
+            } else if(coDriver.rightBumper.wasReleased()) {
+                wrist.setWeakIntakeState(false);
                 wrist.setLowStatorLimit(false);
                 intake.conformToState(Intake.ControlState.OFF);
                 ballFeeder.queueShutdown(true);
@@ -320,11 +343,7 @@ public class DriverControls implements Loop {
        
         
 
-        if(coDriver.rightBumper.wasActivated()) {
-            column.setVelocityState(Constants.Column.kFeedVelocitySpeed);
-        } else if(coDriver.rightBumper.wasReleased()) {
-            column.conformToState(Column.ControlState.OFF);
-        }
+        
         if(coDriver.leftBumper.wasActivated()) {
             s.reverseAllSubsystems();
         } else if(coDriver.leftBumper.wasReleased()) {

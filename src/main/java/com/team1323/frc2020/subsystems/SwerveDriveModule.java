@@ -110,6 +110,10 @@ public class SwerveDriveModule extends Subsystem{
 	public void disableDriveEncoder(){
 		useDriveEncoder = false;
 	}
+
+	public void setDriveNeutralMode(NeutralMode mode) {
+		driveMotor.setNeutralMode(mode);
+	}
 	
 	private void configureMotors(){
 

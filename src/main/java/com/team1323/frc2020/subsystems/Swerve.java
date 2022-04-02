@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.DriveMotionPlanner;
@@ -228,6 +229,10 @@ public class Swerve extends Subsystem{
 		
 		lateralPID.setSetpoint(0.0);
 		forwardPID.setSetpoint(0.0);
+	}
+
+	public void setDriveNeutralMode(NeutralMode mode) {
+		modules.forEach((m) -> m.setDriveNeutralMode(mode));
 	}
 	
 	//Assigns appropriate directions for scrub factors

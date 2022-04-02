@@ -42,6 +42,10 @@ public class Wrist extends Subsystem {
     private boolean zeroedAbsolutely = false;
     private boolean weakPIDEnabled = false;
     private boolean weakCurrentEnabled = false;
+    private boolean weakIntakeStateEnabled = false;
+    public void setWeakIntakeState(boolean enable) {
+        weakIntakeStateEnabled = enable;
+    }
     private static Wrist instance = null;
     public static Wrist getInstance() {
         if (instance==null)
@@ -99,7 +103,7 @@ public class Wrist extends Subsystem {
     public void setLowStatorLimit(boolean enable) {
         weakCurrentEnabled = enable;
         if(enable)
-            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.1));
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 20, 0.1));
         else
             wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
 
@@ -177,7 +181,7 @@ public class Wrist extends Subsystem {
         @Override
         public void onLoop(double timestamp) {
             if((getState() == State.OPEN_LOOP) || ((getState() == State.POSITION || getState() == State.LOCK) &&
-            Math.abs(encUnitsToDegrees(periodicIO.demand) - encUnitsToDegrees(periodicIO.position)) <= 10.0) && Util.epsilonEquals(Constants.Wrist.kIntakeAngle, encUnitsToDegrees(periodicIO.demand), 0.01) && !weakCurrentEnabled) {
+            Math.abs(encUnitsToDegrees(periodicIO.demand) - encUnitsToDegrees(periodicIO.position)) <= 10.0) && Util.epsilonEquals(Constants.Wrist.kIntakeAngle, encUnitsToDegrees(periodicIO.demand), 0.01) && !weakCurrentEnabled && weakIntakeStateEnabled) {
                 if (Double.isInfinite(onTargetTimestamp)) {
                     onTargetTimestamp = timestamp;
                 }
