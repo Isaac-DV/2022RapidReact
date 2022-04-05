@@ -40,6 +40,7 @@ public class Constants {
 
     public static final Pose2d autoRightStartingPose = new Pose2d(new Translation2d(297.7142857142857, 92.85714285714286), Rotation2d.fromDegrees(90));
     public static final Pose2d autoLeftStartingPose = new Pose2d(new Translation2d(233.71428571428572, -40.28571428571429), Rotation2d.fromDegrees(-135.0));
+    public static final Pose2d autoLeftFarStartingPose = new Pose2d(new Translation2d(264.57142857142856, -79.71428571428571), Rotation2d.fromDegrees(-135.0));
     /**
     * Target Specifications
     */
@@ -264,8 +265,8 @@ public class Constants {
         public static final double kYOffset = 0.0;
 
         public static final double kWrapSettlingTime = 0.75;
-        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 2.0 : 1.0;
-        public static final double kMaxAccelerationScalar = 3.0;
+        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 3.0 : 2.0;
+        public static final double kMaxAccelerationScalar = 3.5;
 
         public static final double kInterpolationCutoffDistance = 137.5; // inches
     

@@ -3,6 +3,7 @@ package com.team1323.frc2020.auto;
 import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
+import com.team1323.frc2020.auto.modes.TaxiOneBallMode;
 import com.team1323.frc2020.auto.modes.TestMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 
@@ -41,7 +42,8 @@ public class SmartDashboardInteractions {
     enum AutoOption{
         STAND_STILL("Stand Still"), TEST_MODE("Test Mode"),
         FIVE_BALL_ONE_EJECT_MODE("Five Ball One Eject Mode"),
-        TWO_BALL_TWO_EJECT_MODE("Two Ball Two Eject Mode");
+        TWO_BALL_TWO_EJECT_MODE("Two Ball Two Eject Mode"),
+        TAXI_ONE_BALL_MODE("Taxi One Ball Mode");
     	
     	public final String name;
     	
@@ -60,6 +62,8 @@ public class SmartDashboardInteractions {
                 return new FiveBallOneEjectMode();
             case TWO_BALL_TWO_EJECT_MODE:
                 return new TwoBallTwoEjectMode();
+            case TAXI_ONE_BALL_MODE:
+                return new TaxiOneBallMode();
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();

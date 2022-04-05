@@ -132,6 +132,8 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> thirdBallToSecondOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> secondOpponentBallToThirdOpponentBall;
 
+        public final Trajectory<TimedState<Pose2dWithCurvature>> farLeftTaxiBackup;
+    
         
         private TrajectorySet() {
             //Test Paths
@@ -156,6 +158,7 @@ public class TrajectoryGenerator {
             thirdBallToSecondOpponentBall = getThirdBallToSecondOpponentBall();
             secondOpponentBallToThirdOpponentBall = getSecondOpponentBallToThirdOpponentBall();
 
+            farLeftTaxiBackup = getFarLeftTaxiBackup();
         }
         
         private Trajectory<TimedState<Pose2dWithCurvature>> getTestPath(){
@@ -288,6 +291,14 @@ public class TrajectoryGenerator {
             waypoints.add(secondOpponentBallPickupPose);
             waypoints.add(thirdOpponentBallPickupPose);
             
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFarLeftTaxiBackup() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(Constants.autoLeftFarStartingPose);
+            waypoints.add(Constants.autoLeftFarStartingPose.transformBy(Pose2d.fromTranslation(new Translation2d(36.0, 0.0))));
+
             return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
     }

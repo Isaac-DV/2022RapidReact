@@ -366,6 +366,14 @@ public class Turret extends Subsystem {
                         } else {
                             turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), 0);
                         }
+                        double limelightDegrees = targetInfo.get(2).getDouble(0);
+                        double crosshairDistancePlane = Math.sin(Math.toRadians(limelightDegrees)) * aim.get().getRange();
+                        if(crosshairDistancePlane >= 24) {
+                            LimelightProcessor.getInstance().enableUpdates(false);
+                        } else {
+                            LimelightProcessor.getInstance().enableUpdates(true);
+                        }
+                        
                         setAngle(turretAngle);
                     }
 
