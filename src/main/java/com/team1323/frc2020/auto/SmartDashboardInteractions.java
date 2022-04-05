@@ -3,7 +3,6 @@ package com.team1323.frc2020.auto;
 import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
-import com.team1323.frc2020.auto.modes.TaxiOneBallMode;
 import com.team1323.frc2020.auto.modes.TestMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 
@@ -62,8 +61,8 @@ public class SmartDashboardInteractions {
                 return new FiveBallOneEjectMode();
             case TWO_BALL_TWO_EJECT_MODE:
                 return new TwoBallTwoEjectMode();
-            case TAXI_ONE_BALL_MODE:
-                return new TaxiOneBallMode();
+            /*case TAXI_ONE_BALL_MODE:
+                return new TaxiOneBallMode();*/
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();
