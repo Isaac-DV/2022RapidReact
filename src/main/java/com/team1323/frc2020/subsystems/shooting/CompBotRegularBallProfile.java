@@ -9,27 +9,30 @@ import com.team254.lib.geometry.Translation2d;
 public class CompBotRegularBallProfile extends ShootingProfile {
 
     private static final double kCloseRPMOffset = 0.0;
-    private static final double kMidRPMOffset = -100.0;
-    private static final double kFarRPMOffset = -100.0;
+    private static final double kMidRPMOffset = 0.0;
+    private static final double kFarRPMOffset = 0.0;
 
+    private static final double kCloseHoodOffset = 0.0;
+    private static final double kMidHoodOffset = 0.0;
+    private static final double kFarHoodOffset = 0.0;
     //4 PSI
     private static final InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
     static {
         // Key: distance from the vision target, in inches
         // Value: a Translation2d whose direction represents a hood angle, and whose magnitude represents a shooter RPM
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(86.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 13.0), 1800.0 + kCloseRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(98.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 14.5), 1875.0 + kCloseRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(110.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 15.5), 1925.0 + kCloseRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(122.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 17.0), 2000.0 + kCloseRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(134.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 19.0), 2075.0 + kMidRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(146.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 20.0), 2150.0 + kMidRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(158.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 22.0), 2250.0 + kMidRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(170.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 23.0), 2500.0 + kMidRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(182.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 25.0), 2600.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(194.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 27.0), 2700.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(206.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 2800.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(218.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3000.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(228.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3200.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(86.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 13.0 + kCloseHoodOffset), 1700.0 + kCloseRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(98.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 15.5 + kCloseHoodOffset), 1800.0 + kCloseRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(110.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 17.5 + kCloseHoodOffset), 1825.0 + kCloseRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(122.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 19.5 + kCloseHoodOffset), 1950.0 + kCloseRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(134.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 21.0 + kMidHoodOffset), 2025.0 + kMidRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(146.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 22.0 + kMidHoodOffset), 2100.0 + kMidRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(158.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 24.0 + kMidHoodOffset), 2200.0 + kMidRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(170.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 25.5 + kMidHoodOffset), 2450.0 + kMidRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(182.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0 + kFarHoodOffset), 2800.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(194.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 29.0 + kFarHoodOffset), 2850.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(206.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 29.0 + kFarHoodOffset), 2950.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(218.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 30.0 + kFarHoodOffset), 3000.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(228.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 30.0 + kFarHoodOffset), 3200.0 + kFarRPMOffset));
     }
     /*
     private static final InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();

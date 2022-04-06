@@ -202,8 +202,8 @@ public class Constants {
         public static final double kWeakF = 1023.0/kMaxSpeed;
 
         public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 103.0 : 97.0; //96.0
-        public static final double kStowedAngle = -2.0;
-        public static final double kBallDebouncerAngle = 15.0; //65.0
+        public static final double kStowedAngle = -13.0;
+        public static final double kBallDebouncerAngle = -2.0; //65.0
         public static final double kLowestAngle = 135.0;
 
     }
@@ -232,7 +232,7 @@ public class Constants {
         public static final double kMinDistance = 60.0;
         public static final double kMaxDistance = 180.0;
 
-        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.1;
+        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.08;
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
 
