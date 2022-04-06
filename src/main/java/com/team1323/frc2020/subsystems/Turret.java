@@ -368,7 +368,7 @@ public class Turret extends Subsystem {
                         }
                         double limelightDegrees = targetInfo.get(2).getDouble(0);
                         double crosshairDistancePlane = Math.sin(Math.toRadians(limelightDegrees)) * aim.get().getRange();
-                        if(crosshairDistancePlane >= 24) {
+                        if(crosshairDistancePlane >= 24 && hasReachedAngle()) {
                             LimelightProcessor.getInstance().enableUpdates(false);
                         } else {
                             LimelightProcessor.getInstance().enableUpdates(true);
