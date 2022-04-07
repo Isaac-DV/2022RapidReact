@@ -146,7 +146,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, robotCentric , false);
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed() , false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -180,13 +180,13 @@ public class DriverControls implements Loop {
         } else if(driver.leftTrigger.wasReleased()) {
             swerve.setMaxSpeed(1.0);
         }
-        if(driver.rightTrigger.wasActivated()) {
+        /*if(driver.rightTrigger.wasActivated()) {
             swerve.useSlewLimiter(true);
             swerve.setMaxSpeed(0.5);
         } else if(driver.rightTrigger.wasReleased()) {
             swerve.useSlewLimiter(false);
             swerve.setMaxSpeed(1.0);
-        }
+        }*/
         if(driver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }

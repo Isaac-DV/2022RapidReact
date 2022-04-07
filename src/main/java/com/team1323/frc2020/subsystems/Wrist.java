@@ -103,7 +103,7 @@ public class Wrist extends Subsystem {
     public void setLowStatorLimit(boolean enable) {
         weakCurrentEnabled = enable;
         if(enable)
-            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 20, 20, 0.1));
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.Wrist.kWristHoldCurrent , Constants.Wrist.kWristHoldCurrent, 0.1));
         else
             wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
 

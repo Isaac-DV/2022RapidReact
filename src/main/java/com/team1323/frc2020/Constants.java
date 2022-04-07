@@ -178,7 +178,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -19.5;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 115.5;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 138.5;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -206,6 +206,7 @@ public class Constants {
         public static final double kBallDebouncerAngle = -2.0; //65.0
         public static final double kLowestAngle = 135.0;
 
+        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
     }
     
     public static class BallSplitter {
