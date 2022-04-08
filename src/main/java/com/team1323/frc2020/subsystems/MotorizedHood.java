@@ -223,7 +223,7 @@ public class MotorizedHood extends Subsystem {
                         hood.setSelectedSensorPosition(degreesToEncUnits(Constants.MotorizedHood.kHoodStartingAngle), 0, 0);
                         System.out.println("Zeroed el hood");
                         enableLimits(true);
-                        currentState = State.VISION;
+                        //currentState = State.VISION;
                     }
                     break;
                 default:

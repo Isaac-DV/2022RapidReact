@@ -206,7 +206,7 @@ public class Constants {
         public static final double kBallDebouncerAngle = -2.0; //65.0
         public static final double kLowestAngle = 135.0;
 
-        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
+        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 35.0;
     }
     
     public static class BallSplitter {
