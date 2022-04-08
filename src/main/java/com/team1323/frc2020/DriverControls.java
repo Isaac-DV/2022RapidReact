@@ -318,7 +318,7 @@ public class DriverControls implements Loop {
             if(coDriver.startButton.wasActivated()) {
                 //turret.lockAngle();
                 turret.startVision();
-                motorizedHood.setState(MotorizedHood.State.VISION);
+                //motorizedHood.setState(MotorizedHood.State.VISION);
             }
 
         } else {

@@ -204,7 +204,7 @@ public class RobotState {
 				Translation2d unmodified_shot_vector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(latest_turret_fixed_to_goal.getTranslation().norm()));
 				Translation2d initial_ball_velocity = Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.physicalAngleToEmpiricalAngle(unmodified_shot_vector.direction().getDegrees())), Shooter.rpmToInitialBallVelocity(unmodified_shot_vector.norm()));
 				Translation2d stationary_shot_vector = Translation2d.fromPolar(latest_turret_fixed_to_goal.getTranslation().direction(), initial_ball_velocity.x());
-				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy).scale(Settings.kShootingProfile.getRobotVelocityScalar()));
+				Translation2d moving_shot_vector = stationary_shot_vector.translateBy(new Translation2d(-vehicle_velocity_.dx, -vehicle_velocity_.dy).scale(Settings.kShootingProfile.getRobotVelocityScalar())).scale(Settings.kIsUsingCompBot ? 1.0 : 0.9);
 
 				Rotation2d turretAngle = stationary_shot_vector.direction().interpolate(moving_shot_vector.direction(), 
 						latest_turret_fixed_to_goal.getTranslation().norm() > Constants.Turret.kInterpolationCutoffDistance ? Settings.kShootingProfile.getFarTurretAngleInterpolation() : Settings.kShootingProfile.getCloseTurretAngleInterpolation());

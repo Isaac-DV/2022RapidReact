@@ -89,7 +89,7 @@ public class Wrist extends Subsystem {
 
         wrist.config_IntegralZone(0, (int)degreesToEncUnits(5), 10);
         wrist.configMotionCruiseVelocity((int)(Constants.Wrist.kMaxSpeed * 1.0), Constants.kCANTimeoutMs);
-        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 2.5)), Constants.kCANTimeoutMs);
+        wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 5.0)), Constants.kCANTimeoutMs);
         wrist.configMotionSCurveStrength(0);
 
     }
@@ -142,7 +142,7 @@ public class Wrist extends Subsystem {
         if(angle > encUnitsToDegrees(periodicIO.position)) {
             wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 3.0 : 3.0)), Constants.kCANTimeoutMs);
         } else if(angle < encUnitsToDegrees(periodicIO.position)) {
-            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 3.0)), Constants.kCANTimeoutMs);
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 5.0)), Constants.kCANTimeoutMs);
         }
         setWristAngle(angle);
     }
