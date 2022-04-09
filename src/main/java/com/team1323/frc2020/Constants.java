@@ -203,10 +203,10 @@ public class Constants {
 
         public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 103.0 : 97.0; //96.0
         public static final double kStowedAngle = -13.0;
-        public static final double kBallDebouncerAngle = -2.0; //65.0
+        public static final double kBallDebouncerAngle = Settings.kIsUsingCompBot ? -2.0 : -8.0; //65.0
         public static final double kLowestAngle = 135.0;
 
-        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 35.0;
+        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
     }
     
     public static class BallSplitter {
@@ -233,7 +233,7 @@ public class Constants {
         public static final double kMinDistance = 60.0;
         public static final double kMaxDistance = 180.0;
 
-        public static final double kFeedVelocitySpeed = kMaxSpeed * 0.08;
+        public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.08 : 0.2);
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
 

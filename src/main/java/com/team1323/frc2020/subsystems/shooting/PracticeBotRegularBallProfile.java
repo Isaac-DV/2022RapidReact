@@ -34,11 +34,11 @@ public class PracticeBotRegularBallProfile extends ShootingProfile {
 
     private static final double kBallVelocityScrubFactor = 290.570415188 / 426.73300175;
 
-    private static final double kRobotVelocityScalar = 0.7;
+    private static final double kRobotVelocityScalar = 0.6;
 
     private static final double kCloseTurretAngleInterpolation = 0.8;
 
-    private static final double kFarTurretAngleInterpolation = 0.875;
+    private static final double kFarTurretAngleInterpolation = 0.975;
 
     private static final double kRpmCompensationScalar = 1.25;
 
