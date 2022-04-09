@@ -45,13 +45,13 @@ public class DoubleTelescopes extends Subsystem {
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = false;
-    private boolean isFirstEnable = true;
+    private boolean isFirstEnable = false;
     private boolean autoLiftMode = true;
 
     private boolean leftTelescopeZeroed = false;
     private boolean rightTelescopeZeroed = false;
     public boolean bothTelescopesZeroed() {
-        return Settings.kIsUsingCompBot ? (leftTelescopeZeroed && rightTelescopeZeroed) : true;
+        return Settings.kIsUsingCompBot ? /*(leftTelescopeZeroed && rightTelescopeZeroed)*/ true : true;
     }
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);

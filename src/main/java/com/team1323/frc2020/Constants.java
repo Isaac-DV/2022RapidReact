@@ -246,7 +246,7 @@ public class Constants {
         
         public static final double kMaxCurrent = 30.0;
         public static final double kMaxSpeed = 6380.0 * 2048.0 / 600.0;
-        public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? -198.253112 : 349.987509;
+        public static final double kTurretStartingEncoderPosition = Settings.kIsUsingCompBot ? -106.740831 : 349.987509;
         public static final double kTurretStartingAngle = Settings.kIsUsingCompBot ? 0.0 : 0.0; // Turret facing straight forward
         public static final double kFalconToTurretRatio = 65.0; // Falcon Encoder : Turret - Ratio
         public static final double kEncoderToTurretRatio = Settings.kIsUsingCompBot ? 360.0 / 1080.0 : 1.0;
