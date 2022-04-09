@@ -233,7 +233,7 @@ public class Constants {
         public static final double kMinDistance = 60.0;
         public static final double kMaxDistance = 180.0;
 
-        public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.08 : 0.2);
+        public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.15 : 0.2);
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
 

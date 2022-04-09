@@ -223,7 +223,8 @@ public class Column extends Subsystem {
 
         @Override
         public void onStart(double timestamp) {
-            
+            column.setNeutralMode(NeutralMode.Brake);
+
         }
 
         @Override
