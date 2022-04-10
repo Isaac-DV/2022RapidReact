@@ -206,7 +206,7 @@ public class Constants {
         public static final double kBallDebouncerAngle = Settings.kIsUsingCompBot ? -2.0 : -8.0; //65.0
         public static final double kLowestAngle = 135.0;
 
-        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
+        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 15.0 : 25.0;
     }
     
     public static class BallSplitter {
@@ -234,12 +234,17 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.15 : 0.2);
+        public static final double kFasterFeedVelocity = kMaxSpeed * 1.0;
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
+        public static final double kFasterFeedDuration = 0.375; // seconds
+        public static final double kMinFasterFeedRange = 112.0;
+        public static final double kMaxFasterFeedRange = 164.0;
 
         public static final double kColumnRunTime = 0.5;
 
-        public static final double kColumnActivationShotTime = 0.4; //The time from which the column is activated to the shot
+        public static final double kColumnActivationShotTime = 0.5; //The time from which the column is activated to the shot
+        public static final double kExtraSwerveDelay = 0.2;
     }
 
     public static class Turret {
@@ -265,11 +270,11 @@ public class Constants {
         public static final double kXOffset = 0.0;
         public static final double kYOffset = 0.0;
 
-        public static final double kWrapSettlingTime = 0.75;
+        public static final double kWrapSettlingTime = Settings.kIsUsingCompBot ? 0.25 : 0.75;
         public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 3.0 : 2.0;
         public static final double kMaxAccelerationScalar = 3.5;
 
-        public static final double kInterpolationCutoffDistance = 137.5; // inches
+        public static final double kInterpolationCutoffDistance = 140.0; // inches
     
     }
 
@@ -294,7 +299,7 @@ public class Constants {
         public static final double kMinInitialAngle = 10.0;
         public static final double kMaxInitialAngle = 50.0;
 
-        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 15.0 : 15.0;
+        public static final double kMinControlAngle = Settings.kIsUsingCompBot ? 15.6 : 15.0;
         public static final double kMaxControlAngle = 45.0;
 
         // Measured upward from the ground; corresponds to kMinControlAngle
@@ -310,7 +315,7 @@ public class Constants {
         public static final double kEncToOutputRatio = 18.0 / 12.0;
 
         public static final double kBottomToMotorRatio = 12.0 / 18.0; //1 : Falcon = 12 -> Bottom = 18
-        public static final double kTopToBottomRatio = Settings.kIsUsingCompBot ? 24.0 / 28.0 : 30.0 / 22.0; //24/18 : 22 -> 30
+        public static final double kTopToBottomRatio = Settings.kIsUsingCompBot ? 26.0 / 26.0 : 30.0 / 22.0; //24/18 : 22 -> 30
 
         public static final double kBottomWheelRadius = 2.0; // inches //2
         public static final double kTopWheelRadius = 1.25; // inches //1

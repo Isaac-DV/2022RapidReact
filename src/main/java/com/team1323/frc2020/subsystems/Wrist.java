@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.CANCoder;
@@ -66,6 +67,7 @@ public class Wrist extends Subsystem {
         wrist.configReverseSoftLimitEnable(true);
         wrist.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         wrist.enableVoltageCompensation(true);
+        wrist.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 60, 60, 0.1), 0);
 
         wrist.setNeutralMode(NeutralMode.Coast);
 
@@ -102,10 +104,11 @@ public class Wrist extends Subsystem {
     }
     public void setLowStatorLimit(boolean enable) {
         weakCurrentEnabled = enable;
-        if(enable)
-            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.Wrist.kWristHoldCurrent , Constants.Wrist.kWristHoldCurrent, 0.1));
-        else
-            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1));
+        if(enable) {
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.Wrist.kWristHoldCurrent , Constants.Wrist.kWristHoldCurrent, 0.1), 0);
+        } else {
+            wrist.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(false, 5, 5, 0.1), 0);
+        }   
 
     }
     public double getAbsoluteEncoderDegrees() {
@@ -140,9 +143,9 @@ public class Wrist extends Subsystem {
     }
     public void setWristAngleWithAcceleration(double angle) {
         if(angle > encUnitsToDegrees(periodicIO.position)) {
-            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 3.0 : 3.0)), Constants.kCANTimeoutMs);
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 3.0 : 3.0)), 0);
         } else if(angle < encUnitsToDegrees(periodicIO.position)) {
-            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 5.0)), Constants.kCANTimeoutMs);
+            wrist.configMotionAcceleration((int)(Constants.Wrist.kMaxSpeed * ((Settings.kIsUsingCompBot) ? 5.0 : 5.0)), 0);
         }
         setWristAngle(angle);
     }

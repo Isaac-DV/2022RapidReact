@@ -143,6 +143,8 @@ public class Turret extends Subsystem {
         
         smartTuner = new SmartTuner(turret, "turret");
         smartTuner.enabled(false);
+        SmartDashboard.putBoolean("Turret limelight updates disabled", false);
+
     }
 
     public double getAbsoluteEncoderPosition() {
@@ -275,7 +277,7 @@ public class Turret extends Subsystem {
     public void updateTurretTolerance() {
         double T2O = swerve.getVelocity().dtheta; //Twist 2d Omega
         double robotVelocity = swerve.getVelocity().norm();
-        double robotScaledAngleTolerance = Math.max(Math.abs(T2O * 3.5), (robotVelocity * 0.045)) + 1;
+        double robotScaledAngleTolerance = Math.max(Math.abs(T2O * 2.5), (robotVelocity * 0.045)) + 2;
         turretTolerance = robotScaledAngleTolerance;
         /*if(((Constants.Turret.kMaxControlAngle - 5) < getAngle()) && (getAngle() < Constants.Turret.kMaxControlAngle)){
             turretTolerance = 1;
@@ -365,13 +367,6 @@ public class Turret extends Subsystem {
                             turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kWrapAccelerationScalar), 0);
                         } else {
                             turret.configMotionAcceleration((Constants.Turret.kMaxSpeed * Constants.Turret.kMaxAccelerationScalar), 0);
-                        }
-                        double limelightDegrees = targetInfo.get(2).getDouble(0);
-                        double crosshairDistancePlane = Math.sin(Math.toRadians(limelightDegrees)) * aim.get().getRange();
-                        if(crosshairDistancePlane >= 24 && hasReachedAngle()) {
-                            LimelightProcessor.getInstance().enableUpdates(false);
-                        } else {
-                            LimelightProcessor.getInstance().enableUpdates(true);
                         }
                         
                         setAngle(turretAngle);
