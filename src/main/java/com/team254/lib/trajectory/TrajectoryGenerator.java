@@ -132,6 +132,8 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> thirdBallToSecondOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> secondOpponentBallToThirdOpponentBall;
 
+        
+
         public final Trajectory<TimedState<Pose2dWithCurvature>> farLeftTaxiBackup;
     
         

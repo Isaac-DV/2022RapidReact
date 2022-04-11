@@ -61,11 +61,11 @@ public class CompBotRegularBallProfile extends ShootingProfile {
 
     private static final double kBallVelocityScrubFactor = 295.055651299 / 331.83072395;
 
-    private static final double kRobotVelocityScalar = 0.9;
+    private static final double kRobotVelocityScalar = 0.7;
 
-    private static final double kCloseTurretAngleInterpolation = 0.65; // 0.55
+    private static final double kCloseTurretAngleInterpolation = 0.8; // 0.65 // 0.85
 
-    private static final double kFarTurretAngleInterpolation = 0.75;
+    private static final double kFarTurretAngleInterpolation = 0.95; // 0.75
 
     private static final double kRpmCompensationScalar = 2.0;
 

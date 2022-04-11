@@ -310,10 +310,13 @@ public class DriverControls implements Loop {
             }
             if(coDriver.rightTrigger.wasActivated() || driver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
+                if(driver.rightTrigger.isBeingPressed())
+                    swerve.setMaxSpeed(0.5);
                 s.visionShotState();
             } else if((coDriver.rightTrigger.wasReleased() && !driver.rightTrigger.isBeingPressed()) ||
                     (driver.rightTrigger.wasReleased() && !coDriver.rightTrigger.isBeingPressed())) {
                 SmartDashboard.putBoolean("Vision Shot is activated", false);
+                swerve.setMaxSpeed(1.0);
                 s.postShotState();
             }
 

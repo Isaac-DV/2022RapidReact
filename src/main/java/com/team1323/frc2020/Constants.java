@@ -178,7 +178,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = -19.5;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 138.5;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 91.3;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -201,12 +201,12 @@ public class Constants {
         public static final double kWeakD = 0.0;
         public static final double kWeakF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 103.0 : 97.0; //96.0
+        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 103.0 : 108.0; //96.0
         public static final double kStowedAngle = -13.0;
         public static final double kBallDebouncerAngle = Settings.kIsUsingCompBot ? -2.0 : -8.0; //65.0
         public static final double kLowestAngle = 135.0;
 
-        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 15.0 : 25.0;
+        public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
     }
     
     public static class BallSplitter {
@@ -234,17 +234,18 @@ public class Constants {
         public static final double kMaxDistance = 180.0;
 
         public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.15 : 0.2);
-        public static final double kFasterFeedVelocity = kMaxSpeed * 1.0;
+        public static final double kFasterFeedVelocity = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.9 : 0.3);
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
         public static final double kBallDelay = 0.001;
         public static final double kFasterFeedDuration = 0.375; // seconds
-        public static final double kMinFasterFeedRange = 112.0;
-        public static final double kMaxFasterFeedRange = 164.0;
+        public static final double kMinFasterFeedRange = 134.0; // 112
+        public static final double kMaxFasterFeedRange = 170.0; // 164
+        public static final double kFasterFeedMaxSwerveVelocity = 12.0;
 
         public static final double kColumnRunTime = 0.5;
 
         public static final double kColumnActivationShotTime = 0.5; //The time from which the column is activated to the shot
-        public static final double kExtraSwerveDelay = 0.2;
+        public static final double kExtraSwerveDelay = (Settings.kIsUsingCompBot ? 0.2 : 0.1);
     }
 
     public static class Turret {

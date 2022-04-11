@@ -45,13 +45,13 @@ public class DoubleTelescopes extends Subsystem {
     public double leftTargetHeight = 0;
     public double rightTargetHeight = 0;
     private boolean liftModeEnabled = false;
-    private boolean isFirstEnable = false;
+    private boolean isFirstEnable = true;
     private boolean autoLiftMode = true;
 
     private boolean leftTelescopeZeroed = false;
     private boolean rightTelescopeZeroed = false;
     public boolean bothTelescopesZeroed() {
-        return Settings.kIsUsingCompBot ? /*(leftTelescopeZeroed && rightTelescopeZeroed)*/ true : true;
+        return Settings.kIsUsingCompBot ? true : (leftTelescopeZeroed && rightTelescopeZeroed);
     }
 
     private CircularBuffer previousPitchAngle = new CircularBuffer(5);
@@ -365,7 +365,7 @@ public class DoubleTelescopes extends Subsystem {
     public void readPeriodicInputs() {
         periodicIO.rightPosition = rightTelescope.getSelectedSensorPosition();
         periodicIO.leftPosition = leftTelescope.getSelectedSensorPosition();
-        if(liftModeEnabled && false) {
+        if(liftModeEnabled) {
             periodicIO.rightCurrent = rightTelescope.getOutputCurrent();
             periodicIO.leftCurrent = leftTelescope.getOutputCurrent();
         }

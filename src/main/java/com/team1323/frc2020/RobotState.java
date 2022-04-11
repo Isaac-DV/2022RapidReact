@@ -8,6 +8,8 @@
 package com.team1323.frc2020;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -195,6 +197,21 @@ public class RobotState {
 		public synchronized Optional<ShooterAimingParameters> getAimingParameters() {
 			List<TrackReport> reports = goal_tracker_.getTracks();
 			if (!reports.isEmpty()) {
+				Collections.sort(reports, new Comparator<TrackReport>() {
+
+					@Override
+					public int compare(TrackReport report1, TrackReport report2) {
+						double difference = report1.field_to_goal.distance(Constants.kCenterOfField) - report2.field_to_goal.distance(Constants.kCenterOfField);
+						if (difference < 0) {
+							return -1;
+						} else if (difference > 0) {
+							return 1;
+						}
+						
+						return 0;
+					}
+					
+				});
 				TrackReport report = reports.get(0);
 				Pose2d latest_turret_fixed_to_field = getPredictedFieldToVehicle(Constants.kAutoAimPredictionTime)
 						.transformBy(kVehicleToTurretFixed).inverse();
