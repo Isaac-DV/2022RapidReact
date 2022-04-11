@@ -17,9 +17,11 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
+import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
+import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -212,10 +214,10 @@ public class MotorizedHood extends Subsystem {
                     }
                     break;
                 case ROBOT_POSITION:
-                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getCachedAimingParameters();
-                    if (poseAim.isPresent()) {
-                        setAngle(poseAim.get().getHoodAngle().getDegrees());
-                    }
+                    Translation2d robotToCenterVector = RobotState.getInstance().getTurretToCenterOfField();
+                    double robotToCenterMagnitude = robotToCenterVector.norm();
+                    Translation2d shotVector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(robotToCenterMagnitude));
+                    setAngle(shotVector.direction().getDegrees());
                     break;
                 case ZEROING:
                     if (hood.getOutputCurrent() > Constants.MotorizedHood.kZeroingCurrent) {

@@ -385,14 +385,8 @@ public class Turret extends Subsystem {
                     }*/
                     break;
                 case ROBOT_POSITION:
-                    Optional<ShooterAimingParameters> poseAim = robotState.getCachedAimingParameters();
-                    if (poseAim.isPresent()) {
-                        // Compensate for the robot's velocity when aiming
-                        double turretAngle = poseAim.get().getTurretAngle().getDegrees();
-                        turretAngle = boundToTurretScope(turretAngle);
-                        visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
-                        setAngle(turretAngle);
-                    }
+                    Translation2d robotToCenter = robotState.getTurretToCenterOfField();
+                    setAngle(boundToTurretScope(robotToCenter.direction().getDegrees()));
                     break;
                 default:
                 break;

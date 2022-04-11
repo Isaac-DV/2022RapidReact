@@ -21,6 +21,7 @@ import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
 import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -231,16 +232,12 @@ public class Shooter extends Subsystem {
                     }
                     break;
                 case POSITION:
-                    Optional<ShooterAimingParameters> poseAim = RobotState.getInstance().getCachedAimingParameters();
-                    if (poseAim.isPresent()) {
-                        double rpm = poseAim.get().getShooterRPM();
-                        periodicIO.demand = rpmToEncVelocity(rpm);
-                        targetRPM = rpm;
-                        limelightRange = poseAim.get().getRange();
-                        System.out.println("COF Magnitude" + poseAim.get().getRange());
-                    } else {
-                        System.out.println("Goal target not visible in shooter loop!");
-                    }
+                    Translation2d robotToCenter = RobotState.getInstance().getTurretToCenterOfField();
+                    double robotToCenterMagnitude = robotToCenter.norm();
+                    Translation2d shotVector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(robotToCenterMagnitude));
+                    double rpm = shotVector.norm();
+                    periodicIO.demand = rpmToEncVelocity(rpm);
+                    targetRPM = rpm;
                 default:
                     break;
             }
