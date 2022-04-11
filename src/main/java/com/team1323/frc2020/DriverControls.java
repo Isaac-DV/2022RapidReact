@@ -112,6 +112,7 @@ public class DriverControls implements Loop {
             s.enableCompressor(true);
             swerve.setNominalDriveOutput(0.0);
             swerve.set10VoltRotationMode(false);
+            motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
         swerve.setDriveNeutralMode(NeutralMode.Brake);
         wrist.setWristLocked();
@@ -146,7 +147,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightTrigger.isBeingPressed() , false);
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightBumper.isBeingPressed() , false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
@@ -190,7 +191,7 @@ public class DriverControls implements Loop {
         if(driver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
-        if(driver.rightBumper.wasActivated()) {
+        if(driver.leftBumper.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
 
@@ -307,11 +308,15 @@ public class DriverControls implements Loop {
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
             }
-            if(coDriver.rightTrigger.wasActivated()) {
+            if(coDriver.rightTrigger.wasActivated() || driver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
+                if(driver.rightTrigger.isBeingPressed())
+                    swerve.setMaxSpeed(0.5);
                 s.visionShotState();
-            } else if(coDriver.rightTrigger.wasReleased()) {
+            } else if((coDriver.rightTrigger.wasReleased() && !driver.rightTrigger.isBeingPressed()) ||
+                    (driver.rightTrigger.wasReleased() && !coDriver.rightTrigger.isBeingPressed())) {
                 SmartDashboard.putBoolean("Vision Shot is activated", false);
+                swerve.setMaxSpeed(1.0);
                 s.postShotState();
             }
 

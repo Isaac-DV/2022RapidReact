@@ -259,6 +259,10 @@ public class Swerve extends Subsystem{
 	public void useSlewLimiter(boolean use) {
 		useSlewLimiter = use;
 	}
+	private boolean updateInputs = true;
+	public void enableInputs(boolean enable) {
+		updateInputs = enable;
+	}
 	private boolean robotCentric = false;
 	
 	//Swerve kinematics (exists in a separate class)
@@ -289,83 +293,83 @@ public class Swerve extends Subsystem{
 	* @param lowPower scaled down output
 	*/
 	public void sendInput(double x, double y, double rotate, boolean robotCentric, boolean lowPower){
-		if (useSlewLimiter) {
-			x = xInputLimiter.calculate(x);
-			y = yInputLimiter.calculate(y);
-		} else {
-			xInputLimiter.reset(x);
-			yInputLimiter.reset(y);
-		}
-		Translation2d translationalInput = new Translation2d(x, y);
-		double inputMagnitude = translationalInput.norm();
-		
-		/* Snap the translational input to its nearest pole, if it is within a certain threshold 
-		of it. */
-		double threshold = Math.toRadians(10.0);
-		if(Math.abs(translationalInput.direction().distance(translationalInput.direction().nearestPole())) < threshold){
-			translationalInput = translationalInput.direction().nearestPole().toTranslation().scale(inputMagnitude);
-		}
-		
-		/* Scale x and y by applying a power to the magnitude of the vector they create, in order
-		to make the controls less sensitive at the lower end. */
-		double translationalDeadband = 0.025;
-		inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, translationalDeadband);
-		final double power = (lowPower) ? 1.75 : 1.5;
-		inputMagnitude = Math.pow(inputMagnitude, power);
-		inputMagnitude = Util.deadBand(inputMagnitude, 0.05);
-		translationalInput = Translation2d.fromPolar(translationalInput.direction(), inputMagnitude);
-		
-		double rotationalDeadband = 0.1;
-		rotate = Util.scaledDeadband(rotate, 1.0, rotationalDeadband);
-		rotate = Math.pow(Math.abs(rotate), 1.75)*Math.signum(rotate);
-		
-		translationalInput = translationalInput.scale(maxSpeedFactor);
-		rotate *= maxSpeedFactor;
-		
-		translationalVector = translationalInput;
-		
-		if(lowPower){
-			translationalVector = translationalVector.scale(lowPowerScalar);
-			rotate *= lowPowerScalar;
-		}else{
-			rotate *= 0.8;
-		}
-		
-		if(!Util.epsilonEquals(rotate, 0.0) /*&& Util.epsilonEquals(rotationalInput, 0.0)*/){
-			headingController.disable();
-		}else if(Util.epsilonEquals(rotate, 0.0) && !Util.epsilonEquals(rotationalInput, 0.0)){
-			headingController.temporarilyDisable();
-		}
-		
-		rotationalInput = rotate;
-		
-		if(!Util.epsilonEquals(translationalInput.norm(), 0.0)){
-			if (headingController.getState() == SwerveHeadingController.State.Snap || 
-				headingController.getState() == SwerveHeadingController.State.Stationary)
-				headingController.setStabilizationTarget(headingController.getTargetHeading());
+		if (updateInputs) {
+			if (useSlewLimiter) {
+				x = xInputLimiter.calculate(x);
+				y = yInputLimiter.calculate(y);
+			} else {
+				xInputLimiter.reset(x);
+				yInputLimiter.reset(y);
+			}
+			Translation2d translationalInput = new Translation2d(x, y);
+			double inputMagnitude = translationalInput.norm();
+			
+			/* Snap the translational input to its nearest pole, if it is within a certain threshold 
+			of it. */
+			double threshold = Math.toRadians(10.0);
+			if(Math.abs(translationalInput.direction().distance(translationalInput.direction().nearestPole())) < threshold){
+				translationalInput = translationalInput.direction().nearestPole().toTranslation().scale(inputMagnitude);
+			}
+			
+			/* Scale x and y by applying a power to the magnitude of the vector they create, in order
+			to make the controls less sensitive at the lower end. */
+			double translationalDeadband = 0.025;
+			inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, translationalDeadband);
+			final double power = (lowPower) ? 1.75 : 1.5;
+			inputMagnitude = Math.pow(inputMagnitude, power);
+			inputMagnitude = Util.deadBand(inputMagnitude, 0.05);
+			translationalInput = Translation2d.fromPolar(translationalInput.direction(), inputMagnitude);
+			
+			double rotationalDeadband = 0.1;
+			rotate = Util.scaledDeadband(rotate, 1.0, rotationalDeadband);
+			rotate = Math.pow(Math.abs(rotate), 1.75)*Math.signum(rotate);
+			
+			translationalInput = translationalInput.scale(maxSpeedFactor);
+			rotate *= maxSpeedFactor;
+			
+			translationalVector = translationalInput;
+			
+			if(lowPower){
+				translationalVector = translationalVector.scale(lowPowerScalar);
+				rotate *= lowPowerScalar;
+			}else{
+				rotate *= 0.8;
+			}
+			
+			if(!Util.epsilonEquals(rotate, 0.0) /*&& Util.epsilonEquals(rotationalInput, 0.0)*/){
+				headingController.disable();
+			}else if(Util.epsilonEquals(rotate, 0.0) && !Util.epsilonEquals(rotationalInput, 0.0)){
+				headingController.temporarilyDisable();
+			}
+			
+			rotationalInput = rotate;
+			
+			if(!Util.epsilonEquals(translationalInput.norm(), 0.0)){
+				if (headingController.getState() == SwerveHeadingController.State.Snap || 
+					headingController.getState() == SwerveHeadingController.State.Stationary)
+					headingController.setStabilizationTarget(headingController.getTargetHeading());
 
-			if(isTracking() || currentState == ControlState.POSITION){
-				if(Math.abs(translationalInput.direction().distance(visionTargetHeading)) > Math.toRadians(120.0)){
-					//setState(ControlState.MANUAL);
+				if(isTracking() || currentState == ControlState.POSITION){
+					if(Math.abs(translationalInput.direction().distance(visionTargetHeading)) > Math.toRadians(120.0)){
+						//setState(ControlState.MANUAL);
+					}
+				} else if(currentState != ControlState.MANUAL){
+					setState(ControlState.MANUAL);
 				}
-			} else if(currentState != ControlState.MANUAL){
-				setState(ControlState.MANUAL);
+			}else if(!Util.epsilonEquals(rotationalInput, 0.0)){
+				if(currentState != ControlState.MANUAL && currentState != ControlState.TRAJECTORY && currentState != ControlState.VISION_PID && currentState != ControlState.POSITION){
+					setState(ControlState.MANUAL);
+				}
 			}
-		}else if(!Util.epsilonEquals(rotationalInput, 0.0)){
-			if(currentState != ControlState.MANUAL && currentState != ControlState.TRAJECTORY && currentState != ControlState.VISION_PID && currentState != ControlState.POSITION){
-				setState(ControlState.MANUAL);
+			
+			if(inputMagnitude > 0.1)
+			lastDriveVector = new Translation2d(x, y);
+			else if(translationalVector.x() == 0.0 && translationalVector.y() == 0.0 && rotate != 0.0){
+				lastDriveVector = rotationalVector;
 			}
+			
+			this.robotCentric = robotCentric;
 		}
-		
-		if(inputMagnitude > 0.1)
-		lastDriveVector = new Translation2d(x, y);
-		else if(translationalVector.x() == 0.0 && translationalVector.y() == 0.0 && rotate != 0.0){
-			lastDriveVector = rotationalVector;
-		}
-		
-		this.robotCentric = robotCentric;
-
-		//System.out.println("Swerve translational input: " + translationalVector.toString());
 	}
 	
 	//Possible new control method for rotation

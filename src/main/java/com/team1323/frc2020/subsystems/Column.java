@@ -62,7 +62,11 @@ public class Column extends Subsystem {
 
     double columnStartTimestamp = Double.POSITIVE_INFINITY;
     double ballDetectedTimestamp = 0.0;
+    double ballLeftTimestamp = 0.0;
+    double disabledSwerveTimestamp = 0.0;
     double targetRPM = 0.0;
+    int fastFedBalls = 0;
+    boolean isFastFeeding = false;
 
     private int loadedBallCount = 0;
     public int getLoadedBallCount() {
@@ -96,9 +100,9 @@ public class Column extends Subsystem {
         column.configOpenloopRamp(0.0, Constants.kCANTimeoutMs);
         column.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, Constants.kCANTimeoutMs);
 
-        column.config_kP(0, 0.1, Constants.kCANTimeoutMs); //0.2
-        column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0
-        column.config_kD(0, 1.0, Constants.kCANTimeoutMs); //4.0
+        column.config_kP(0, 0.0, Constants.kCANTimeoutMs); //0.2 : 0.1
+        column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0 : 0.0
+        column.config_kD(0, 0.0, Constants.kCANTimeoutMs); //4.0 : 1.0
         column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
         column.selectProfileSlot(0, 0);
         column.config_IntegralZone(0, getRPMToEncVelocity(100));
@@ -120,6 +124,9 @@ public class Column extends Subsystem {
                 } else {
                     ballDetectedTimestamp = Double.POSITIVE_INFINITY;
                     detectedBall = false;
+                    if (shootingCurrentBall) {
+                        ballLeftTimestamp = Timer.getFPGATimestamp();
+                    }
                     shootingCurrentBall = false;
                     System.out.println("Column banner stopped detecting ball");
                 }
@@ -219,6 +226,17 @@ public class Column extends Subsystem {
         }
     }
 
+    private boolean inRange(Optional<ShooterAimingParameters> aim, double floor, double ceiling) {
+        if (aim.isPresent()) {
+            return floor <= aim.get().getRange() && aim.get().getRange() <= ceiling &&
+                    Swerve.getInstance().getVelocity().norm() <= Constants.Column.kFasterFeedMaxSwerveVelocity && 
+                    !(Intake.getInstance().getState() == Intake.ControlState.INTAKE || Intake.getInstance().getState() == Intake.ControlState.AUTO_FEED_INTAKE) &&
+                    fastFedBalls < 1;
+        }
+
+        return false;
+    }
+
     Loop loop = new Loop() {
 
         @Override
@@ -231,34 +249,66 @@ public class Column extends Subsystem {
         public void onLoop(double timestamp) {
             switch(currentState) {
                 case FEED_BALLS:
+                    Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
                     if (!getBanner()) {
-                        setVelocity(Constants.Column.kQueueVelocitySpeed);
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration && 
+                                inRange(aim, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                        } else {
+                            setVelocity(Constants.Column.kQueueVelocitySpeed);
+                        }
                     } else if((getBanner() && Double.isFinite(ballDetectedTimestamp) && 
                             (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay && allSubsystemsReady())) {
                         //setOpenLoop(Constants.Column.kFeedBallSpeed);
                         columnStartTimestamp = timestamp;
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration &&
+                                inRange(aim, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                            if (!shootingCurrentBall) {
+                                fastFedBalls++;
+                            }
+                        } else {
+                            setVelocity(Constants.Column.kFeedVelocitySpeed);
+                            if (!shootingCurrentBall) {
+                                fastFedBalls = 0;
+                            }
+                        }
                         if (!shootingCurrentBall) {
                             printVisionSubsystemInfo();
+                            Swerve.getInstance().enableInputs(false);
+                            disabledSwerveTimestamp = timestamp;
                         }
                         shootingCurrentBall = true;
-                        setVelocity(Constants.Column.kFeedVelocitySpeed);
                         //System.out.println("Shot the ball at a range of : " + shooter.getTargetRange());
                     } else {
-                        if (!shootingCurrentBall)
+                        if (!shootingCurrentBall && 
+                                (timestamp - ballLeftTimestamp >= Constants.Column.kFasterFeedDuration || !inRange(aim, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)))
                             setOpenLoop(0.0);
                     }
                     break;
                 case MANUAL_FEED_BALLS:
                     System.out.println("Column Banner : " + getBanner() + ", Ball Detected Timestamp finite : " + Double.isFinite(ballDetectedTimestamp) + ", within timestamp : " + ((timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay) + ", Shooter on Target : " + shooter.hasReachedSetpoint() + ", Hood on Target : " + motorizedHood.hasReachedAngle());
+                    Optional<ShooterAimingParameters> aimManual = RobotState.getInstance().getCachedAimingParameters();
                     if (!getBanner()) {
-                        setVelocity(Constants.Column.kQueueVelocitySpeed);
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration && 
+                                inRange(aimManual, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                        } else {
+                            setVelocity(Constants.Column.kQueueVelocitySpeed);
+                        }
                     } else if(getBanner() && Double.isFinite(ballDetectedTimestamp) && (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay
                                 && shooter.hasReachedSetpoint() && motorizedHood.hasReachedAngle()) {
                         columnStartTimestamp = timestamp;
                         shootingCurrentBall = true;
-                        setVelocity(Constants.Column.kFeedVelocitySpeed);
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration &&
+                                inRange(aimManual, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                        } else {
+                            setVelocity(Constants.Column.kFeedVelocitySpeed);
+                        }
                     } else {
-                        if (!shootingCurrentBall)
+                        if (!shootingCurrentBall && 
+                                (timestamp - ballLeftTimestamp >= Constants.Column.kFasterFeedDuration || !inRange(aimManual, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)))
                             setOpenLoop(0.0);
                     }
                     break;
@@ -285,6 +335,15 @@ public class Column extends Subsystem {
             }
             if(banner.get() && ballFeeder.detectedBallType == BallFeeder.BallType.Team) {
                 notifyDrivers = true;
+            }
+
+            if (timestamp - disabledSwerveTimestamp >= Constants.Column.kColumnActivationShotTime) {
+                Swerve.getInstance().enableInputs(true);
+            }
+
+            if (!shootingCurrentBall && timestamp - ballLeftTimestamp >= Constants.Column.kExtraSwerveDelay) {
+                Swerve.getInstance().enableInputs(true);
+
             }
             
         }
