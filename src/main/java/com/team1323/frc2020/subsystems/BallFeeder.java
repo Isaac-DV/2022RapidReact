@@ -264,7 +264,10 @@ public class BallFeeder extends Subsystem {
                     break;
                 case DETECT:
                     updateDetectionLogic(timestamp);
-                    break;               
+                    break; 
+                case HOLD:
+                    setFeederOpenLoop(1.0);
+                    ballSplitter.setOpenLoop(0.0);             
                 default:
                     break;
             }

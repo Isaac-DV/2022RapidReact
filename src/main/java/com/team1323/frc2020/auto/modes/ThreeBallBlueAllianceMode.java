@@ -16,6 +16,7 @@ import com.team1323.frc2020.auto.actions.WaitAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
+import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Intake;
 import com.team1323.frc2020.subsystems.MotorizedHood;
@@ -32,10 +33,8 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
     Superstructure s;
     @Override
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
-        return Arrays.asList(trajectories.thirdBallBackup, trajectories.firstBallToSecondBall, 
-                trajectories.secondBallToHumanPlayer,
-                trajectories.terminalToBackupPoint,
-                trajectories.backupPointToPostTerminalShotPose
+        return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
+                trajectories.opponentBallToEjectLocation
                 );
     }
     public ThreeBallBlueAllianceMode() {
@@ -63,6 +62,22 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
         runAction(new WaitForSuperstructureAction());
         runAction(new WaitForShotsAction(2.0));
 
+        //Go To the opponents ball and intake(do not eject)
+        s.intakeState();
+        runAction(new WaitForSuperstructureAction());
+        s.ballFeeder.setOpenLoopState(1.0);
+        runAction(new SetTrajectoryAction(trajectories.thirdBallToThirdOpponentBall, 0.0, 1.0));
+        runAction(new WaitToFinishPathAction(4));
+
+        //Go the the eject location and eject
+        runAction(new SetTrajectoryAction(trajectories.opponentBallToEjectLocation, 129.0, 1.0));
+        runAction(new WaitToFinishPathAction(4));
+        runAction(new WaitAction(1.0));
+        s.ballSplitter.setOpenLoop(0.25);
+
+        //Wait and then go to the side wall
+        runAction(new SetTrajectoryAction(trajectories.));
+        
         
         
     }
