@@ -76,7 +76,7 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
         s.ballSplitter.setOpenLoop(0.25);
 
         //Wait and then go to the side wall
-        runAction(new SetTrajectoryAction(trajectories.));
+        //runAction(new SetTrajectoryAction(trajectories.));
         
         
         
