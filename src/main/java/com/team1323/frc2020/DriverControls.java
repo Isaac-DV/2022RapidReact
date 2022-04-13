@@ -147,14 +147,15 @@ public class DriverControls implements Loop {
         double swerveXInput = -driver.getLeftY();
         double swerveRotationInput = driver.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightBumper.isBeingPressed() , false);
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.leftBumper.isBeingPressed() , false);
         
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
         else if (driver.aButton.wasActivated()) 
             swerve.rotate(180);
         else if (driver.xButton.wasActivated())
-            swerve.rotate(270);
+            //swerve.rotate(270);
+            turret.setCOFState();
         else if (driver.yButton.wasActivated())
             swerve.rotate(0.0);
 
@@ -191,7 +192,10 @@ public class DriverControls implements Loop {
         if(driver.POV180.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
-        if(driver.leftBumper.wasActivated()) {
+        if(driver.POV0.wasActivated()) {
+            swerve.resetPosition(Constants.kLaunchPadPose);
+        }
+        if(driver.rightBumper.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
 
@@ -293,7 +297,7 @@ public class DriverControls implements Loop {
             }
 
             if(coDriver.yButton.wasActivated()) {
-                s.manualShotState(2150.0, 20); //2250, 19
+                s.positionShotState(); //2250, 19
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
@@ -323,7 +327,7 @@ public class DriverControls implements Loop {
             if(coDriver.startButton.wasActivated()) {
                 //turret.lockAngle();
                 turret.startVision();
-                //motorizedHood.setState(MotorizedHood.State.VISION);
+                motorizedHood.setState(MotorizedHood.State.VISION);
             }
 
         } else {
@@ -333,6 +337,9 @@ public class DriverControls implements Loop {
             if(coDriver.bButton.wasActivated()) {
                 if(doubleTelescopes.leftTelescopeOnTarget() && doubleTelescopes.rightTelescopeOnTarget())
                     doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.THIRD_INITIAL_HANG);
+            }
+            if(coDriver.yButton.wasActivated()) {
+                doubleTelescopes.setLiftMode(DoubleTelescopes.LiftMode.SECOND_FULL_RELEASE);
             }
         }
 

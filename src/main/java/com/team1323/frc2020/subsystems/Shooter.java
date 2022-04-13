@@ -332,7 +332,7 @@ public class Shooter extends Subsystem {
 
     @Override
     public void writePeriodicOutputs() {
-        if (getState() == State.VELOCITY || getState() == State.VISION) {
+        if (getState() == State.VELOCITY || getState() == State.VISION || getState() == State.POSITION) {
             master.set(ControlMode.Velocity, periodicIO.demand);
         } else {
             master.set(ControlMode.PercentOutput, periodicIO.demand);

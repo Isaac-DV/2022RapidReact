@@ -325,9 +325,8 @@ public class Superstructure extends Subsystem {
 					turret.startRobotStatePositionRequest(),
 					shooter.positionVelocityRequest()
 				),
-				turret.robotStateVisionRequest(),
 				//intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.FEED_BALLS)
+				column.stateRequest(Column.ControlState.MANUAL_FEED_BALLS)
 			)
 		);
 	}
@@ -338,7 +337,7 @@ public class Superstructure extends Subsystem {
 				//new LambdaRequest(() -> swerve.useSlewLimiter(false)),
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
-				motorizedHood.setAngleRequest(15.5),
+				//motorizedHood.setAngleRequest(15.5),
 				//shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
 					Optional<Pose2d> newRobotPose = RobotState.getInstance().getEstimatedRobotPosition();
@@ -349,7 +348,7 @@ public class Superstructure extends Subsystem {
 					}
 				}),
 				new LambdaRequest(() -> {
-					if (turret.getState() == Turret.ControlState.ROBOT_STATE_VISION) {
+					if (turret.getState() == Turret.ControlState.ROBOT_STATE_VISION || turret.getState() == Turret.ControlState.ROBOT_POSITION) {
 						turret.startVision();
 					} else {
 						turret.lockAngle();

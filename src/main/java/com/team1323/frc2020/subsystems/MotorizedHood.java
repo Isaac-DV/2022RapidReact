@@ -291,12 +291,17 @@ public class MotorizedHood extends Subsystem {
         System.out.println("Hood Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + Constants.MotorizedHood.kEncStartingAngle + ", difference: " + (getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle) + ", degreesToEncUnits: " + degreesToEncUnits(getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle));
         zeroedAbsolutely = true;
     }
-
+    private void dashboardHoodReZero() {
+        SmartDashboard.putBoolean("Re-zero Hood", false);
+        /*if(getState() != State.ZEROING)
+            zeroHood();*/
+    }
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
         SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
-
+        if(SmartDashboard.getBoolean("Re-zero Hood", false))
+            dashboardHoodReZero();
         if(Settings.debugHood()) {
             SmartDashboard.putNumber("Hood Absolute Encoder", getAbsoluteEncoderDegrees()); // -281 -234
             SmartDashboard.putNumber("Hood Encoder", periodicIO.position); // -8000
