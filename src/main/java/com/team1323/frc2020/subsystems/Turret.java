@@ -380,8 +380,12 @@ public class Turret extends Subsystem {
                     }*/
                     break;
                 case ROBOT_POSITION:
-                    Translation2d robotToCenter = robotState.getTurretToCenterOfField();
-                    setAngle(boundToTurretScope(robotToCenter.direction().getDegrees()));
+                    Optional<ShooterAimingParameters> positionParameters = robotState.getAimingParametersFromPosition();
+                    if(positionParameters.isPresent()) {
+                        setAngle(boundToTurretScope(positionParameters.get().getTurretAngle().getDegrees()));
+                    }
+                    /*Translation2d robotToCenter = robotState.getTurretToCenterOfField();
+                    setAngle(boundToTurretScope(robotToCenter.direction().getDegrees()));*/
                     break;
                 default:
                 break;

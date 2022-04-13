@@ -101,6 +101,8 @@ public class MotorizedHood extends Subsystem {
         setOpenLoop(0.0);
         smartTuner = new SmartTuner(hood, "hood");
         smartTuner.enabled(true);
+
+        initializeDashboardValues();
     }
 
     private void enableLimits(boolean enable) {
@@ -214,10 +216,14 @@ public class MotorizedHood extends Subsystem {
                     }
                     break;
                 case ROBOT_POSITION:
-                    Translation2d robotToCenterVector = RobotState.getInstance().getTurretToCenterOfField();
+                    Optional<ShooterAimingParameters> positionParameters = RobotState.getInstance().getAimingParametersFromPosition();
+                    if(positionParameters.isPresent()) {
+                        setAngle(positionParameters.get().getHoodAngle().getDegrees());
+                    }
+                    /*Translation2d robotToCenterVector = RobotState.getInstance().getTurretToCenterOfField();
                     double robotToCenterMagnitude = robotToCenterVector.norm();
                     Translation2d shotVector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(robotToCenterMagnitude));
-                    setAngle(shotVector.direction().getDegrees());
+                    setAngle(shotVector.direction().getDegrees());*/
                     break;
                 case ZEROING:
                     if (hood.getOutputCurrent() > Constants.MotorizedHood.kZeroingCurrent) {
@@ -290,6 +296,10 @@ public class MotorizedHood extends Subsystem {
         System.out.println("Hood Zeroed");
         System.out.println("Hood Absolute angle: " + getAbsoluteEncoderDegrees() + ", encoder offset: " + Constants.MotorizedHood.kEncStartingAngle + ", difference: " + (getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle) + ", degreesToEncUnits: " + degreesToEncUnits(getAbsoluteEncoderDegrees() - Constants.MotorizedHood.kEncStartingAngle));
         zeroedAbsolutely = true;
+    }
+    private void initializeDashboardValues() {
+        boolean zeroedHoodValue = SmartDashboard.getBoolean("Re-zero Hood", false);
+        SmartDashboard.putBoolean("Re-zero Hood", false);
     }
     private void dashboardHoodReZero() {
         SmartDashboard.putBoolean("Re-zero Hood", false);

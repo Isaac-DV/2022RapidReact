@@ -13,10 +13,12 @@ import com.team1323.frc2020.auto.AutoModeEndedException;
 import com.team1323.frc2020.auto.actions.ResetPoseAction;
 import com.team1323.frc2020.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2020.auto.actions.WaitAction;
+import com.team1323.frc2020.auto.actions.WaitForOneBallAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
 import com.team1323.frc2020.subsystems.BallFeeder;
+import com.team1323.frc2020.subsystems.BallSplitter;
 import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Intake;
 import com.team1323.frc2020.subsystems.MotorizedHood;
@@ -34,7 +36,7 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
     @Override
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
-                trajectories.opponentBallToEjectLocation
+                trajectories.opponentBallToEjectLocation, trajectories.ejectLocationToWallRide
                 );
     }
     public ThreeBallBlueAllianceMode() {
@@ -63,10 +65,10 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
         runAction(new WaitForShotsAction(2.0));
 
         //Go To the opponents ball and intake(do not eject)
+        runAction(new SetTrajectoryAction(trajectories.thirdBallToThirdOpponentBall, 0.0, 1.0));
         s.intakeState();
         runAction(new WaitForSuperstructureAction());
         s.ballFeeder.setOpenLoopState(1.0);
-        runAction(new SetTrajectoryAction(trajectories.thirdBallToThirdOpponentBall, 0.0, 1.0));
         runAction(new WaitToFinishPathAction(4));
 
         //Go the the eject location and eject
@@ -76,8 +78,13 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
         s.ballSplitter.setOpenLoop(0.25);
 
         //Wait and then go to the side wall
-        //runAction(new SetTrajectoryAction(trajectories.));
-        
+        runAction(new WaitAction(2.0));
+        runAction(new SetTrajectoryAction(trajectories.ejectLocationToWallRide, 225.0, 1.0));
+        s.intakeState();
+        runAction(new WaitForSuperstructureAction());
+        runAction(new WaitForOneBallAction(8.0));
+        s.visionShotState();
+        runAction(new WaitToFinishPathAction(5.0));
         
         
     }

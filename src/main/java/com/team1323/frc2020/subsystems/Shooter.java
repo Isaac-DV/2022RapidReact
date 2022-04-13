@@ -232,12 +232,20 @@ public class Shooter extends Subsystem {
                     }
                     break;
                 case POSITION:
-                    Translation2d robotToCenter = RobotState.getInstance().getTurretToCenterOfField();
+                    Optional<ShooterAimingParameters> positionParameters = RobotState.getInstance().getAimingParametersFromPosition();
+                    if(positionParameters.isPresent()) {
+                        double rpm = positionParameters.get().getShooterRPM();
+                        periodicIO.demand = rpmToEncVelocity(rpm);
+                        targetRPM = rpm;
+
+                    }
+                    /*Translation2d robotToCenter = RobotState.getInstance().getTurretToCenterOfField();
                     double robotToCenterMagnitude = robotToCenter.norm();
                     Translation2d shotVector = Constants.kDistanceToShotVectorMap.getInterpolated(new InterpolatingDouble(robotToCenterMagnitude));
                     double rpm = shotVector.norm();
                     periodicIO.demand = rpmToEncVelocity(rpm);
-                    targetRPM = rpm;
+                    targetRPM = rpm;*/
+                    break;
                 default:
                     break;
             }

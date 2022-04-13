@@ -143,7 +143,7 @@ public class Column extends Subsystem {
     }
 
     public enum ControlState {
-        OFF(0.0), FEED_BALLS(0.0), MANUAL_FEED_BALLS(Constants.Column.kFeedBallSpeed), EJECT(Constants.Column.kReverseSpeed), 
+        OFF(0.0), FEED_BALLS(0.0), MANUAL_FEED_BALLS(0.0), EJECT(Constants.Column.kReverseSpeed), 
         INDEX_BALLS(0.0), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
         double speed;
         ControlState(double speed) {

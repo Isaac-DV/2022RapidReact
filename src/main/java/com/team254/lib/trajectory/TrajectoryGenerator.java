@@ -137,6 +137,7 @@ public class TrajectoryGenerator {
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> thirdBallToThirdOpponentBall;
         public final Trajectory<TimedState<Pose2dWithCurvature>> opponentBallToEjectLocation;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> ejectLocationToWallRide;
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> farLeftTaxiBackup;
     
@@ -166,6 +167,7 @@ public class TrajectoryGenerator {
 
             thirdBallToThirdOpponentBall = getThirdBallToThirdOpponentBall();
             opponentBallToEjectLocation = getThirdOpponentBallToEjectPosition();
+            ejectLocationToWallRide = getEjectPositionToWallRide();
 
             farLeftTaxiBackup = getFarLeftTaxiBackup();
         }
@@ -322,8 +324,19 @@ public class TrajectoryGenerator {
             waypoints.add(wallRideStartPosition);
             waypoints.add(new Pose2d(wallRideStartPosition.getTranslation(), Rotation2d.fromDegrees(-180)));
             waypoints.add(wallRideEndPosition);
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, 72.0, kMaxDecel, kMaxVoltage, 24.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 60, 60.0, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getPacManPath(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(new Translation2d(152.57142857142858, -142.57142857142858), Rotation2d.fromDegrees(90)));
+            waypoints.add(new Pose2d(new Translation2d(156, -72.28571428571429), Rotation2d.fromDegrees(0)));
+            waypoints.add(new Pose2d(new Translation2d(175.42857142857142, -135.71428571428572), Rotation2d.fromDegrees(0)));
+            waypoints.add(new Pose2d(new Translation2d(204.57142857142858, -71.71428571428571), Rotation2d.fromDegrees(0)));
+            waypoints.add(new Pose2d(new Translation2d(223.42857142857142, -135.71428571428572), Rotation2d.fromDegrees(0)));
+            waypoints.add(new Pose2d(new Translation2d(254.28571428571428, -74.57142857142857), Rotation2d.fromDegrees(0)));
+            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+        }
+
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getFarLeftTaxiBackup() {
             List<Pose2d> waypoints = new ArrayList<>();

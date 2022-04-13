@@ -104,6 +104,7 @@ public class DoubleTelescopes extends Subsystem {
             motor.setSelectedSensorPosition(0);
         }
         configPID();
+        initializeDashboardValues();
     }
 
     private void configPID() {
@@ -383,8 +384,19 @@ public class DoubleTelescopes extends Subsystem {
             rightTelescope.set(ControlMode.MotionMagic, periodicIO.rightDemand);
         }
     }
+    private void dashboardRezeroTelescopes() {
+        SmartDashboard.putBoolean("Re-zero Telescopes", false);
+        if(getLeftTelescopeState() != TelescopeState.ZEROING && getRightTelescopeState() != TelescopeState.ZEROING)
+            zeroWithHardStop();
+    }
+    private void initializeDashboardValues() {
+        boolean values = SmartDashboard.getBoolean("Re-zero Telescopes", false);
+        SmartDashboard.putBoolean("Re-zero Telescopes", false);
+    }
     @Override
     public void outputTelemetry() {
+        if(SmartDashboard.getBoolean("Re-zero Telescopes", false))
+            dashboardRezeroTelescopes();
         SmartDashboard.putNumber("Telescope Right Height Inches", encUnitsToInches(rightTelescope.getSelectedSensorPosition()));
         SmartDashboard.putNumber("Telescope Left Height Inches", encUnitsToInches(leftTelescope.getSelectedSensorPosition()));
         SmartDashboard.putString("Current Lift Mode", currentLiftMode.toString());
