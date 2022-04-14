@@ -103,7 +103,7 @@ public class Column extends Subsystem {
         column.config_kP(0, 0.0, Constants.kCANTimeoutMs); //0.2 : 0.1
         column.config_kI(0, 0.0, Constants.kCANTimeoutMs); //0.0 : 0.0
         column.config_kD(0, 0.0, Constants.kCANTimeoutMs); //4.0 : 1.0
-        column.config_kF(0, 0.051, Constants.kCANTimeoutMs); //0.051
+        column.config_kF(0, 0.0495, Constants.kCANTimeoutMs); //0.051
         column.selectProfileSlot(0, 0);
         column.config_IntegralZone(0, getRPMToEncVelocity(100));
 
@@ -228,12 +228,12 @@ public class Column extends Subsystem {
 
     private boolean inRange(Optional<ShooterAimingParameters> aim, double floor, double ceiling) {
         if (aim.isPresent()) {
-            return floor <= aim.get().getRange() && aim.get().getRange() <= ceiling &&
+            /*return floor <= aim.get().getRange() && aim.get().getRange() <= ceiling &&
                     Swerve.getInstance().getVelocity().norm() <= Constants.Column.kFasterFeedMaxSwerveVelocity && 
                     !(Intake.getInstance().getState() == Intake.ControlState.INTAKE || Intake.getInstance().getState() == Intake.ControlState.AUTO_FEED_INTAKE) &&
-                    fastFedBalls < 1;
+                    fastFedBalls < 1;*/
         }
-
+        
         return false;
     }
 

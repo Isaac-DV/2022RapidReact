@@ -65,7 +65,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         runAction(new WaitAction(0.5));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitForShotsAction(2.0));
+        runAction(new WaitForShotsAction(1.0));
         s.turret.setCOFState();
         s.intakeState();
 
@@ -76,7 +76,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         // Shoot third ball
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitForShotsAction(1.5, 1));
+        runAction(new WaitForShotsAction(1.0, 1));
         s.turret.setCOFState();
         s.intakeState();
 
