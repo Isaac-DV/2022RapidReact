@@ -36,7 +36,7 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
     @Override
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
-                trajectories.opponentBallToEjectLocation, trajectories.ejectLocationToWallRide
+                trajectories.opponentBallToEjectLocation
                 );
     }
     public ThreeBallBlueAllianceMode() {
@@ -79,9 +79,13 @@ public class ThreeBallBlueAllianceMode extends AutoModeBase{
 
         //Wait and then go to the side wall
         runAction(new WaitAction(2.0));
-        runAction(new SetTrajectoryAction(trajectories.ejectLocationToWallRide, 225.0, 1.0));
+        runAction(new SetTrajectoryAction(trajectories.ejectLocationToWallRideStart, 225.0, 1.0));
         s.intakeState();
         runAction(new WaitForSuperstructureAction());
+        runAction(new WaitToFinishPathAction(4.0));
+
+        //Start the Wall Ride
+        runAction(new SetTrajectoryAction(trajectories.wallRideStartToWallRideEnd, 225.0, 1.0));
         runAction(new WaitForOneBallAction(8.0));
         s.visionShotState();
         runAction(new WaitToFinishPathAction(5.0));
