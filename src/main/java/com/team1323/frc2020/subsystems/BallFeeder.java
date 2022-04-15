@@ -43,6 +43,11 @@ public class BallFeeder extends Subsystem {
     boolean isIntakeOpenLoop = false;
     boolean sentUpBall = false;
     boolean canChangeDetectedBall = true;
+    boolean intakeResuckActivated = false;
+    private boolean intakeResuckHasBeenActivated = false;
+    public boolean hasIntakeResuckBeenActivated() {
+        return intakeResuckHasBeenActivated;
+    }
     public boolean hasSentUpBall() {
         return sentUpBall;
     }
@@ -267,7 +272,16 @@ public class BallFeeder extends Subsystem {
                     break; 
                 case HOLD:
                     setFeederOpenLoop(1.0);
-                    ballSplitter.setOpenLoop(0.0);             
+                    ballSplitter.setOpenLoop(0.0);
+                    if(banner.get()) {
+                        intakeResuckActivated = true;
+                        intakeResuckHasBeenActivated = true;
+                        intake.setOpenLoop(-0.25);
+                    }
+                    if(!banner.get() && intakeResuckActivated) {
+                        intake.setOpenLoop(0.0);
+                        intakeResuckActivated = false;
+                    }
                 default:
                     break;
             }

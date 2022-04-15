@@ -238,7 +238,7 @@ public class Constants {
         public static final double kFeedVelocitySpeed = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.15 : 0.2);
         public static final double kFasterFeedVelocity = kMaxSpeed * (Settings.kIsUsingCompBot ? 0.8 : 0.3);
         public static final double kQueueVelocitySpeed = kMaxSpeed * 0.4; //0.4
-        public static final double kBallDelay = 0.001;
+        public static final double kBallDelay = 0.05;
         public static final double kFasterFeedDuration = 0.375; // seconds
         public static final double kMinFasterFeedRange = 134.0; // 112
         public static final double kMaxFasterFeedRange = 170.0; // 164

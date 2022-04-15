@@ -5,6 +5,7 @@ import com.team1323.frc2020.auto.modes.SixBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.StandStillMode;
 import com.team1323.frc2020.auto.modes.TaxiOneBallMode;
 import com.team1323.frc2020.auto.modes.TestMode;
+import com.team1323.frc2020.auto.modes.ThreeBallPoachBlueAllianceMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,6 +25,7 @@ public class SmartDashboardInteractions {
         //modeChooser.addOption(AutoOption.TEST_MODE.name, AutoOption.TEST_MODE);
         modeChooser.addOption(AutoOption.TWO_BALL_TWO_EJECT_MODE.name, AutoOption.TWO_BALL_TWO_EJECT_MODE);
         modeChooser.addOption(AutoOption.STAND_STILL.name, AutoOption.STAND_STILL);
+        modeChooser.addOption(AutoOption.THREE_BALL_POACH_MODE.name, AutoOption.THREE_BALL_POACH_MODE);
 
         SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -43,7 +45,8 @@ public class SmartDashboardInteractions {
         STAND_STILL("Stand Still"), TEST_MODE("Test Mode"),
         FIVE_BALL_ONE_EJECT_MODE("Five Ball One Eject Mode"),
         TWO_BALL_TWO_EJECT_MODE("Two Ball Two Eject Mode"),
-        TAXI_ONE_BALL_MODE("Taxi One Ball Mode");
+        TAXI_ONE_BALL_MODE("Taxi One Ball Mode"),
+        THREE_BALL_POACH_MODE("Three Ball Poach Mode");
     	
     	public final String name;
     	
@@ -64,6 +67,8 @@ public class SmartDashboardInteractions {
                 return new TwoBallTwoEjectMode();
             case TAXI_ONE_BALL_MODE:
                 return new TaxiOneBallMode();
+            case THREE_BALL_POACH_MODE:
+                return new ThreeBallPoachBlueAllianceMode();
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();

@@ -22,7 +22,7 @@ public class Settings {
 
     private static Settings instance = new Settings(); 
 
-    public static final boolean kIsUsingCompBot = true;
+    public static final boolean kIsUsingCompBot = false;
     public static final ShootingProfile kShootingProfile = kIsUsingCompBot ? new CompBotRegularBallProfile() : new PracticeBotRegularBallProfile();
 	public static final boolean kIsUsingTractionWheels = true;
 

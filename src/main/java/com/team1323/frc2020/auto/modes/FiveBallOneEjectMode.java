@@ -87,7 +87,7 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         runAction(new WaitForTwoBallsAction(2.0));
 
         // Go back to shooting spot
-        runAction(new SetTrajectoryAction(trajectories.backupPointToPostTerminalShotPose, 90.0, 1));
+        runAction(new SetTrajectoryAction(trajectories.backupPointToPostTerminalShotPose, 0.0, 1));
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot last two balls
