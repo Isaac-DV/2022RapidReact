@@ -17,7 +17,7 @@ import com.team254.lib.trajectory.timing.VelocityLimitRegionConstraint;
 import edu.wpi.first.wpilibj.Timer;
 
 public class TrajectoryGenerator {
-    private static final double kMaxVelocity = 72.0;
+    private static final double kMaxVelocity = 120.0;
     private static final double kMaxAccel = 120.0; // 120 
     private static final double kMaxDecel = 72.0; //72
     private static final double kMaxVoltage = 9.0;
@@ -290,7 +290,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(autoEjectStartingPose);
             waypoints.add(new Pose2d(thirdBallPickupPose.getTranslation(), Rotation2d.fromDegrees(-135)));
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 12.0, 1);
         }
         private Trajectory<TimedState<Pose2dWithCurvature>> getThirdBallToSecondOpponentBall(){
             List<Pose2d> waypoints = new ArrayList<>();
@@ -312,26 +312,26 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(thirdBallPickupPose.getTranslation(), Rotation2d.fromDegrees(0.0)));
             waypoints.add(new Pose2d(thirdOpponentBallPickupPose.getTranslation().translateBy(new Translation2d(0, -17.0)), Rotation2d.fromDegrees(-90.0)));
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
         private Trajectory<TimedState<Pose2dWithCurvature>> getThirdOpponentBallToEjectPosition() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(thirdOpponentBallPickupPose.getTranslation().translateBy(new Translation2d(0, -17.0)), Rotation2d.fromDegrees(45.0)));
             waypoints.add(opponentBallEjectPosition);
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getEjectPositionToWallRideStart() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(opponentBallEjectPosition.getTranslation(), Rotation2d.fromDegrees(-90)));
             waypoints.add(wallRideStartPosition);
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
         private Trajectory<TimedState<Pose2dWithCurvature>> getWallRideStartToWallRideEnd() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(wallRideStartPosition.getTranslation(), Rotation2d.fromDegrees(-180)));
             waypoints.add(wallRideEndPosition);
-            return generateTrajectory(false, waypoints, Arrays.asList(), kMaxVelocity, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
 
 
