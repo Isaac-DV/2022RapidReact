@@ -6,6 +6,7 @@ package com.team1323.frc2020.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.music.Orchestra;
@@ -36,6 +37,7 @@ public class Intake extends Subsystem {
         intake.setInverted(TalonFXInvertType.Clockwise);
         intake.configOpenloopRamp(0.1, Constants.kCANTimeoutMs);
         intake.setNeutralMode(NeutralMode.Coast);
+        intake.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 110.0, 110.0, 0.1));
     }
 
     public enum ControlState {

@@ -203,7 +203,7 @@ public class Constants {
         public static final double kWeakD = 0.0;
         public static final double kWeakF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 103.0 : 96.0; //96.0
+        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 100.0 : 96.0; //96.0
         public static final double kStowedAngle = -13.0;
         public static final double kBallDebouncerAngle = Settings.kIsUsingCompBot ? -2.0 : -8.0; //65.0
         public static final double kLowestAngle = 135.0;
