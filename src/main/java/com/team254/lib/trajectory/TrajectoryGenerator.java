@@ -92,12 +92,15 @@ public class TrajectoryGenerator {
     static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(162.0, 30.0), Rotation2d.fromDegrees(-90));
     static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0)).transformBy(Pose2d.fromTranslation(new Translation2d(0.0 ,0.0))); //(11, 12)
     static final Pose2d humanPlayerBackupPose = humanPlayerPickupPose.transformBy(Pose2d.fromTranslation(new Translation2d(-24.0, 0)));
-    static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(207.42857142857142, -70), Rotation2d.fromDegrees(-90));
+    static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(205, -68), Rotation2d.fromDegrees(-90)).transformBy(Pose2d.fromTranslation(Translation2d.fromPolar(Rotation2d.fromDegrees(-135.0), 0.0)));
     static final Pose2d thirdOpponentBallPickupPose = new Pose2d(new Translation2d(236, -107.71428571428572), Rotation2d.fromDegrees(-90));
 
-    static final Pose2d opponentBallEjectPosition = new Pose2d(new Translation2d(310, -120.42857142857143), Rotation2d.fromDegrees(-45.0));
-    static final Pose2d wallRideStartPosition = new Pose2d(new Translation2d(316, -134), Rotation2d.fromDegrees(-50.8263420296 + -90));
-    static final Pose2d wallRideEndPosition = new Pose2d(new Translation2d(235, -103), Rotation2d.fromDegrees(90));
+    static final Pose2d opponentBallEjectPosition = new Pose2d(new Translation2d(320.0, -130.42857142857143), Rotation2d.fromDegrees(-45.0));
+    static final Pose2d wallRideStartPosition = new Pose2d(new Translation2d(290, -140), Rotation2d.fromDegrees(-50.8263420296 + -90));
+    static final Pose2d wallRideEndPosition = new Pose2d(new Translation2d(180, -103), Rotation2d.fromDegrees(90));
+
+    static final Pose2d backSideEjectPosition = new Pose2d(new Translation2d(246, -30), Rotation2d.fromDegrees(80.0));    
+
     public class TrajectorySet {
         public class MirroredTrajectory {
             public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> left) {
@@ -140,6 +143,10 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> ejectLocationToWallRideStart;
         public final Trajectory<TimedState<Pose2dWithCurvature>> wallRideStartToWallRideEnd;
 
+        public final Trajectory<TimedState<Pose2dWithCurvature>> opponentBallToBackEjectLocation;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> backSideEjectToSecondOpponentBall;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> secondOpponentToBackSideEject;
+
         public final Trajectory<TimedState<Pose2dWithCurvature>> farLeftTaxiBackup;
     
         
@@ -170,6 +177,10 @@ public class TrajectoryGenerator {
             opponentBallToEjectLocation = getThirdOpponentBallToEjectPosition();
             ejectLocationToWallRideStart = getEjectPositionToWallRideStart();
             wallRideStartToWallRideEnd = getWallRideStartToWallRideEnd();
+
+            opponentBallToBackEjectLocation = getThirdOpponentBallToBackSideEject();
+            backSideEjectToSecondOpponentBall = getBackSideToSecondOpponentBall();
+            secondOpponentToBackSideEject = getSecondOpponentBallToBackSide();
 
             farLeftTaxiBackup = getFarLeftTaxiBackup();
         }
@@ -331,6 +342,24 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(wallRideStartPosition.getTranslation(), Rotation2d.fromDegrees(-180)));
             waypoints.add(wallRideEndPosition);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+        }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getThirdOpponentBallToBackSideEject() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(thirdOpponentBallPickupPose.getTranslation().translateBy(new Translation2d(0, -17.0)), Rotation2d.fromDegrees(90.0)));
+            waypoints.add(backSideEjectPosition);
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+        }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getBackSideToSecondOpponentBall() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(backSideEjectPosition.getTranslation(), Rotation2d.fromDegrees(180.0)));
+            waypoints.add(new Pose2d(secondOpponentBallPickupPose.getTranslation().translateBy(new Translation2d(17.0, 4.0)), Rotation2d.fromDegrees(135.0)));
+            return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
+        }
+        private Trajectory<TimedState<Pose2dWithCurvature>> getSecondOpponentBallToBackSide() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(secondOpponentBallPickupPose.getTranslation().translateBy(new Translation2d(17.0, 4.0)), Rotation2d.fromDegrees(-45.0)));
+            waypoints.add(new Pose2d(backSideEjectPosition.getTranslation().translateBy(new Translation2d(-7.0, 22.0)), Rotation2d.fromDegrees(0.0)));
             return generateTrajectory(false, waypoints, Arrays.asList(), 72.0, kMaxAccel, kMaxDecel, kMaxVoltage, 24.0, 1);
         }
 

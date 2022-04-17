@@ -13,7 +13,6 @@ import com.team1323.frc2020.auto.AutoModeEndedException;
 import com.team1323.frc2020.auto.actions.ResetPoseAction;
 import com.team1323.frc2020.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2020.auto.actions.WaitAction;
-import com.team1323.frc2020.auto.actions.WaitForOneBallAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
@@ -30,16 +29,16 @@ import com.team254.lib.trajectory.timing.TimedState;
 import edu.wpi.first.wpilibj.Timer;
 
 /** Add your docs here. */
-public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
+public class TwoBallBackHubHideMode extends AutoModeBase {
     Superstructure s;
     @Override
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
-                trajectories.opponentBallToEjectLocation, trajectories.ejectLocationToWallRideStart,
-                trajectories.wallRideStartToWallRideEnd
+                trajectories.opponentBallToBackEjectLocation, trajectories.backSideEjectToSecondOpponentBall,
+                trajectories.secondOpponentToBackSideEject
                 );
     }
-    public ThreeBallPoachBlueAllianceMode() {
+    public TwoBallBackHubHideMode() {
         s = Superstructure.getInstance();
     }
     @Override
@@ -55,6 +54,7 @@ public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
         
         // Pick up first ball
         s.intakeState();
+        runAction(new WaitForSuperstructureAction());
         runAction(new SetTrajectoryAction(trajectories.thirdBallBackup, -135.0, 1.0));
         runAction(new WaitAction(0.5));
         runAction(new WaitToFinishPathAction(4));
@@ -71,31 +71,32 @@ public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
         s.ballFeeder.setState(BallFeeder.State.HOLD);
         runAction(new WaitToFinishPathAction(4));
         runAction(new WaitAction(0.5));
-
+        
+        //Go To the back side of the hub and poop el ball
         if(s.ballFeeder.hasIntakeResuckBeenActivated()) {
-            //Go the the eject location and eject
             s.wrist.setWristAngle(80.0);
-            runAction(new SetTrajectoryAction(trajectories.opponentBallToEjectLocation, -135.0, 1.0)); //-129.0 Angle
-            runAction(new WaitToFinishPathAction(4));
-            runAction(new WaitAction(0.25));
-            s.intake.setOpenLoop(-0.35);
+            runAction(new SetTrajectoryAction(trajectories.opponentBallToBackEjectLocation, 21.0, 0.7));
+            runAction(new WaitToFinishPathAction(6.0));
+            s.intake.setOpenLoop(-0.15);
             runAction(new WaitAction(1.0));
-            
-            //Wait and then go to the side wall
-            runAction(new SetTrajectoryAction(trajectories.ejectLocationToWallRideStart, -135.0, 1.0));
-            s.intakeState();
-            s.wrist.setWeakIntakeState(true);
-            runAction(new WaitForSuperstructureAction());
-            runAction(new WaitToFinishPathAction(4.0));
 
-            //Start the Wall Ride
-            runAction(new SetTrajectoryAction(trajectories.wallRideStartToWallRideEnd, -135.0, 1.0));
-            runAction(new WaitForOneBallAction(8.0));
-            runAction(new WaitToFinishPathAction(5.0));
-            runAction(new WaitAction(1.0));
-            s.visionShotState();
+            //go to the next ball and intake it
+            runAction(new SetTrajectoryAction(trajectories.backSideEjectToSecondOpponentBall, 135.0, 1.0));
+            s.intakeState();
+            runAction(new WaitForSuperstructureAction());
+            s.ballFeeder.setState(BallFeeder.State.HOLD);
+            runAction(new WaitToFinishPathAction(6.0));
+
+            //take the ball to the back side
+            runAction(new WaitAction(0.5));
+            s.wrist.setWristAngle(80.0);
+            runAction(new SetTrajectoryAction(trajectories.secondOpponentToBackSideEject, 21.0, 0.7));
+            runAction(new WaitToFinishPathAction(6.0));
+            s.intake.setOpenLoop(-0.15);
+
+
+
         }
         System.out.println("Auto mode finished in " + currentTime() + " seconds");
     }
-
 }

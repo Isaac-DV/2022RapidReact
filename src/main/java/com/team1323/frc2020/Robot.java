@@ -14,6 +14,7 @@ import com.team1323.frc2020.auto.AutoModeExecuter;
 import com.team1323.frc2020.auto.SmartDashboardInteractions;
 import com.team1323.frc2020.auto.modes.FiveBallOneEjectMode;
 import com.team1323.frc2020.auto.modes.ThreeBallPoachBlueAllianceMode;
+import com.team1323.frc2020.auto.modes.TwoBallBackHubHideMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Looper;
@@ -102,7 +103,7 @@ public class Robot extends TimedRobot {
 
 		generator.generateTrajectories();
 
-		AutoModeBase auto = new ThreeBallPoachBlueAllianceMode();
+		AutoModeBase auto = new TwoBallBackHubHideMode();
 		qTransmitter.addPaths(auto.getPaths());
 		System.out.println("Total path time: " + qTransmitter.getTotalPathTime(auto.getPaths()));
 

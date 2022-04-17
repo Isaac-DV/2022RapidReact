@@ -63,6 +63,12 @@ public class Shooter extends Subsystem {
     public double getTargetRange() {
         return limelightRange;
     }
+
+    private boolean limelightShotEnabled = true;
+    public boolean isLimelightShotEnabled() {
+        return limelightShotEnabled;
+    }
+
     private double onTargetTimestamp = Double.POSITIVE_INFINITY;
 
     PeriodicIO periodicIO = new PeriodicIO();
@@ -120,9 +126,16 @@ public class Shooter extends Subsystem {
 
         smartTuner = new SmartTuner(master, "shooter");
         smartTuner.enabled(true);
+
+        initializeDashboard();
         /*
         double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
         SmartDashboard.putNumber("ShooterRPMInput", dsRPMInputValue);*/
+    }
+
+    public void initializeDashboard() {
+        boolean limelightShotEnabled = SmartDashboard.getBoolean("Limelight Shot Enabled", true);
+        SmartDashboard.putBoolean("Limelight Shot Enabled", limelightShotEnabled);
     }
 
     public void setOpenLoop(double output) {
@@ -346,6 +359,7 @@ public class Shooter extends Subsystem {
             master.set(ControlMode.PercentOutput, periodicIO.demand);
         }
     }
+
     
     public void updateRPM() {
         /*double rpmValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
@@ -354,6 +368,7 @@ public class Shooter extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
+        limelightShotEnabled = SmartDashboard.getBoolean("Limelight Shot Enabled", true);
         SmartDashboard.putNumber("Shooter RPM", getLeftRPM());
         SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);

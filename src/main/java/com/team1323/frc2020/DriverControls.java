@@ -293,30 +293,53 @@ public class DriverControls implements Loop {
             }
 
             if(coDriver.bButton.wasActivated()) {
-                wrist.setWristAngleWithAcceleration(Constants.Wrist.kStowedAngle);
+                wrist.setWeakIntakeState(true);
+                intake.conformToState(Intake.ControlState.INTAKE);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle + 5.0);
+                ballFeeder.setState(BallFeeder.State.DETECT);
+                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                    column.setState(Column.ControlState.INDEX_BALLS);
+                }
+                ballFeeder.setPrintFeeder(true);
+            } else if(coDriver.bButton.wasReleased()) {
+                wrist.setWeakIntakeState(false);
+                wrist.setLowStatorLimit(false);
+                intake.conformToState(Intake.ControlState.OFF);
+                ballFeeder.queueShutdown(true);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
+                column.shutDownIfUnused();
+                ballFeeder.setPrintFeeder(false);
             }
 
             if(coDriver.yButton.wasActivated()) {
-                s.positionShotState(); //2250, 19
+                //s.positionShotState(); //2250, 19
+                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 2100.0), (Settings.kIsUsingCompBot ? 20.0 : 23.0));
+                turret.startRobotPosition();
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
-            /*if(coDriver.xButton.wasActivated()) {
-                s.manualShotState(1900, 14);
+            if(coDriver.xButton.wasActivated()) {
+                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 2100.0), (Settings.kIsUsingCompBot ? 20.0 : 23.0));
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
-            }*/
-            if(coDriver.xButton.wasActivated()) {
+            }
+            /*if(coDriver.xButton.wasActivated()) {
                 s.manualShotState(shooter.dashboardRPMInput, motorizedHood.angleInput);
                 turret.startVision();
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
-            }
-            if(coDriver.rightTrigger.wasActivated() || driver.rightTrigger.wasActivated()) {
+            }*/
+            if(driver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
                 if(driver.rightTrigger.isBeingPressed())
                     swerve.setMaxSpeed(0.5);
                 s.visionShotState();
+            } else if(coDriver.rightTrigger.wasActivated()) {
+                if(shooter.isLimelightShotEnabled()) {
+                    s.visionShotState();
+                } else {
+                    s.positionShotState();
+                }
             } else if((coDriver.rightTrigger.wasReleased() && !driver.rightTrigger.isBeingPressed()) ||
                     (driver.rightTrigger.wasReleased() && !coDriver.rightTrigger.isBeingPressed())) {
                 SmartDashboard.putBoolean("Vision Shot is activated", false);

@@ -303,6 +303,10 @@ public class DoubleTelescopes extends Subsystem {
                         if(autoLiftMode) {
                             if(leftTelescopeOnTarget() && rightTelescopeOnTarget() && isRobotTiltingUp() && isRobotPitchWithinAngle(Constants.DoubleTelescopes.kFirstPitchAngle)) {
                                 wrist.setWristAngle(Constants.Wrist.kStowedAngle);
+                                /*if(!Settings.kIsUsingCompBot) {
+                                    leftTelescope.configMotionCruiseVelocity(Constants.DoubleTelescopes.kMaxSpeed * 0.65, Constants.kCANTimeoutMs);
+                                    leftTelescope.configMotionAcceleration(Constants.DoubleTelescopes.kMaxSpeed * 5.0, Constants.kCANTimeoutMs);
+                                }*/
                                 setLiftMode(LiftMode.SECOND_INITIAL_RELEASE);
                             }
                         }
