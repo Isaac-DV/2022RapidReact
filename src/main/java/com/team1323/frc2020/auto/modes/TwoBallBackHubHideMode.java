@@ -16,6 +16,8 @@ import com.team1323.frc2020.auto.actions.WaitAction;
 import com.team1323.frc2020.auto.actions.WaitForShotsAction;
 import com.team1323.frc2020.auto.actions.WaitForSuperstructureAction;
 import com.team1323.frc2020.auto.actions.WaitToFinishPathAction;
+import com.team1323.frc2020.auto.actions.WaitToPassXCoordinateAction;
+import com.team1323.frc2020.auto.actions.WaitToPassYCoordinateAction;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.Column;
 import com.team1323.frc2020.subsystems.Intake;
@@ -35,7 +37,7 @@ public class TwoBallBackHubHideMode extends AutoModeBase {
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
                 trajectories.opponentBallToBackEjectLocation, trajectories.backSideEjectToSecondOpponentBall,
-                trajectories.secondOpponentToBackSideEject
+                trajectories.secondOpponentToBackSideEject, trajectories.backSideToMidline
                 );
     }
     public TwoBallBackHubHideMode() {
@@ -82,6 +84,7 @@ public class TwoBallBackHubHideMode extends AutoModeBase {
 
             //go to the next ball and intake it
             runAction(new SetTrajectoryAction(trajectories.backSideEjectToSecondOpponentBall, 135.0, 1.0));
+            runAction(new WaitToPassXCoordinateAction(220.0));
             s.intakeState();
             runAction(new WaitForSuperstructureAction());
             s.ballFeeder.setState(BallFeeder.State.HOLD);
@@ -93,6 +96,11 @@ public class TwoBallBackHubHideMode extends AutoModeBase {
             runAction(new SetTrajectoryAction(trajectories.secondOpponentToBackSideEject, 21.0, 0.7));
             runAction(new WaitToFinishPathAction(6.0));
             s.intake.setOpenLoop(-0.15);
+            runAction(new WaitAction(0.75));
+            
+            s.postIntakeState();
+            runAction(new SetTrajectoryAction(trajectories.backSideToMidline, 0, 1.0));
+            runAction(new WaitToFinishPathAction());
 
 
 

@@ -36,7 +36,7 @@ public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
     public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
         return Arrays.asList(trajectories.thirdBallBackup, trajectories.thirdBallToThirdOpponentBall,
                 trajectories.opponentBallToEjectLocation, trajectories.ejectLocationToWallRideStart,
-                trajectories.wallRideStartToWallRideEnd
+                trajectories.wallRideStartToWallRideEnd, trajectories.wallRideEndToMidline
                 );
     }
     public ThreeBallPoachBlueAllianceMode() {
@@ -90,10 +90,16 @@ public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
 
             //Start the Wall Ride
             runAction(new SetTrajectoryAction(trajectories.wallRideStartToWallRideEnd, -135.0, 1.0));
-            runAction(new WaitForOneBallAction(8.0));
             runAction(new WaitToFinishPathAction(5.0));
-            runAction(new WaitAction(1.0));
             s.visionShotState();
+            runAction(new WaitForSuperstructureAction());
+            runAction(new WaitForShotsAction(2.0, 1));
+
+            runAction(new SetTrajectoryAction(trajectories.wallRideEndToMidline, 0, 1.0));
+            runAction(new WaitToFinishPathAction());
+            s.wrist.setWeakIntakeState(false);
+            s.wrist.setLowStatorLimit(false);
+
         }
         System.out.println("Auto mode finished in " + currentTime() + " seconds");
     }

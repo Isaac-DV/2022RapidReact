@@ -180,7 +180,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = Settings.kIsUsingCompBot ? -19.5 : -25.0;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 335.926430;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 269.611180 : 297.324709;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 

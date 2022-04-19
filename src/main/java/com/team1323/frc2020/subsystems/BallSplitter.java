@@ -100,7 +100,9 @@ public class BallSplitter extends Subsystem {
     }
     ControlState bestSplitterState = ControlState.OFF; //Determines the best direction for the splitter motor to go in
                                                       //based on the robots position on the field
-
+    public ControlState getBestSplitterState() {
+        return bestSplitterState;
+    }
     public void setOpenLoop(double demand) {
         splitter.set(ControlMode.PercentOutput, demand);
     }

@@ -7,6 +7,7 @@ import com.team1323.frc2020.auto.modes.TaxiOneBallMode;
 import com.team1323.frc2020.auto.modes.TestMode;
 import com.team1323.frc2020.auto.modes.ThreeBallPoachBlueAllianceMode;
 import com.team1323.frc2020.auto.modes.TwoBallBackHubHideMode;
+import com.team1323.frc2020.auto.modes.TwoBallCloseHideMode;
 import com.team1323.frc2020.auto.modes.TwoBallTwoEjectMode;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -24,10 +25,12 @@ public class SmartDashboardInteractions {
     	modeChooser = new SendableChooser<AutoOption>();
         modeChooser.setDefaultOption(DEFAULT_MODE.name, DEFAULT_MODE);
         //modeChooser.addOption(AutoOption.TEST_MODE.name, AutoOption.TEST_MODE);
-        modeChooser.addOption(AutoOption.TWO_BALL_TWO_EJECT_MODE.name, AutoOption.TWO_BALL_TWO_EJECT_MODE);
         modeChooser.addOption(AutoOption.STAND_STILL.name, AutoOption.STAND_STILL);
+        modeChooser.addOption(AutoOption.TAXI_ONE_BALL_MODE.name, AutoOption.TAXI_ONE_BALL_MODE);
+        modeChooser.addOption(AutoOption.TWO_BALL_TWO_EJECT_MODE.name, AutoOption.TWO_BALL_TWO_EJECT_MODE);
         modeChooser.addOption(AutoOption.THREE_BALL_POACH_MODE.name, AutoOption.THREE_BALL_POACH_MODE);
-        modeChooser.addOption(AutoOption.TWO_BALL_HIDE_MODE.name, AutoOption.TWO_BALL_HIDE_MODE);
+        modeChooser.addOption(AutoOption.TWO_BALL_HUB_HIDE_MODE.name, AutoOption.TWO_BALL_HUB_HIDE_MODE);
+        modeChooser.addOption(AutoOption.TWO_BALL_CLOSE_HIDE_MIDE.name, AutoOption.TWO_BALL_CLOSE_HIDE_MIDE);
         
         SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -49,8 +52,9 @@ public class SmartDashboardInteractions {
         TWO_BALL_TWO_EJECT_MODE("Two Ball Two Eject Mode"),
         TAXI_ONE_BALL_MODE("Taxi One Ball Mode"),
         THREE_BALL_POACH_MODE("Three Ball Poach Mode"),
-        TWO_BALL_HIDE_MODE("Two Ball Hide Mode");
-    	
+        TWO_BALL_HUB_HIDE_MODE("Two Ball Back Hub Hide Mode"),
+        TWO_BALL_CLOSE_HIDE_MIDE("Two Ball Close Hide Mode");
+
     	public final String name;
     	
     	AutoOption(String name){
@@ -72,8 +76,10 @@ public class SmartDashboardInteractions {
                 return new TaxiOneBallMode();
             case THREE_BALL_POACH_MODE:
                 return new ThreeBallPoachBlueAllianceMode();
-            case TWO_BALL_HIDE_MODE:
+            case TWO_BALL_HUB_HIDE_MODE:
                 return new TwoBallBackHubHideMode();
+            case TWO_BALL_CLOSE_HIDE_MIDE:
+                return new TwoBallCloseHideMode();
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();

@@ -313,13 +313,13 @@ public class DriverControls implements Loop {
 
             if(coDriver.yButton.wasActivated()) {
                 //s.positionShotState(); //2250, 19
-                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 2100.0), (Settings.kIsUsingCompBot ? 20.0 : 23.0));
+                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 1950.0), (Settings.kIsUsingCompBot ? 20.0 : 19.0));
                 turret.startRobotPosition();
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
             if(coDriver.xButton.wasActivated()) {
-                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 2100.0), (Settings.kIsUsingCompBot ? 20.0 : 23.0));
+                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 1950.0), (Settings.kIsUsingCompBot ? 20.0 : 19.0));
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
             }
@@ -347,10 +347,17 @@ public class DriverControls implements Loop {
                 s.postShotState();
             }
 
-            if(coDriver.startButton.wasActivated()) {
+            /*if(coDriver.startButton.wasActivated()) {
                 //turret.lockAngle();
                 turret.startVision();
                 motorizedHood.setState(MotorizedHood.State.VISION);
+            }*/
+            if(coDriver.startButton.wasActivated()) {
+                ballSplitter.conformToState(ballSplitter.getBestSplitterState());
+                ballFeeder.setFeederOpenLoop(1.0);
+            } else if(coDriver.startButton.wasReleased()) {
+                ballSplitter.conformToState(BallSplitter.ControlState.OFF);
+                ballFeeder.setFeederOpenLoop(0.0);
             }
 
         } else {
