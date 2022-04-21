@@ -601,7 +601,7 @@ public class Swerve extends Subsystem{
 	* @param rotationScalar Scalar to increase or decrease the robot's rotation speed
 	* @param followingCenter The point (relative to the robot) that will follow the trajectory
 	*/
-	public void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
+	public synchronized void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 	double rotationScalar, Translation2d followingCenter){
 		hasStartedFollowing = false;
 		hasFinishedPath = false;
@@ -616,7 +616,7 @@ public class Swerve extends Subsystem{
 		setState(ControlState.TRAJECTORY);
 	}
 	
-	public void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
+	public synchronized void setTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 	double rotationScalar){
 		setTrajectory(trajectory, targetHeading, rotationScalar, Translation2d.identity());
 	}
