@@ -313,13 +313,13 @@ public class DriverControls implements Loop {
 
             if(coDriver.yButton.wasActivated()) {
                 //s.positionShotState(); //2250, 19
-                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 1950.0), (Settings.kIsUsingCompBot ? 20.0 : 19.0));
+                s.manualShotState((Settings.kIsUsingCompBot ? 1975.0 : 1950.0), (Settings.kIsUsingCompBot ? 18.0 : 19.0));
                 turret.startRobotPosition();
             } else if(coDriver.yButton.wasReleased()) {
                 s.postShotState();
             }
             if(coDriver.xButton.wasActivated()) {
-                s.manualShotState((Settings.kIsUsingCompBot ? 2150.0 : 1950.0), (Settings.kIsUsingCompBot ? 20.0 : 19.0));
+                s.manualShotState((Settings.kIsUsingCompBot ? 1975.0 : 1950.0), (Settings.kIsUsingCompBot ? 18.0 : 19.0));
             } else if(coDriver.xButton.wasReleased()) {
                 s.postShotState();
             }
