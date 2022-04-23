@@ -9,7 +9,7 @@ import com.team254.lib.geometry.Translation2d;
 public class CompBotRegularBallProfile extends ShootingProfile {
 
     private static final double kCloseRPMOffset = 0.0;
-    private static final double kMidRPMOffset = -100.0;
+    private static final double kMidRPMOffset = -150.0;
     private static final double kFarRPMOffset = -150.0;
 
     private static final double kCloseHoodOffset = 0.0;

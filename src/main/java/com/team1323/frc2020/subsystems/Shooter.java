@@ -1,6 +1,5 @@
 package com.team1323.frc2020.subsystems;
 
-import java.lang.StackWalker.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,14 +16,11 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
-import com.team1323.lib.util.InterpolatingDouble;
 import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
-import com.team254.lib.geometry.Rotation2d;
-import com.team254.lib.geometry.Translation2d;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends Subsystem {
@@ -70,6 +66,8 @@ public class Shooter extends Subsystem {
     }
 
     private double onTargetTimestamp = Double.POSITIVE_INFINITY;
+
+    private SendableChooser<Double> rpmOffsetChooser;
 
     PeriodicIO periodicIO = new PeriodicIO();
     
@@ -131,6 +129,23 @@ public class Shooter extends Subsystem {
         /*
         double dsRPMInputValue = SmartDashboard.getNumber("ShooterRPMInput", dashboardRPMInput);
         SmartDashboard.putNumber("ShooterRPMInput", dsRPMInputValue);*/
+
+        rpmOffsetChooser = new SendableChooser<Double>();
+        rpmOffsetChooser.setDefaultOption("0", 0.0);
+        rpmOffsetChooser.addOption("-150", -150.0);
+        rpmOffsetChooser.addOption("-100", -100.0);
+        rpmOffsetChooser.addOption("-50", -50.0);
+        rpmOffsetChooser.addOption("+50", 50.0);
+        rpmOffsetChooser.addOption("+100", 100.0);
+        rpmOffsetChooser.addOption("+150", 150.0);
+
+        SmartDashboard.putData("RPM Offset Chooser", rpmOffsetChooser);
+    	SmartDashboard.putNumber("Selected RPM Offset", 0);
+
+    }
+
+    private double getSelectedRPMOffset() {
+        return (double) rpmOffsetChooser.getSelected();
     }
 
     public void initializeDashboard() {
@@ -146,6 +161,7 @@ public class Shooter extends Subsystem {
 
     public void setVelocity(double rpm) {
         setState(State.VELOCITY);
+        rpm += getSelectedRPMOffset();
         periodicIO.demand = rpmToEncVelocity(rpm);
         targetRPM = rpm;
     }
@@ -237,6 +253,7 @@ public class Shooter extends Subsystem {
                     Optional<ShooterAimingParameters> aim = RobotState.getInstance().getCachedAimingParameters();
                     if (aim.isPresent()) {
                         double rpm = aim.get().getShooterRPM();
+                        rpm += getSelectedRPMOffset();
                         periodicIO.demand = rpmToEncVelocity(rpm);
                         targetRPM = rpm;
                         limelightRange = aim.get().getRange();
@@ -248,6 +265,7 @@ public class Shooter extends Subsystem {
                     Optional<ShooterAimingParameters> positionParameters = RobotState.getInstance().getAimingParametersFromPosition();
                     if(positionParameters.isPresent()) {
                         double rpm = positionParameters.get().getShooterRPM();
+                        rpm += getSelectedRPMOffset();
                         periodicIO.demand = rpmToEncVelocity(rpm);
                         targetRPM = rpm;
 
@@ -373,6 +391,7 @@ public class Shooter extends Subsystem {
         SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
         SmartDashboard.putString("Shooter State", currentState.toString());
+        SmartDashboard.putNumber("Selected RPM Offset", getSelectedRPMOffset());
         if(Settings.debugShooter()) {
             SmartDashboard.putNumber("Shooter Left RPM", getLeftRPM());
             SmartDashboard.putNumber("Shooter Right RPM", getRightRPM());

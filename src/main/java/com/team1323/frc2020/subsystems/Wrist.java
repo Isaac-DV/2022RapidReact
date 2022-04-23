@@ -75,6 +75,9 @@ public class Wrist extends Subsystem {
         //periodicIO.demand = degreesToEncUnits(Constants.Wrist.kStowedAngle);
         configWristPID();
         resetToAbsolutePosition();
+
+        setLowStatorLimit(false);
+        setWeakIntakeState(false);
     }
 
     private void configWristPID() {
