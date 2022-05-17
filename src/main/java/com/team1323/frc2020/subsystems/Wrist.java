@@ -44,6 +44,10 @@ public class Wrist extends Subsystem {
     private boolean weakPIDEnabled = false;
     private boolean weakCurrentEnabled = false;
     private boolean weakIntakeStateEnabled = false;
+    private boolean driverIntakeEnabled = false;
+    public boolean isDriverIntakeEnabled() {
+        return driverIntakeEnabled;
+    }
     public void setWeakIntakeState(boolean enable) {
         weakIntakeStateEnabled = enable;
     }
@@ -78,6 +82,9 @@ public class Wrist extends Subsystem {
 
         setLowStatorLimit(false);
         setWeakIntakeState(false);
+
+        SmartDashboard.putBoolean("Driver Intake Enabled", false);
+
     }
 
     private void configWristPID() {
@@ -300,9 +307,11 @@ public class Wrist extends Subsystem {
     }
     @Override
     public void outputTelemetry() {
+        driverIntakeEnabled = SmartDashboard.getBoolean("Driver Intake Enabled", false);
+
         SmartDashboard.putNumber("Wrist Falcon Position", encUnitsToDegrees(periodicIO.position));
         SmartDashboard.putNumber("Wrist Absolute Position", getAbsoluteEncoderDegrees());
-
+        
         if(Settings.debugWrist()) {
             SmartDashboard.putNumber("Wrist Falcon Target Angle", wristTargetAngle);
             SmartDashboard.putNumber("Wrist Position Error", wristTargetAngle - encUnitsToDegrees(periodicIO.position));

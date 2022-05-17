@@ -157,7 +157,8 @@ public class DriverControls implements Loop {
             //swerve.rotate(270);
             turret.setCOFState();
         else if (driver.yButton.wasActivated())
-            swerve.rotate(0.0);
+            swerve.toggleEvade();
+        
 
         if (driver.startButton.isBeingPressed()) 
             swerve.setState(Swerve.ControlState.NEUTRAL);
@@ -176,11 +177,32 @@ public class DriverControls implements Loop {
             driver.rumble(1.0, 2.0);
             coDriver.rumble(1.0, 2.0);
         }
-        if(driver.leftTrigger.wasActivated()) {
-            swerve.setMaxSpeed(0.5);
-            //motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
-        } else if(driver.leftTrigger.wasReleased()) {
-            swerve.setMaxSpeed(1.0);
+        if(wrist.isDriverIntakeEnabled()) {
+            if(driver.leftTrigger.wasActivated()) {
+                wrist.setWeakIntakeState(true);
+                intake.conformToState(Intake.ControlState.INTAKE);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
+                ballFeeder.setState(BallFeeder.State.DETECT);
+                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                    column.setState(Column.ControlState.INDEX_BALLS);
+                }
+                ballFeeder.setPrintFeeder(true);
+            } else if(driver.leftTrigger.wasReleased()) {
+                wrist.setWeakIntakeState(false);
+                wrist.setLowStatorLimit(false);
+                intake.conformToState(Intake.ControlState.OFF);
+                ballFeeder.queueShutdown(true);
+                wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
+                column.shutDownIfUnused();
+                ballFeeder.setPrintFeeder(false);
+            }
+        } else {
+            if(driver.leftTrigger.wasActivated()) {
+                swerve.setMaxSpeed(0.5);
+                //motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
+            } else if(driver.leftTrigger.wasReleased()) {
+                swerve.setMaxSpeed(1.0);
+            }
         }
         /*if(driver.rightTrigger.wasActivated()) {
             swerve.useSlewLimiter(true);
@@ -379,7 +401,7 @@ public class DriverControls implements Loop {
         if(coDriver.POV0.wasActivated()) {
             s.startHangSequence();
         }
-
+        
         if (coDriver.leftTrigger.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }

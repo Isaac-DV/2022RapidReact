@@ -167,7 +167,7 @@ public class BallFeeder extends Subsystem {
         return currentState;
     }
     public void setState(State desiredState) {
-        if (desiredState == State.DETECT) {
+        if (desiredState == State.DETECT && isAutoDetectEnabled()) {
             pendingShutdown = false;
             setFeederOpenLoop(1.0);
         }
