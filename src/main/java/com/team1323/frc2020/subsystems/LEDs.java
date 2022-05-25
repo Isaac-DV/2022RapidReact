@@ -5,8 +5,12 @@
 package com.team1323.frc2020.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.CANdleConfiguration;
+import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
+import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
+import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.team1323.frc2020.Ports;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -29,10 +33,12 @@ public class LEDs extends Subsystem {
     public LEDs() {
         candle = new CANdle(Ports.CANDLE);
         candle.configLEDType(LEDStripType.RGB);
-        configLEDs(LEDColors.GREEN);
+        CANdleConfiguration config = new CANdleConfiguration();
+        candle.configAllSettings(config);
+        //candle.setLEDs(255, 0, 0);
     }
     public enum LEDMode {
-        SOLID, RAINBOW;
+        SOLID, RAINBOW, FIRE, TWINKLE;
     }
     private LEDMode selectedLEDType = LEDMode.SOLID;
     public LEDMode getLEDType() {
@@ -41,7 +47,7 @@ public class LEDs extends Subsystem {
     public enum LEDColors {
         OFF(0,0,0, LEDMode.SOLID), RED(255,0,0, LEDMode.SOLID), GREEN(0,255,0, LEDMode.SOLID), BLUE(0,0,255, LEDMode.SOLID),
         DISABLED(255,0,0, LEDMode.SOLID), ENABLED(0,0,255, LEDMode.SOLID),
-        RAINBOW(0,0,0, LEDMode.RAINBOW);
+        RAINBOW(0,0,0, LEDMode.RAINBOW), FIRE(0,0,0, LEDMode.FIRE), TWINKLE(0,0,0, LEDMode.TWINKLE);
         int r;
         int g;
         int b;
@@ -53,7 +59,7 @@ public class LEDs extends Subsystem {
             this.ledMode = ledMode;
         }
     }
-    private LEDColors currentLEDMode = LEDColors.OFF;
+    private LEDColors currentLEDMode = LEDColors.RED;
     public LEDColors getLEDMode() {
         return currentLEDMode;
     }
@@ -63,23 +69,29 @@ public class LEDs extends Subsystem {
         this.mBlue = ledColors.b;
         this.selectedLEDType = ledColors.ledMode;
     }
-
+    
     @Override
     public void writePeriodicOutputs() {
         if(selectedLEDType == LEDMode.SOLID) {
             candle.setLEDs(mRed, mGreen, mBlue);
         } else if(selectedLEDType == LEDMode.RAINBOW) {
-            RainbowAnimation animation = new RainbowAnimation(0.25, 1, 1690);
+            RainbowAnimation animation = new RainbowAnimation(0.25, 0.25, 1690);
             candle.animate(animation);
+        } else if(selectedLEDType == LEDMode.FIRE) {
+            FireAnimation fireAnimation = new FireAnimation(1, 1, 1690, 1, 0.25);
+            candle.animate(fireAnimation);
+        } else if(selectedLEDType == LEDMode.TWINKLE) {
+            TwinkleAnimation twinkleAnimation = new TwinkleAnimation(255, 255, 255, 127, 0.25, 1690, TwinklePercent.Percent76);
+            candle.animate(twinkleAnimation);
         }
     }
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putString("LED Mode", selectedLEDType.toString());
-        SmartDashboard.putString("LED Color", currentLEDMode.toString());
+
     }
+    
     @Override
     public void stop() {
-        configLEDs(LEDColors.GREEN);
+        //configLEDs(LEDColors.GREEN);
     }
 }

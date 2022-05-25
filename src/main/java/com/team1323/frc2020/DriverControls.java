@@ -116,7 +116,7 @@ public class DriverControls implements Loop {
         }
         swerve.setDriveNeutralMode(NeutralMode.Brake);
         wrist.setWristLocked();
-        leds.configLEDs(LEDs.LEDColors.OFF);
+        //leds.configLEDs(LEDs.LEDColors.OFF);
     }
 
     @Override

@@ -189,7 +189,7 @@ public class Robot extends TimedRobot {
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
-			leds.configLEDs(LEDColors.GREEN);
+			//leds.configLEDs(LEDColors.GREEN);
 			DoubleTelescopes.getInstance().setTelescopesBrakeMode();
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
@@ -207,7 +207,7 @@ public class Robot extends TimedRobot {
 			Wrist.getInstance().resetToAbsolutePosition();
 			Turret.getInstance().resetToAbsolutePosition();
 			if (subsystems.haveEmergency()) {
-				leds.configLEDs(LEDColors.RED);
+				//leds.configLEDs(LEDColors.RED);
 			}
 		} catch (Throwable t) {
 			CrashTracker.logThrowableCrash(t);
