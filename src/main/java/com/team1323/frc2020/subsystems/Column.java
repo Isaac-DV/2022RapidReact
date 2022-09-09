@@ -40,7 +40,7 @@ public class Column extends Subsystem {
     Turret turret;
     MotorizedHood motorizedHood;
     BallFeeder ballFeeder;
-
+    LEDs leds;
 
     LazyTalonFX column;
     DigitalInput banner;
@@ -89,6 +89,7 @@ public class Column extends Subsystem {
         turret = Turret.getInstance();
         motorizedHood = MotorizedHood.getInstance();
         ballFeeder = BallFeeder.getInstance();
+        leds = LEDs.getInstance();
 
         column = new LazyTalonFX(Ports.COLUMN, "main");
         banner = new DigitalInput(Ports.COLUMN_BANNER);
@@ -183,7 +184,7 @@ public class Column extends Subsystem {
         conformToState(desiredState, desiredState.speed);
     }
 
-    private boolean allSubsystemsReady() {
+    public boolean allSubsystemsReady() {
         return shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle();
     }
 
@@ -285,6 +286,12 @@ public class Column extends Subsystem {
                                 (timestamp - ballLeftTimestamp >= Constants.Column.kFasterFeedDuration || !inRange(aim, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)))
                             setOpenLoop(0.0);
                     }
+                    if(allSubsystemsReady()) {
+                        leds.configLEDs(LEDs.LEDColors.GREEN);
+                    } else {
+                        leds.configLEDs(LEDs.LEDColors.RED);
+                    }
+
                     break;
                 case MANUAL_FEED_BALLS:
                     System.out.println("Column Banner : " + getBanner() + ", Ball Detected Timestamp finite : " + Double.isFinite(ballDetectedTimestamp) + ", within timestamp : " + ((timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay) + ", Shooter on Target : " + shooter.hasReachedSetpoint() + ", Hood on Target : " + motorizedHood.hasReachedAngle());
@@ -343,7 +350,6 @@ public class Column extends Subsystem {
 
             if (!shootingCurrentBall && timestamp - ballLeftTimestamp >= Constants.Column.kExtraSwerveDelay) {
                 Swerve.getInstance().enableInputs(true);
-
             }
             
         }

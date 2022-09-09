@@ -35,7 +35,9 @@ public class Superstructure extends Subsystem {
     public Shooter shooter;
 	public MotorizedHood motorizedHood;
 	public DoubleTelescopes doubleTelescopes;
+	public LEDs leds;
 	public RobotState robotState;
+
 	
 	public Superstructure(){
 		//compressor = new Compressor(Ports.PCM, PneumaticsModuleType.CTREPCM);
@@ -50,6 +52,7 @@ public class Superstructure extends Subsystem {
         shooter = Shooter.getInstance();
 		motorizedHood = MotorizedHood.getInstance();
 		doubleTelescopes = DoubleTelescopes.getInstance();
+		leds = LEDs.getInstance();
 
 		robotState = RobotState.getInstance();
 		
@@ -312,7 +315,8 @@ public class Superstructure extends Subsystem {
 				),
 				turret.robotStateVisionRequest(),
 				//intake.stateRequest(Intake.ControlState.INTAKE),
-				column.stateRequest(Column.ControlState.FEED_BALLS)
+				column.stateRequest(Column.ControlState.FEED_BALLS),
+				leds.ledModeRequest(LEDs.LEDColors.RED)
 			)
 		);
 	}
@@ -337,6 +341,7 @@ public class Superstructure extends Subsystem {
 				//new LambdaRequest(() -> swerve.useSlewLimiter(false)),
 				column.stateRequest(Column.ControlState.OFF),
 				ballFeeder.stateRequest(BallFeeder.State.DETECT),
+				leds.ledModeRequest(LEDs.LEDColors.RAINBOW),
 				//motorizedHood.setAngleRequest(15.5),
 				//shooter.velocityRequest(Constants.Shooter.kPostShotRPM),
 				new LambdaRequest(()-> {
@@ -398,7 +403,8 @@ public class Superstructure extends Subsystem {
 					wrist.setWristAngleRequest(Constants.Wrist.kStowedAngle),
 					motorizedHood.setAngleRequest(Constants.MotorizedHood.kMinControlAngle)
 				),
-				new LambdaRequest(()-> doubleTelescopes.startLiftMode())
+				new LambdaRequest(()-> doubleTelescopes.startLiftMode()),
+				leds.ledModeRequest(LEDs.LEDColors.STROBE)
 			)
 		);
 	}

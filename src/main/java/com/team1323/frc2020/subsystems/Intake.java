@@ -89,6 +89,7 @@ public class Intake extends Subsystem {
         /*if(intake.getBusVoltage() == 0)
             DriverStation.reportError("INTAKE MOTOR NOT DETECTED", false);*/
         //SmartDashboard.putString("Intake State", currentState.toString());
+        SmartDashboard.putNumber("Intake Motor Temperature", ((intake.getTemperature() * 9/5) + 32.0));
     }
 
     @Override

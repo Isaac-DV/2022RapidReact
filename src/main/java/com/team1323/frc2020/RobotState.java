@@ -29,6 +29,7 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.geometry.Twist2d;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
@@ -326,7 +327,7 @@ public class RobotState {
 		
 		public void outputToSmartDashboard(){
 			SmartDashboard.putBoolean("Sees Target", seesTarget);
-			
+			SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
 			if(true){
 				List<Pose2d> poses = getCaptureTimeFieldToGoal();
 				for (Pose2d pose : poses) {

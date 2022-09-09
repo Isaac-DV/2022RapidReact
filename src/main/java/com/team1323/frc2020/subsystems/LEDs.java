@@ -8,12 +8,16 @@ import com.ctre.phoenix.led.CANdle;
 import com.ctre.phoenix.led.CANdleConfiguration;
 import com.ctre.phoenix.led.FireAnimation;
 import com.ctre.phoenix.led.RainbowAnimation;
+import com.ctre.phoenix.led.StrobeAnimation;
 import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.loops.Loop;
+import com.team1323.frc2020.subsystems.requests.Request;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /** Add your docs here. */
 public class LEDs extends Subsystem {
@@ -31,14 +35,15 @@ public class LEDs extends Subsystem {
     }
 
     public LEDs() {
+
         candle = new CANdle(Ports.CANDLE);
         candle.configLEDType(LEDStripType.RGB);
         CANdleConfiguration config = new CANdleConfiguration();
         candle.configAllSettings(config);
-        //candle.setLEDs(255, 0, 0);
+        configLEDs(LEDColors.RAINBOW);
     }
     public enum LEDMode {
-        SOLID, RAINBOW, FIRE, TWINKLE;
+        SOLID, RAINBOW, FIRE, TWINKLE, STROBE;
     }
     private LEDMode selectedLEDType = LEDMode.SOLID;
     public LEDMode getLEDType() {
@@ -47,7 +52,8 @@ public class LEDs extends Subsystem {
     public enum LEDColors {
         OFF(0,0,0, LEDMode.SOLID), RED(255,0,0, LEDMode.SOLID), GREEN(0,255,0, LEDMode.SOLID), BLUE(0,0,255, LEDMode.SOLID),
         DISABLED(255,0,0, LEDMode.SOLID), ENABLED(0,0,255, LEDMode.SOLID),
-        RAINBOW(0,0,0, LEDMode.RAINBOW), FIRE(0,0,0, LEDMode.FIRE), TWINKLE(0,0,0, LEDMode.TWINKLE);
+        RAINBOW(0,0,0, LEDMode.RAINBOW), FIRE(0,0,0, LEDMode.FIRE), TWINKLE(0,0,0, LEDMode.TWINKLE), STROBE(0,0,0, LEDMode.STROBE),
+        REDFIRE(255,0,0, LEDMode.FIRE);
         int r;
         int g;
         int b;
@@ -83,15 +89,30 @@ public class LEDs extends Subsystem {
         } else if(selectedLEDType == LEDMode.TWINKLE) {
             TwinkleAnimation twinkleAnimation = new TwinkleAnimation(255, 255, 255, 127, 0.25, 1690, TwinklePercent.Percent76);
             candle.animate(twinkleAnimation);
+        } else if(selectedLEDType == LEDMode.STROBE) {
+            candle.animate(new StrobeAnimation(100, 100, 100, 50, 0.25, 1690));
         }
     }
+
+  
     @Override
     public void outputTelemetry() {
 
     }
+
+    public Request ledModeRequest(LEDColors desiredColor) {
+        return new Request() {
+
+            @Override
+            public void act() {
+                configLEDs(desiredColor);              
+            }
+            
+        };
+    }
     
     @Override
     public void stop() {
-        //configLEDs(LEDColors.GREEN);
+        configLEDs(LEDColors.TWINKLE);
     }
 }

@@ -30,9 +30,9 @@ public class CompBotRegularBallProfile extends ShootingProfile {
         kDistanceToShotVectorMap.put(new InterpolatingDouble(170.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 23.5), 2350.0 + kMidRPMOffset));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(182.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 25.0), 2450.0 + kFarRPMOffset));
         kDistanceToShotVectorMap.put(new InterpolatingDouble(194.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 26.5), 2550.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(206.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0), 2700.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(218.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 2950.0 + kFarRPMOffset));
-        kDistanceToShotVectorMap.put(new InterpolatingDouble(230.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5), 3050.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(206.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.0 + kFarHoodOffset), 2700.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(218.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5 + kFarHoodOffset), 2950.0 + kFarRPMOffset));
+        kDistanceToShotVectorMap.put(new InterpolatingDouble(230.6875), Translation2d.fromPolar(Rotation2d.fromDegrees(MotorizedHood.kMinControlAngle + 28.5 + kFarHoodOffset), 3050.0 + kFarRPMOffset));
     }
 
     /*private static final InterpolatingTreeMap<InterpolatingDouble, Translation2d> kDistanceToShotVectorMap = new InterpolatingTreeMap<>();
@@ -58,7 +58,7 @@ public class CompBotRegularBallProfile extends ShootingProfile {
 
     private static final double kRobotVelocityScalar = 0.7;
 
-    private static final double kCloseTurretAngleInterpolation = 0.8; // 0.65 // 0.85
+    private static final double kCloseTurretAngleInterpolation = 0.8; // 0.65 // 0.85 //0.8
 
     private static final double kFarTurretAngleInterpolation = 0.95; // 0.75
 

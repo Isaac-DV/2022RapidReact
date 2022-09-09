@@ -43,6 +43,8 @@ public class Constants {
     public static final Pose2d autoLeftFarStartingPose = new Pose2d(new Translation2d(264.57142857142856, -79.71428571428571), Rotation2d.fromDegrees(-135.0));
 
     public static final Pose2d kLaunchPadPose = new Pose2d(new Translation2d(152, -53), Rotation2d.fromDegrees(0));
+    public static final Pose2d kManualResetPose = Pose2d.fromTranslation(kCenterOfField.translateBy(new Translation2d(-96, 0))); //8 feet from the center
+
     /**
     * Target Specifications
     */
@@ -108,7 +110,7 @@ public class Constants {
     public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -132.488580 : -188.701172; //Module 0 - Front Right -3.52 | -7.91 | 5.71
     public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -287.794402 : -312.275391; //Module 1 - Front Left -109.97 | -109.95
     public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -321.925598 : -174.462891; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
-    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -344.835369 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
+    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -347.695209 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
     public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength / 2, kWheelbaseWidth / 2);
@@ -373,7 +375,7 @@ public class Constants {
         public static final double kMaxSpeed = (6380.0 * 2048.0) / 600;
         public static final double kMinControlHeight = 0.0;
         public static final double kLowestPoint = 0.0;
-        public static final double kMaxControlHeight = 29.0;
+        public static final double kMaxControlHeight = 29.0; //29.0
         public static final double kTicksPerInch = 173180.0 / 17.375; //-3.000000
         
         public static final double kLeftP = 0.1;

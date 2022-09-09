@@ -397,6 +397,7 @@ public class DriverControls implements Loop {
 
         if(coDriver.POV180.wasActivated()) {
             doubleTelescopes.disableLiftMode();
+            leds.ledModeRequest(LEDs.LEDColors.RAINBOW);
         }
         if(coDriver.POV0.wasActivated()) {
             s.startHangSequence();
