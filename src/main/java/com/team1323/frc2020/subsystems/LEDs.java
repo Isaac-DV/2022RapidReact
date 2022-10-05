@@ -13,6 +13,7 @@ import com.ctre.phoenix.led.TwinkleAnimation;
 import com.ctre.phoenix.led.CANdle.LEDStripType;
 import com.ctre.phoenix.led.TwinkleAnimation.TwinklePercent;
 import com.team1323.frc2020.Ports;
+import com.team1323.frc2020.Settings;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 
@@ -78,19 +79,21 @@ public class LEDs extends Subsystem {
     
     @Override
     public void writePeriodicOutputs() {
-        if(selectedLEDType == LEDMode.SOLID) {
-            candle.setLEDs(mRed, mGreen, mBlue);
-        } else if(selectedLEDType == LEDMode.RAINBOW) {
-            RainbowAnimation animation = new RainbowAnimation(0.25, 0.25, 1690);
-            candle.animate(animation);
-        } else if(selectedLEDType == LEDMode.FIRE) {
-            FireAnimation fireAnimation = new FireAnimation(1, 1, 1690, 1, 0.25);
-            candle.animate(fireAnimation);
-        } else if(selectedLEDType == LEDMode.TWINKLE) {
-            TwinkleAnimation twinkleAnimation = new TwinkleAnimation(255, 255, 255, 127, 0.25, 1690, TwinklePercent.Percent76);
-            candle.animate(twinkleAnimation);
-        } else if(selectedLEDType == LEDMode.STROBE) {
-            candle.animate(new StrobeAnimation(100, 100, 100, 50, 0.25, 1690));
+        if(Settings.kIsUsingCompBot) {
+            if(selectedLEDType == LEDMode.SOLID) {
+                candle.setLEDs(mRed, mGreen, mBlue);
+            } else if(selectedLEDType == LEDMode.RAINBOW) {
+                RainbowAnimation animation = new RainbowAnimation(0.25, 0.25, 1690);
+                candle.animate(animation);
+            } else if(selectedLEDType == LEDMode.FIRE) {
+                FireAnimation fireAnimation = new FireAnimation(1, 1, 1690, 1, 0.25);
+                candle.animate(fireAnimation);
+            } else if(selectedLEDType == LEDMode.TWINKLE) {
+                TwinkleAnimation twinkleAnimation = new TwinkleAnimation(255, 255, 255, 127, 0.25, 1690, TwinklePercent.Percent76);
+                candle.animate(twinkleAnimation);
+            } else if(selectedLEDType == LEDMode.STROBE) {
+                candle.animate(new StrobeAnimation(100, 100, 100, 50, 0.25, 1690));
+            }
         }
     }
 
@@ -113,6 +116,6 @@ public class LEDs extends Subsystem {
     
     @Override
     public void stop() {
-        configLEDs(LEDColors.TWINKLE);
+        
     }
 }

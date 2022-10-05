@@ -65,6 +65,10 @@ public class Swerve extends Subsystem{
 		evading = !evading;
 		evadingToggled = true;
 	}
+	public void toggleEvade(boolean enabled) {
+		evading = enabled;
+		evadingToggled = true;
+	}
 	
 	//Heading controller methods
 	Pigeon pigeon;
@@ -245,7 +249,7 @@ public class Swerve extends Subsystem{
 	private double rotationalInput = 0;
 	private Translation2d lastDriveVector = new Translation2d();
 	private final Translation2d rotationalVector = Translation2d.identity();
-	private double lowPowerScalar = 0.6;
+	private double lowPowerScalar = 0.25; //0.6
 	public void setLowPowerScalar(double scalar){
 		lowPowerScalar = scalar;
 	}
@@ -315,7 +319,7 @@ public class Swerve extends Subsystem{
 			to make the controls less sensitive at the lower end. */
 			double translationalDeadband = 0.025;
 			inputMagnitude = Util.scaledDeadband(inputMagnitude, 1.0, translationalDeadband);
-			final double power = (lowPower) ? 1.75 : 1.5;
+			final double power = (lowPower) ? 2.0 : 1.5;
 			inputMagnitude = Math.pow(inputMagnitude, power);
 			inputMagnitude = Util.deadBand(inputMagnitude, 0.05);
 			translationalInput = Translation2d.fromPolar(translationalInput.direction(), inputMagnitude);
@@ -1281,7 +1285,9 @@ public class Swerve extends Subsystem{
 		odometry.resetPosition(pose, pose.getRotation());
 		System.out.println("Y coordinate reset to: " + pose.getTranslation().y());
 	}
-	
+	double prevSwerveVelocity = 0;
+	double largestVelocity = 0;
+	double lastTimestamp = 0;
 	@Override
 	public void outputTelemetry() {
 		modules.forEach((m) -> m.outputTelemetry());
@@ -1290,6 +1296,8 @@ public class Swerve extends Subsystem{
 		// testing the wpi odometry
 		if(outputWpiPose)
 		SmartDashboard.putNumberArray("Path Pose", new double[]{wpiPose.getTranslation().x(), wpiPose.getTranslation().y(), wpiPose.getRotation().getUnboundedDegrees()});
+
+		
 		if(Settings.debugSwerve()){
 			SmartDashboard.putNumber("Robot X", pose.getTranslation().x());
 			SmartDashboard.putNumber("Robot Y", pose.getTranslation().y());
@@ -1300,6 +1308,16 @@ public class Swerve extends Subsystem{
 			SmartDashboard.putString("Swerve State", currentState.toString());
 			SmartDashboard.putBoolean("Vision Updates Allowed", visionUpdatesAllowed);
 			SmartDashboard.putNumberArray("Pigeon YPR", pigeon.getYPR());
+
+			double swerveVelocity =  (Math.sqrt((velocity.dx * velocity.dx) + (velocity.dy * velocity.dy))) / 12;
+			double currentTimestamp = Timer.getFPGATimestamp();
+			SmartDashboard.putNumber("Robot Swerve Velocity", swerveVelocity);
+			SmartDashboard.putNumber("Robot Swerve Acceleration", ((swerveVelocity - prevSwerveVelocity)));
+			prevSwerveVelocity = swerveVelocity;
+			lastTimestamp = currentTimestamp;
+			if(swerveVelocity > largestVelocity)
+				largestVelocity = swerveVelocity;
+			SmartDashboard.putNumber("Robot Swerve Peak Velocity", largestVelocity);
 		}
 	}
 }

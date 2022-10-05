@@ -349,6 +349,11 @@ public class Turret extends Subsystem {
                     if (aim.isPresent()) {
                         // Compensate for the robot's velocity when aiming
                         double turretAngle = aim.get().getTurretAngle().getDegrees();
+                        if((targetInfo.get(0).getDouble(0) - getAngle()) > 2 && (swerve.getVelocity().dtheta > 0.2)) {
+                            //turretAngle = getAngle() + targetInfo.get(0).getDouble(0);
+                            System.out.println("Robo Rot Velocity Greate at : "+ swerve.getVelocity().dtheta);
+                        }
+                        System.out.println("Turret angle = " + turretAngle);
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         /*if (turretAngle < Constants.Turret.kMinControlAngle || turretAngle > Constants.Turret.kMaxControlAngle) {
@@ -370,6 +375,7 @@ public class Turret extends Subsystem {
                         }
                         
                         setAngle(turretAngle);
+                        
                     }
 
                     break;

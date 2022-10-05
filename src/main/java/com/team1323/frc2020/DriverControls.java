@@ -27,6 +27,7 @@ import com.team1323.frc2020.subsystems.Turret;
 import com.team1323.frc2020.subsystems.Wrist;
 import com.team1323.io.Xbox;
 import com.team254.lib.geometry.Pose2d;
+import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -149,6 +150,7 @@ public class DriverControls implements Loop {
         
         swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.leftBumper.isBeingPressed() , false);
         
+        SmartDashboard.putNumber("Translation Scalar", new Translation2d(swerveXInput, swerveYInput).norm());
         if (driver.bButton.wasActivated())
             swerve.rotate(90);
         else if (driver.aButton.wasActivated()) 
@@ -157,7 +159,7 @@ public class DriverControls implements Loop {
             //swerve.rotate(270);
             turret.setCOFState();
         else if (driver.yButton.wasActivated())
-            swerve.toggleEvade();
+            swerve.rotate(0);
         
 
         if (driver.startButton.isBeingPressed()) 
@@ -197,11 +199,16 @@ public class DriverControls implements Loop {
                 ballFeeder.setPrintFeeder(false);
             }
         } else {
-            if(driver.leftTrigger.wasActivated()) {
+            /*if(driver.leftTrigger.wasActivated()) {
                 swerve.setMaxSpeed(0.5);
                 //motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
             } else if(driver.leftTrigger.wasReleased()) {
                 swerve.setMaxSpeed(1.0);
+            }*/
+            if (driver.leftTrigger.wasActivated()) {
+                swerve.toggleEvade(true);
+            } else if(driver.leftTrigger.wasReleased()) {
+                swerve.toggleEvade(false);
             }
         }
         /*if(driver.rightTrigger.wasActivated()) {
@@ -223,7 +230,7 @@ public class DriverControls implements Loop {
 
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
-        double coDriverRightY = coDriver.getRightX();
+        double coDriverRightY = -coDriver.getRightY();
         double coDriverLeftY = -coDriver.getLeftY();
         double coDriverLeftX = coDriver.getLeftX();
 
@@ -233,9 +240,9 @@ public class DriverControls implements Loop {
         }
         */
         
-        if(coDriverLeftY != 0 || coDriverLeftX != 0) {
-            turret.fieldRelativeManual(coDriverLeftX, coDriverLeftY);
-        } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
+        if(coDriverRightY != 0 || coDriverRightX != 0) {
+            turret.fieldRelativeManual(coDriverRightX, coDriverRightY);
+        } else if(turret.getState() == Turret.ControlState.FIELD_RELATIVE) {
             turret.lockAngle();
         }
 
@@ -246,15 +253,24 @@ public class DriverControls implements Loop {
         if(coDriver.POV180.wasActivated()) {
             motorizedHood.setAngle(15);
         }*/
-        /*
         if(coDriverLeftY != 0) {
-            wrist.setOpenLoop(coDriverLeftY);
+            if((Constants.Wrist.kWristMinManualAngle < wrist.getAngle()) && (wrist.getAngle() < Constants.Wrist.kWristMaxManualAngle)) {
+                wrist.setOpenLoop(coDriverLeftY);
+            } else if(Constants.Wrist.kWristMinManualAngle > wrist.getAngle()) {
+                wrist.setWristAngle(Constants.Wrist.kWristMinManualAngle);
+            } else if(Constants.Wrist.kWristMaxManualAngle < wrist.getAngle()) {
+                wrist.setWristAngle(Constants.Wrist.kWristMaxManualAngle);
+            }
+                
         } else if(wrist.getState() == Wrist.State.OPEN_LOOP) {
-            wrist.setWristLockedAtCurrentAngle();
-        }*/
-        if(coDriverRightX != 0) {
+            wrist.setWeakIntakeState(true);
+            wrist.setLowStatorLimit(true);
+            wrist.setWristLocked();
+        }
+        /*if(coDriverRightX != 0) {
             turret.setOpenLoop(coDriverRightX);
-        } else if (!doubleTelescopes.bothTelescopesZeroed()) {
+        } else */
+        if (!doubleTelescopes.bothTelescopesZeroed()) {
             turret.setOpenLoop(0.0);
         } else if(turret.getState() == Turret.ControlState.OPEN_LOOP) {
             turret.lockAngle();
@@ -354,7 +370,7 @@ public class DriverControls implements Loop {
             if(driver.rightTrigger.wasActivated()) {
                 SmartDashboard.putBoolean("Vision Shot is activated", true);
                 if(driver.rightTrigger.isBeingPressed())
-                    swerve.setMaxSpeed(0.5);
+                    swerve.setMaxSpeed(0.6);
                 s.visionShotState();
             } else if(coDriver.rightTrigger.wasActivated()) {
                 if(shooter.isLimelightShotEnabled()) {
@@ -437,7 +453,7 @@ public class DriverControls implements Loop {
         double swerveXInput = -singleController.getLeftY();
         double swerveRotationInput = singleController.getRightX();
         
-        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, false, singleController.leftTrigger.isBeingPressed());
+        swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, false, true);//singleController.leftTrigger.isBeingPressed());
         
         if (singleController.startButton.isBeingPressed()) 
             swerve.setState(Swerve.ControlState.NEUTRAL);

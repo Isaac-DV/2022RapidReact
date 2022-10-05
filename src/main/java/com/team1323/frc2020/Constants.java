@@ -107,10 +107,10 @@ public class Constants {
     * Enter angle read by the absolute encoder. Insert as degrees and subtract or add 90° to the value
     * based on where the bevel ended up.
     */
-    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -132.488580 : -188.701172; //Module 0 - Front Right -3.52 | -7.91 | 5.71
-    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -287.794402 : -312.275391; //Module 1 - Front Left -109.97 | -109.95
-    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -321.925598 : -174.462891; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
-    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -347.695209 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
+    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -286.0 : -188.701172; //Module 0 - Front Right -3.52 | -7.91 | 5.71
+    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -224.5 : -312.275391; //Module 1 - Front Left -109.97 | -109.95
+    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -201.7 : -174.462891; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
+    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -332.6 : -23.818359; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
     public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength / 2, kWheelbaseWidth / 2);
@@ -211,6 +211,9 @@ public class Constants {
         public static final double kLowestAngle = 135.0;
 
         public static final double kWristHoldCurrent = Settings.kIsUsingCompBot ? 20.0 : 25.0;
+
+        public static final double kWristMaxManualAngle = kIntakeAngle;
+        public static final double kWristMinManualAngle = kMinWristAngle + 10.0;
     }
     
     public static class BallSplitter {
@@ -276,8 +279,8 @@ public class Constants {
         public static final double kYOffset = 0.0;
 
         public static final double kWrapSettlingTime = Settings.kIsUsingCompBot ? 0.25 : 0.75;
-        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 3.0 : 3.0;
-        public static final double kMaxAccelerationScalar = 3.5;
+        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 1.5 : 3.0; //3.0
+        public static final double kMaxAccelerationScalar = 3.0;//3.5
 
         public static final double kInterpolationCutoffDistance = 140.0; // inches
     
