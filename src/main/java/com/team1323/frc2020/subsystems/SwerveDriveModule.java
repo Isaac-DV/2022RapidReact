@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
 	LazyTalonFX rotationMotor, driveMotor;
-	CANCoder rotationCancoder;
+	InductiveEncoder rotationCancoder;
 	DutyCycle rotationMagEncoder;
 	int moduleID;
 	String name = "Module ";
@@ -60,7 +60,7 @@ public class SwerveDriveModule extends Subsystem{
 			if (Settings.kIsUsingCompBot) {
 				rotationMagEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
 			} else {
-				rotationCancoder = new CANCoder(Ports.kModuleEncoders[moduleID], "main");
+				rotationCancoder = new InductiveEncoder(Ports.kModuleEncoders[moduleID]);
 			}
 		}
 			
@@ -194,7 +194,7 @@ public class SwerveDriveModule extends Subsystem{
 			if (Settings.kIsUsingCompBot) {
 				return rotationMagEncoder.getFrequency() != 0;
 			} else {
-				return rotationCancoder.getBusVoltage() > 0;
+				return rotationCancoder.getFrequency() != 0;
 			}
 		}
 		return true;

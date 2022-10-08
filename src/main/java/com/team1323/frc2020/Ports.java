@@ -40,24 +40,24 @@ public class Ports {
 
 
     //Digital Inputs
-    public static final int FRONT_RIGHT_ENCODER = Settings.kIsUsingCompBot ? 6 : 30; //30
-    public static final int FRONT_LEFT_ENCODER = Settings.kIsUsingCompBot ? 7 : 31; //31
-    public static final int REAR_LEFT_ENCODER = Settings.kIsUsingCompBot ? 8 : 32; //32
-    public static final int REAR_RIGHT_ENCODER = Settings.kIsUsingCompBot ? 9 : 33; //33
+    public static final int FRONT_RIGHT_ENCODER = Settings.kIsUsingCompBot ? 6 : 0; //30
+    public static final int FRONT_LEFT_ENCODER = Settings.kIsUsingCompBot ? 7 : 1; //31
+    public static final int REAR_LEFT_ENCODER = Settings.kIsUsingCompBot ? 8 : 2; //32
+    public static final int REAR_RIGHT_ENCODER = Settings.kIsUsingCompBot ? 9 : 3; //33
     public static final int[] kModuleEncoders = new int[]{FRONT_RIGHT_ENCODER, FRONT_LEFT_ENCODER,
         REAR_LEFT_ENCODER, REAR_RIGHT_ENCODER};
     //CANCoders
-    public static final int TURRET_ENCODER = 2;
+    public static final int TURRET_ENCODER = Settings.kIsUsingCompBot ? 2 : 8;
     public static final int FEEDER_BANNER = Settings.kIsUsingCompBot ? 3 : 4; //4 - 3
     public static final int COLUMN_BANNER = Settings.kIsUsingCompBot ? 5 : 6; //6 - 5
     public static final int COLOR_SENSOR = Settings.kIsUsingCompBot ? 4 : 5; //5 - 4
-    public static final int WRIST_ENCODER = 1;
+    public static final int WRIST_ENCODER = Settings.kIsUsingCompBot ? 1 : 7;
 
     // Pneumatics
 
     //Canifier
     public static final int CANIFIER = 30;
-    public static final int HOOD_ENCODER = 0;
+    public static final int HOOD_ENCODER = 9;
         
     }
     

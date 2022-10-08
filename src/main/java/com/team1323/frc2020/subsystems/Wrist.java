@@ -215,25 +215,30 @@ public class Wrist extends Subsystem {
     };
 
     public void resetToAbsolutePosition() {
-        if(!zeroedAbsolutely) {
-            double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.Wrist.kWristStartingEncoderPosition);
-            double absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
-            if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle) {
-                cancoderOffset -= 360.0;
-                absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
-            } else if (absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
-                cancoderOffset += 360.0;
-                absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
-            }   
+        if(Settings.kIsUsingCompBot) {
+            if(!zeroedAbsolutely) {
+                double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.Wrist.kWristStartingEncoderPosition);
+                double absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+                if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle) {
+                    cancoderOffset -= 360.0;
+                    absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+                } else if (absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
+                    cancoderOffset += 360.0;
+                    absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
+                }   
 
-            if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
-                DriverStation.reportError("Wrist angle is out of bounds", false);
-                hasEmergency = true;
-            } else {
-                hasEmergency = false;
+                if (absoluteWristAngle > Constants.Wrist.kMaxInitialAngle || absoluteWristAngle < Constants.Wrist.kMinInitialAngle) {
+                    DriverStation.reportError("Wrist angle is out of bounds", false);
+                    hasEmergency = true;
+                } else {
+                    hasEmergency = false;
+                }
+
+                wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, 0);
             }
+        } else {
+            wrist.setSelectedSensorPosition((int)degreesToEncUnits(Constants.Wrist.kWristStartingAngle), 0, 0);
 
-            wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, 0);
         }
         
     }
