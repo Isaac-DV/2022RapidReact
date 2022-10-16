@@ -43,7 +43,6 @@ public class MotorizedHood extends Subsystem {
     }
 
     LazyTalonFX hood;
-    DutyCycle encoder;
     RobotState robotState;
     
     public double angleInput = 0;
@@ -66,7 +65,6 @@ public class MotorizedHood extends Subsystem {
 
     public MotorizedHood() {
         hood = new LazyTalonFX(Ports.HOOD_TALON, "main");
-        encoder = new DutyCycle(new DigitalInput(Ports.HOOD_ENCODER));
 
         hood.configVoltageCompSaturation(12.0, Constants.kCANTimeoutMs);
         hood.enableVoltageCompensation(true);
@@ -120,14 +118,15 @@ public class MotorizedHood extends Subsystem {
     }
 
     private double getAbsoluteEncoderDegrees() {
-        return (isEncoderFlipped ? -1.0 : 1.0) * encoder.getOutput() * 360.0;
+        return 0;
+        //return (isEncoderFlipped ? -1.0 : 1.0) * encoder.getOutput() * 360.0;
     }
 
     private boolean isEncoderConnected() {
-        if (RobotBase.isReal()) {
+        /*if (RobotBase.isReal()) {
             return encoder.getFrequency() != 0;
-        }
-        return true;
+        }*/
+        return false;
     }
 
     public double encUnitsToDegrees(double encUnits) {

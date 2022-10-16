@@ -120,6 +120,10 @@ public class Constants {
     
     public static final List<Translation2d> kModulePositions = Arrays.asList(kVehicleToModuleZero,
     kVehicleToModuleOne, kVehicleToModuleTwo, kVehicleToModuleThree);
+
+   
+
+
     
     //Scrub Factors
     public static final boolean kSimulateReversedCarpet = false;
@@ -182,7 +186,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = Settings.kIsUsingCompBot ? -19.5 : -19.0;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 340.8 : 297.324709;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 330 : 297.324709;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 

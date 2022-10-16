@@ -499,6 +499,8 @@ public class SwerveDriveModule extends Subsystem{
 		SmartDashboard.putNumber(name + "Angle", getModuleAngle().getDegrees());
 		SmartDashboard.putNumber(name + "Absolute Angle", getAbsoluteEncoderDegrees());
 		SmartDashboard.putNumber(name + "Inches Driven", getDriveDistanceInches());
+		SmartDashboard.putNumber(name + "Velocity", encVelocityToInchesPerSecond(periodicIO.velocity));
+
 		//SmartDashboard.putBoolean(name + "Zeroed With Encoder", moduleZeroedWitoutMagEnc);
 		if(Settings.debugSwerve()){
 			if (RobotBase.isReal()) {
