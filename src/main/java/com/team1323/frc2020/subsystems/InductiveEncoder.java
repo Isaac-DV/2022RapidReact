@@ -11,30 +11,36 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /** Add your docs here. */
 public class InductiveEncoder {
-    DutyCycle encoder;
-    private double lowBound = 0.104193;
-    private double upperBound = 0.904299;
+    DutyCycleEncoder encoder;
+    private double lowBound = 0.1015;
+    private double upperBound = 0.907;
 
     double highestUpperBound = 0;
     double lowestUpperBound = 1;
+    public double getHighestBound() {
+        return highestUpperBound;
+    }
+    public double getLowestBound() {
+        return lowestUpperBound;
+    }
 
     double offset = 0;
     public InductiveEncoder(int port) {
-        encoder = new DutyCycle(new DigitalInput(port));
+        encoder = new DutyCycleEncoder(new DigitalInput(port));
+        encoder.setDutyCycleRange(lowBound, upperBound);
     }
     public double getOutput() {
-        return encoder.getOutput();
+        return encoder.getAbsolutePosition();
     }
     public double getBoundedValue() {
-        double output = getOutput();
-        double targetLowBoundRange = 0;
-        double targetHighBoundRange = 1;
-        output = 0 + ((targetHighBoundRange - targetLowBoundRange) / (upperBound - lowBound)) * (output - lowBound);
-        //System.out.println("Range = " + output + ", output = " + (upperBound - lowBound));
-        return output;
+        return getOutput();
     }
     public double getAbsolutePosition() {
         return getBoundedValue() * 360.0 - offset;
+    }
+
+    public double getRawPosition() {
+        return getBoundedValue();
     }
     public double getFrequency() {
         return encoder.getFrequency();
