@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 
 public class Xbox extends XboxController{
-    private static final double PRESS_THRESHOLD = 0.3;
+    private static final double PRESS_THRESHOLD = 0.05;
     private double DEAD_BAND = 0.15;
     private boolean rumbling = false;
     public ButtonCheck aButton, bButton, xButton, yButton, startButton, backButton,

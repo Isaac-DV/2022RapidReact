@@ -740,19 +740,19 @@ public class Swerve extends Subsystem{
 	}
 	
 	/** Determines which wheels the robot should rotate about in order to perform an evasive maneuver */
+	int evadeClosestIndex = 0;
 	public synchronized void determineEvasionWheels(){
-		Translation2d here = lastDriveVector.rotateBy(pose.getRotation().inverse());
-		List<Translation2d> wheels = Constants.kModulePositions;
-		clockwiseCenter = wheels.get(0);
-		counterClockwiseCenter = wheels.get(wheels.size()-1);
-		for(int i = 0; i < wheels.size()-1; i++) {
-			Translation2d cw = wheels.get(i);
-			Translation2d ccw = wheels.get(i+1);
-			if(here.isWithinAngle(cw,ccw)) {
-				clockwiseCenter = ccw;
-				counterClockwiseCenter = cw;
+		List<Translation2d> modulePositions = Constants.kModulePositions;
+		int evadeClosestIndex = 0;
+		for(int i = 0; i < modulePositions.size(); i++) {
+			Translation2d currentModuleVector = translationalVector.rotateBy(getHeading().inverse());
+			if(modulePositions.get(i).distance(currentModuleVector) < modulePositions.get(evadeClosestIndex).distance(currentModuleVector)) {
+				evadeClosestIndex = i;
 			}
 		}
+		Translation2d targetModule = modulePositions.get(evadeClosestIndex).translateBy(Translation2d.fromPolar(modulePositions.get(evadeClosestIndex).direction(), 7.07));
+		counterClockwiseCenter = targetModule;
+		clockwiseCenter = targetModule;
 	}
 	
 	/** The tried and true algorithm for keeping track of position */

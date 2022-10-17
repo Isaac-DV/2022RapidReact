@@ -25,6 +25,7 @@ import com.team1323.frc2020.subsystems.Superstructure;
 import com.team1323.frc2020.subsystems.Swerve;
 import com.team1323.frc2020.subsystems.Turret;
 import com.team1323.frc2020.subsystems.Wrist;
+import com.team1323.io.PS4;
 import com.team1323.io.Xbox;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Translation2d;
@@ -44,7 +45,8 @@ public class DriverControls implements Loop {
         return instance;
     }
 
-	Xbox driver, coDriver, singleController, testController;
+	Xbox /*driver,*/ coDriver, singleController, testController;
+    PS4 driver;
 
     private Swerve swerve;
     private Intake intake;
@@ -75,7 +77,7 @@ public class DriverControls implements Loop {
     }
 
     public DriverControls() {
-        driver = new Xbox(0);
+        driver = new PS4(0);
 		coDriver = new Xbox(1);
         testController = new Xbox(4);
         singleController = new Xbox(5);
@@ -151,21 +153,21 @@ public class DriverControls implements Loop {
         swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.leftBumper.isBeingPressed() , false);
         
         SmartDashboard.putNumber("Translation Scalar", new Translation2d(swerveXInput, swerveYInput).norm());
-        if (driver.bButton.wasActivated())
+        if (driver.circleButton.wasActivated())
             swerve.rotate(90);
-        else if (driver.aButton.wasActivated()) 
+        else if (driver.crossButton.wasActivated()) 
             swerve.rotate(180);
-        else if (driver.xButton.wasActivated())
+        else if (driver.squareButton.wasActivated())
             //swerve.rotate(270);
             turret.setCOFState();
-        else if (driver.yButton.wasActivated())
+        else if (driver.triangleButton.wasActivated())
             swerve.rotate(0);
         
 
-        if (driver.startButton.isBeingPressed()) 
+        if (driver.optionButton.isBeingPressed()) 
             swerve.setState(Swerve.ControlState.NEUTRAL);
 
-        if (driver.backButton.wasActivated()) {
+        if (driver.shareButton.wasActivated()) {
             swerve.temporarilyDisableHeadingController();
             swerve.zeroSensors(new Pose2d());
             swerve.resetAveragedDirection();

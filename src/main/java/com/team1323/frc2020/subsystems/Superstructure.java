@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.team1323.frc2020.Constants;
 import com.team1323.frc2020.RobotState;
 import com.team1323.frc2020.loops.ILooper;
@@ -311,7 +312,7 @@ public class Superstructure extends Subsystem {
 					//swerve.setDriveMaxPowerRequest(0.75),
 					turret.robotStateVisionRequest(),
 					shooter.visionVelocityRequest()
-					//new LambdaRequest(() -> swerve.useSlewLimiter(true))
+					//new LambdaRequest(() -> swerve.setDriveNeutralMode(NeutralMode.Coast))
 				),
 				turret.robotStateVisionRequest(),
 				//intake.stateRequest(Intake.ControlState.INTAKE),
