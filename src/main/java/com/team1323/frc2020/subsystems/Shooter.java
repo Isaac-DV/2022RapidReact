@@ -61,8 +61,12 @@ public class Shooter extends Subsystem {
     }
 
     private boolean limelightShotEnabled = true;
+    private boolean alwaysFireEnabled = false;
     public boolean isLimelightShotEnabled() {
         return limelightShotEnabled;
+    }
+    public boolean isAlwaysFireEnabled() {
+        return alwaysFireEnabled;
     }
 
     private double onTargetTimestamp = Double.POSITIVE_INFINITY;
@@ -151,6 +155,9 @@ public class Shooter extends Subsystem {
     public void initializeDashboard() {
         boolean limelightShotEnabled = SmartDashboard.getBoolean("Limelight Shot Enabled", true);
         SmartDashboard.putBoolean("Limelight Shot Enabled", limelightShotEnabled);
+
+        boolean alwaysFireEnabled = SmartDashboard.getBoolean("Always Fire", false);
+        SmartDashboard.putBoolean("Always Fire", alwaysFireEnabled);
     }
 
     public void setOpenLoop(double output) {
@@ -387,6 +394,7 @@ public class Shooter extends Subsystem {
     @Override
     public void outputTelemetry() {
         limelightShotEnabled = SmartDashboard.getBoolean("Limelight Shot Enabled", true);
+        alwaysFireEnabled = SmartDashboard.getBoolean("Always Fire", false);
         SmartDashboard.putNumber("Shooter RPM", getLeftRPM());
         SmartDashboard.putBoolean("Shooter Is Ready", hasReachedSetpoint());
         SmartDashboard.putNumber("Shooter RPM Setpoint", targetRPM);
