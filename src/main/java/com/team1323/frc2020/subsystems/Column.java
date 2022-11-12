@@ -20,6 +20,7 @@ import com.team1323.frc2020.loops.ILooper;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.BallFeeder;
 import com.team1323.frc2020.subsystems.requests.Request;
+import com.team1323.frc2020.subsystems.shooting.ShootingProfile;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.SmartTuner;
 import com.team254.drivers.LazyTalonFX;
@@ -145,7 +146,7 @@ public class Column extends Subsystem {
 
     public enum ControlState {
         OFF(0.0), FEED_BALLS(0.0), MANUAL_FEED_BALLS(0.0), EJECT(Constants.Column.kReverseSpeed), 
-        INDEX_BALLS(0.0), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0);
+        INDEX_BALLS(0.0), INTAKE(Constants.Column.kFeedBallSpeed), VELOCITY(0.0), ALWAYS_FIRE(0.0);
         double speed;
         ControlState(double speed) {
             this.speed = speed;
@@ -186,6 +187,11 @@ public class Column extends Subsystem {
 
     public boolean allSubsystemsReady() {
         return shooter.hasReachedSetpoint() && turret.isReady() && motorizedHood.hasReachedAngle();
+    }
+    public boolean shouldFire() {
+        boolean speedIsGood = false;
+        boolean withinRange = false;
+        return false;
     }
 
     public void shutDownIfUnused() {
@@ -317,7 +323,41 @@ public class Column extends Subsystem {
                         if (!shootingCurrentBall && 
                                 (timestamp - ballLeftTimestamp >= Constants.Column.kFasterFeedDuration || !inRange(aimManual, Constants.Column.kMinFasterFeedRange, Constants.Column.kMaxFasterFeedRange)))
                             setOpenLoop(0.0);
+                    } 
+                    break;
+                case ALWAYS_FIRE:
+                    if (!getBanner()) {
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                        } else {
+                            setVelocity(Constants.Column.kQueueVelocitySpeed);
+                        }
+                    } else if((getBanner() && Double.isFinite(ballDetectedTimestamp) && 
+                            (timestamp - ballDetectedTimestamp) >= Constants.Column.kBallDelay && allSubsystemsReady())) {
+                        //setOpenLoop(Constants.Column.kFeedBallSpeed);
+                        columnStartTimestamp = timestamp;
+                        if (timestamp - ballLeftTimestamp <= Constants.Column.kFasterFeedDuration) {
+                            setVelocity(Constants.Column.kFasterFeedVelocity);
+                            if (!shootingCurrentBall) {
+                                fastFedBalls++;
+                            }
+                        } else {
+                            setVelocity(Constants.Column.kFeedVelocitySpeed);
+                            if (!shootingCurrentBall) {
+                                fastFedBalls = 0;
+                            }
+                        }
+                        if (!shootingCurrentBall) {
+                            printVisionSubsystemInfo();
+                        }
+                        shootingCurrentBall = true;
+                        //System.out.println("Shot the ball at a range of : " + shooter.getTargetRange());
+                    } else {
+                        if (!shootingCurrentBall && 
+                                (timestamp - ballLeftTimestamp >= Constants.Column.kFasterFeedDuration))
+                            setOpenLoop(0.0);
                     }
+                    setState(ControlState.ALWAYS_FIRE);
                     break;
                 case INDEX_BALLS:
                     if(!getBanner() && !detectedBall) {

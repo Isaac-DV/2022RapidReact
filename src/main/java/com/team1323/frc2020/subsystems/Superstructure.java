@@ -335,6 +335,22 @@ public class Superstructure extends Subsystem {
 			)
 		);
 	}
+	public void alwaysShootStates() {
+		request(
+			new SequentialRequest(
+				new ParallelRequest(
+					motorizedHood.visionRequest(),
+					//swerve.setDriveMaxPowerRequest(0.75),
+					turret.robotStateVisionRequest(),
+					shooter.visionVelocityRequest(),
+					column.stateRequest(Column.ControlState.ALWAYS_FIRE)
+					//new LambdaRequest(() -> swerve.setDriveNeutralMode(NeutralMode.Coast))
+				),
+				turret.robotStateVisionRequest()
+				//intake.stateRequest(Intake.ControlState.INTAKE),
+			)
+		);
+	}
 
 	public void postShotState() {
 		request(

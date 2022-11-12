@@ -1,6 +1,8 @@
 package com.team1323.io;
 
 import com.team1323.lib.util.Util;
+import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.geometry.Translation2d;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
@@ -81,6 +83,11 @@ public class Xbox extends XboxController{
 	@Override
 	public double getRightTriggerAxis() {
 		return Util.deadBand(getRawAxis(3), PRESS_THRESHOLD);
+	}
+
+	public Rotation2d getPOVDirection() {
+		System.out.println(getPOV());
+		return Rotation2d.fromDegrees(getPOV());
 	}
 
     public void rumble(double rumblesPerSecond, double numberOfSeconds){

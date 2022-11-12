@@ -166,7 +166,7 @@ public class Wrist extends Subsystem {
     }
 
     public void setOpenLoop(double demand) {
-        periodicIO.demand = demand * 0.25;
+        periodicIO.demand = demand * 0.5;
         setState(State.OPEN_LOOP);
     }
     PeriodicIO periodicIO = new PeriodicIO();
@@ -215,7 +215,7 @@ public class Wrist extends Subsystem {
     };
 
     public void resetToAbsolutePosition() {
-        if(Settings.kIsUsingCompBot) {
+        if(true) {
             if(!zeroedAbsolutely) {
                 double cancoderOffset = Util.boundAngle0to360Degrees(getAbsoluteEncoderDegrees() - Constants.Wrist.kWristStartingEncoderPosition);
                 double absoluteWristAngle = Constants.Wrist.kWristStartingAngle + (cancoderOffset / Constants.Wrist.kCANCoderToWristRatio);
@@ -235,11 +235,11 @@ public class Wrist extends Subsystem {
                 }
 
                 wrist.setSelectedSensorPosition((int)degreesToEncUnits(absoluteWristAngle), 0, 0);
-            }
+                }
         } else {
             wrist.setSelectedSensorPosition((int)degreesToEncUnits(Constants.Wrist.kWristStartingAngle), 0, 0);
-
         }
+        
         
     }
 

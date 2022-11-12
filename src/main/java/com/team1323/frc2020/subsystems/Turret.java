@@ -25,7 +25,7 @@ import com.team1323.frc2020.loops.LimelightProcessor;
 import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
-import com.team1323.io.PS4;
+import com.team1323.lib.util.Netlink;
 import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
@@ -55,7 +55,6 @@ public class Turret extends Subsystem {
     Swerve swerve;
     DoubleTelescopes doubleTelescopes;
 
-    PS4 testController;
     
     private Translation2d turretManualVector = new Translation2d();
     public Rotation2d fieldCentricRotation = new Rotation2d();
@@ -104,7 +103,6 @@ public class Turret extends Subsystem {
     private boolean visionAngleInRange = false;
     
     private Turret() {
-        testController = new PS4(2);
 
         robotState = RobotState.getInstance();
         swerve = Swerve.getInstance();
@@ -567,11 +565,16 @@ public class Turret extends Subsystem {
             turret.setSelectedSensorPosition(degreesToEncUnits(absoluteTurretAngle), 0, 0);
         }
     }
-    
+    boolean neutralModeIsBrake = true;
     @Override
     public void outputTelemetry() {
-        testController.update();
-        SmartDashboard.putNumber("PS4 Value", testController.getLeftX());
+        if(Netlink.getBooleanValue("Subsystems Coast Mode") && neutralModeIsBrake) {
+            turret.setNeutralMode(NeutralMode.Coast);
+			neutralModeIsBrake = false;
+		} else if(!neutralModeIsBrake && !Netlink.getBooleanValue("Subsystems Coast Mode")) {
+            turret.setNeutralMode(NeutralMode.Brake);
+			neutralModeIsBrake = true;
+		}
 
         SmartDashboard.putNumber("Turret Angle", getAngle());
         SmartDashboard.putBoolean("Turret TargetInfo", seesTarget());

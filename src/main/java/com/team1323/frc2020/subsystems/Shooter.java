@@ -136,12 +136,15 @@ public class Shooter extends Subsystem {
 
         rpmOffsetChooser = new SendableChooser<Double>();
         rpmOffsetChooser.setDefaultOption("0", 0.0);
+        rpmOffsetChooser.addOption("-300", -300.0);
         rpmOffsetChooser.addOption("-150", -150.0);
         rpmOffsetChooser.addOption("-100", -100.0);
         rpmOffsetChooser.addOption("-50", -50.0);
         rpmOffsetChooser.addOption("+50", 50.0);
         rpmOffsetChooser.addOption("+100", 100.0);
         rpmOffsetChooser.addOption("+150", 150.0);
+        rpmOffsetChooser.addOption("+300", 300.0);
+        rpmOffsetChooser.addOption("+400", 400.0);
 
         SmartDashboard.putData("RPM Offset Chooser", rpmOffsetChooser);
     	SmartDashboard.putNumber("Selected RPM Offset", 0);

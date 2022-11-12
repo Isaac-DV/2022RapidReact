@@ -57,15 +57,20 @@ public class FiveBallOneEjectMode extends AutoModeBase {
 
         // Pick up first ball
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));
-        runAction(new WaitAction(0.5));
+        runAction(new WaitAction(0.6));
+        s.visionShotState();
+        runAction(new WaitAction(0.25));
         s.intakeState();
+        runAction(new WaitForSuperstructureAction());
+
+        s.visionShotState();
         runAction(new WaitToFinishPathAction(7));
 
         // Shoot first two balls
         runAction(new WaitAction(0.5));
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitForShotsAction(1.0));
+        runAction(new WaitForShotsAction(1.5));
         s.turret.setCOFState();
         s.intakeState();
 

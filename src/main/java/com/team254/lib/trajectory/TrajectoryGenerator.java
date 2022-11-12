@@ -90,7 +90,7 @@ public class TrajectoryGenerator {
     static final Pose2d secondBallPickupPose = new Pose2d(new Translation2d(215.42857142857142, 95.0), Rotation2d.fromDegrees(180));
     static final Pose2d postTerminalShotPose = new Pose2d(new Translation2d(283.42857142857144, 102), Rotation2d.fromDegrees(0));
     static final Pose2d secondOpponentBallPickupPose = new Pose2d(new Translation2d(162.0, 30.0), Rotation2d.fromDegrees(-90));
-    static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0)).transformBy(Pose2d.fromTranslation(new Translation2d(11.0, 10.0))); //(11, 12)
+    static final Pose2d humanPlayerPickupPose = new Pose2d(new Translation2d(54.285714285714285, 104.28571428571428), Rotation2d.fromDegrees(135.0)).transformBy(Pose2d.fromTranslation(new Translation2d(0.0, 0.0))); //(11, 12)
     static final Pose2d humanPlayerBackupPose = humanPlayerPickupPose.transformBy(Pose2d.fromTranslation(new Translation2d(-24.0, 0)));
     static final Pose2d thirdBallPickupPose = new Pose2d(new Translation2d(205, -68), Rotation2d.fromDegrees(-90)).transformBy(Pose2d.fromTranslation(Translation2d.fromPolar(Rotation2d.fromDegrees(-135.0), 0.0)));
     static final Pose2d thirdOpponentBallPickupPose = new Pose2d(new Translation2d(234, -107.71428571428572), Rotation2d.fromDegrees(-90));

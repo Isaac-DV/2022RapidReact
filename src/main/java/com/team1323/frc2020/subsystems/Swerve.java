@@ -19,6 +19,7 @@ import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.math.vectors.VectorField;
 import com.team1323.lib.util.DriveSignal;
 import com.team1323.lib.util.Kinematics;
+import com.team1323.lib.util.Netlink;
 import com.team1323.lib.util.SwerveHeadingController;
 import com.team1323.lib.util.SwerveInverseKinematics;
 import com.team1323.lib.util.SynchronousPIDF;
@@ -68,6 +69,7 @@ public class Swerve extends Subsystem{
 	public void toggleEvade(boolean enabled) {
 		evading = enabled;
 		evadingToggled = true;
+		startEvadeRevolve(Translation2d.fromPolar(Rotation2d.fromDegrees(45), 5).rotateBy(getHeading().inverse()));
 	}
 	
 	//Heading controller methods
@@ -238,6 +240,9 @@ public class Swerve extends Subsystem{
 	public void setDriveNeutralMode(NeutralMode mode) {
 		modules.forEach((m) -> m.setDriveNeutralMode(mode));
 	}
+	public void setRotationNeutralMode(NeutralMode mode) {
+		modules.forEach((m) -> m.setRotationNeutralMode(mode));
+	}
 	
 	//Assigns appropriate directions for scrub factors
 	public void setCarpetDirection(boolean standardDirection){
@@ -249,7 +254,7 @@ public class Swerve extends Subsystem{
 	private double rotationalInput = 0;
 	private Translation2d lastDriveVector = new Translation2d();
 	private final Translation2d rotationalVector = Translation2d.identity();
-	private double lowPowerScalar = 0.25; //0.6
+	private double lowPowerScalar = 0.6; //0.6
 	public void setLowPowerScalar(double scalar){
 		lowPowerScalar = scalar;
 	}
@@ -449,13 +454,10 @@ public class Swerve extends Subsystem{
 	}
 
 	public void atomicLockDrivePosition() {
-		setState(ControlState.POSITION);
 		modules.get(0).setModuleAngle(-45.0);
 		modules.get(1).setModuleAngle(45.0);
 		modules.get(2).setModuleAngle(-45.0);
 		modules.get(3).setModuleAngle(45.0);
-		modules.forEach((m) -> m.setDrivePositionTarget(0.0));
-		isDriveLocked = false;
 	}
 
 	public void zukLockDrivePosition() {
@@ -497,6 +499,11 @@ public class Swerve extends Subsystem{
 				modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees());
 				modules.get(i).setDriveOpenLoop(percentOutputOverride);
 			}
+		}
+	}
+	public void setModulesDriveOuput(double output) {
+		for(int i = 0; i < modules.size(); i++) {
+			modules.get(i).setDriveOpenLoop(output);
 		}
 	}
 	
@@ -754,7 +761,37 @@ public class Swerve extends Subsystem{
 		counterClockwiseCenter = targetModule;
 		clockwiseCenter = targetModule;
 	}
+
+
+
+	double startingRotationValue = 0;
+	final double rotationAmount = 135;
+	int currentModuleIndex = 0;
+	int totalModulesPivoted = 1;
+	public synchronized void startEvadeRevolve(Translation2d revolveAround) {
+		startingRotationValue = pose.getRotation().getUnboundedDegrees() - 45;
+		currentModuleIndex = 0;
+		totalModulesPivoted = 1;
+		for(int i = 0; i < Constants.kModulePositions.size(); i++) {
+			if(Constants.kModulePositions.get(currentModuleIndex).distance(revolveAround) > Constants.kModulePositions.get(i).distance(revolveAround)) {
+				currentModuleIndex = i;
+			}
+		}
+		
+	}
 	
+	
+	public synchronized void updateEvadeRevolve() {
+		double predictedRotation = pose.getRotation().getUnboundedDegrees() + (velocity.dtheta * 180/Math.PI) * 0.1;
+		double rotationDifference = predictedRotation /*pose.getRotation().getUnboundedDegrees()*/ - startingRotationValue;
+		if(Math.abs(rotationDifference) >= (rotationAmount * totalModulesPivoted * Math.signum(rotationalInput))) {
+			totalModulesPivoted += Math.signum(rotationalInput);
+			currentModuleIndex = (int) Util.boundToScope(0, 4, currentModuleIndex + Math.signum(rotationalInput));
+		}
+		clockwiseCenter = Constants.kModulePositions.get(currentModuleIndex);
+		counterClockwiseCenter = Constants.kModulePositions.get((int) Util.boundToScope(0, 4, currentModuleIndex + 1));
+	}
+
 	/** The tried and true algorithm for keeping track of position */
 	public synchronized void updatePose(double timestamp){
 		double x = 0.0;
@@ -861,7 +898,8 @@ public class Swerve extends Subsystem{
 		switch(currentState){
 			case MANUAL:
 			if(evading && evadingToggled){
-				determineEvasionWheels();
+				//determineEvasionWheels();
+				updateEvadeRevolve();
 				double sign = Math.signum(rotationalInput);
 				if(sign == 1.0){
 					inverseKinematics.setCenterOfRotation(clockwiseCenter);
@@ -870,6 +908,7 @@ public class Swerve extends Subsystem{
 				}
 				evadingToggled = false;
 			}else if(evading){
+				updateEvadeRevolve();
 				double sign = Math.signum(rotationalInput);
 				if(sign == 1.0){
 					inverseKinematics.setCenterOfRotation(clockwiseCenter);
@@ -1288,15 +1327,28 @@ public class Swerve extends Subsystem{
 	double prevSwerveVelocity = 0;
 	double largestVelocity = 0;
 	double lastTimestamp = 0;
+
+	boolean neutralModeIsBrake = true;
 	@Override
 	public void outputTelemetry() {
 		modules.forEach((m) -> m.outputTelemetry());
 		SmartDashboard.putNumberArray("Robot Pose", new double[]{pose.getTranslation().x(), pose.getTranslation().y(), pose.getRotation().getUnboundedDegrees()});
+		SmartDashboard.putNumberArray("Robot Velocity", new double[]{velocity.dx, velocity.dy, velocity.dtheta});
+
 		SmartDashboard.putNumber("Robot Heading", pose.getRotation().getUnboundedDegrees());
 		// testing the wpi odometry
 		if(outputWpiPose)
 		SmartDashboard.putNumberArray("Path Pose", new double[]{wpiPose.getTranslation().x(), wpiPose.getTranslation().y(), wpiPose.getRotation().getUnboundedDegrees()});
 
+		if(Netlink.getBooleanValue("Subsystems Coast Mode") && neutralModeIsBrake) {
+			setDriveNeutralMode(NeutralMode.Coast);
+			setRotationNeutralMode(NeutralMode.Coast);
+			neutralModeIsBrake = false;
+		} else if(!neutralModeIsBrake && !Netlink.getBooleanValue("Subsystems Coast Mode")) {
+			setDriveNeutralMode(NeutralMode.Brake);
+			setRotationNeutralMode(NeutralMode.Brake);
+			neutralModeIsBrake = true;
+		}
 		
 		if(Settings.debugSwerve()){
 			SmartDashboard.putNumber("Robot X", pose.getTranslation().x());

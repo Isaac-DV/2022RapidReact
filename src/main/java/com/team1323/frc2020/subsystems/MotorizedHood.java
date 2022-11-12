@@ -18,6 +18,7 @@ import com.team1323.frc2020.loops.Loop;
 import com.team1323.frc2020.subsystems.requests.Request;
 import com.team1323.frc2020.vision.ShooterAimingParameters;
 import com.team1323.lib.util.InterpolatingDouble;
+import com.team1323.lib.util.Netlink;
 import com.team1323.lib.util.SmartTuner;
 import com.team1323.lib.util.Util;
 import com.team254.drivers.LazyTalonFX;
@@ -305,8 +306,16 @@ public class MotorizedHood extends Subsystem {
         /*if(getState() != State.ZEROING)
             zeroHood();*/
     }
+    boolean neutralModeIsBrake = true;
     @Override
     public void outputTelemetry() {
+        if(Netlink.getBooleanValue("Subsystems Coast Mode") && neutralModeIsBrake) {
+            hood.setNeutralMode(NeutralMode.Coast);
+			neutralModeIsBrake = false;
+		} else if(!neutralModeIsBrake && !Netlink.getBooleanValue("Subsystems Coast Mode")) {
+            hood.setNeutralMode(NeutralMode.Brake);
+			neutralModeIsBrake = true;
+		}
         SmartDashboard.putNumber("Hood Angle", getAngle()); // -17 -66
         SmartDashboard.putBoolean("Hood angle is ready", hasReachedAngle());
         if(SmartDashboard.getBoolean("Re-zero Hood", false))

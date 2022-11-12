@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
 	LazyTalonFX rotationMotor, driveMotor;
-	InductiveEncoder rotationCancoder;
+	DutyCycle rotationCancoder;
 	DutyCycle rotationMagEncoder;
 	int moduleID;
 	String name = "Module ";
@@ -60,7 +60,7 @@ public class SwerveDriveModule extends Subsystem{
 			if (Settings.kIsUsingCompBot) {
 				rotationMagEncoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
 			} else {
-				rotationCancoder = new InductiveEncoder(Ports.kModuleEncoders[moduleID]);
+				rotationCancoder = new DutyCycle(new DigitalInput(Ports.kModuleEncoders[moduleID]));
 			}
 		}
 			
@@ -113,6 +113,9 @@ public class SwerveDriveModule extends Subsystem{
 
 	public void setDriveNeutralMode(NeutralMode mode) {
 		driveMotor.setNeutralMode(mode);
+	}
+	public void setRotationNeutralMode(NeutralMode mode) {
+		rotationMotor.setNeutralMode(mode);
 	}
 	
 	private void configureMotors(){
@@ -417,7 +420,7 @@ public class SwerveDriveModule extends Subsystem{
 		if (Settings.kIsUsingCompBot) {
 			if(/*!rotationMotorZeroed*/true) periodicIO.absoluteRotation = rotationMagEncoder.getOutput() * 360.0;
 		} else {
-			if(!rotationMotorZeroed) periodicIO.absoluteRotation = rotationCancoder.getAbsolutePosition();
+			if(/*!rotationMotorZeroed*/ true) periodicIO.absoluteRotation = rotationCancoder.getOutput() * 360.0;
 		}
 		if (Settings.debugSwerve()) {
 			periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();

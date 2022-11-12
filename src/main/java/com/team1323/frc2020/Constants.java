@@ -56,13 +56,17 @@ public class Constants {
     public static final double kWheelbaseLength = 24.75;
     public static final double kWheelbaseWidth = 24.75;
     public static final double kSwerveDiagonal = Math.hypot(kWheelbaseLength, kWheelbaseWidth);
+
+    public static final double kBumperLength = 30.0;
+    public static final double kBumperWidth = 30.0;
+    public static final double kBumperDiagonal = Math.hypot(kBumperLength, kBumperWidth);
     
     //Camera Constants (X and Y are with respect to the turret's center)
     public static final double kCameraYOffset = 0.0;//0.25
     public static final double kCameraXOffset = 7.236; //8.5 //9.586
     public static final double kCameraZOffset = 44.467; //26.776 24.524 //42.095
     public static final double kCameraYawAngleDegrees = 0.0;//-12.7
-    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.5 : 38.0; //37.5
+    public static final double kCameraPitchAngleDegrees = Settings.kIsUsingCompBot ? 39.5 : 36.5; //37.5
 
     //Limelight
     public static final double kHorizontalFOV = 59.6; // degrees
@@ -107,10 +111,10 @@ public class Constants {
     * Enter angle read by the absolute encoder. Insert as degrees and subtract or add 90° to the value
     * based on where the bevel ended up.
     */
-    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -286.0 : 122.405599; //Module 0 - Front Right -3.52 | -7.91 | 5.71
-    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -224.5 : -81.860352; //Module 1 - Front Left -109.97 | -109.95
-    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -201.7 : -19.391276; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
-    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -332.6 : 16.346029; //Module 3 - Rear Right -353.5 | 351.77
+    public static final double kFrontRightEncoderStartingPos = Settings.kIsUsingCompBot ? -286.0 : -135.291513; //Module 0 - Front Right -3.52 | -7.91 | 5.71
+    public static final double kFrontLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -224.5 : -13.761396; //Module 1 - Front Left -109.97 | -109.95
+    public static final double kRearLeftEncoderStartingPos = Settings.kIsUsingCompBot ? -201.7 : -352.380087; //Module 2 - Rear Left -219.4 | -219.28 | 242.94
+    public static final double kRearRightEncoderStartingPos = Settings.kIsUsingCompBot ? -281.9 : -16.178085; //Module 3 - Rear Right -353.5 | 351.77
     
     //Swerve Module Positions (relative to the center of the drive base)
     public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength / 2, kWheelbaseWidth / 2);
@@ -186,7 +190,7 @@ public class Constants {
         public static final double kWristRatio = 0.0; //This value needs to be found.
         public static final double kWristSpeed = 0.5;
         public static final double kWristStartingAngle = Settings.kIsUsingCompBot ? -19.5 : -19.0;
-        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 330 : 297.324709;
+        public static final double kWristStartingEncoderPosition = (Settings.kIsUsingCompBot) ? 338 : 155;
         public static final double kCANCoderToWristRatio = 22.0 / 12.0;
         public static final double kFalconToWristRatio = 66.0;
 
@@ -209,8 +213,8 @@ public class Constants {
         public static final double kWeakD = 0.0;
         public static final double kWeakF = 1023.0/kMaxSpeed;
 
-        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 100.0 : 95.0; //96.0
-        public static final double kStowedAngle = -13.0;
+        public static final double kIntakeAngle = Settings.kIsUsingCompBot ? 100.0 : 105.0; //96.0
+        public static final double kStowedAngle = Settings.kIsUsingCompBot ? -13.0 : -5.0;
         public static final double kBallDebouncerAngle = Settings.kIsUsingCompBot ? -2.0 : -8.0; //65.0
         public static final double kLowestAngle = 135.0;
 
@@ -283,7 +287,7 @@ public class Constants {
         public static final double kYOffset = 0.0;
 
         public static final double kWrapSettlingTime = Settings.kIsUsingCompBot ? 0.25 : 0.75;
-        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 1.5 : 3.0; //3.0
+        public static final double kWrapAccelerationScalar = Settings.kIsUsingCompBot ? 1.5 : 1.0; //3.0
         public static final double kMaxAccelerationScalar = 3.0;//3.5
 
         public static final double kInterpolationCutoffDistance = 140.0; // inches
