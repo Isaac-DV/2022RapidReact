@@ -62,7 +62,8 @@ public class ThreeBallPoachBlueAllianceMode extends AutoModeBase{
         // Shoot first balls
         s.visionShotState();
         runAction(new WaitForSuperstructureAction());
-        runAction(new WaitForShotsAction(2.0));
+        //runAction(new WaitForShotsAction(2.0));
+        runAction(new WaitAction(1.5));
 
         //Go To the opponents ball and intake(do not eject)
         runAction(new SetTrajectoryAction(trajectories.thirdBallToThirdOpponentBall, -90.0, 0.8));

@@ -252,6 +252,7 @@ public class Shooter extends Subsystem {
 
         @Override
         public void onLoop(double timestamp) {
+
             boolean onTarget = getState() != State.OPEN_LOOP && Math.abs(targetRPM - getLeftRPM()) < Constants.Shooter.kShooterRPMTolerance;
             if (onTarget && Double.isInfinite(onTargetTimestamp)) {
                 onTargetTimestamp = timestamp;

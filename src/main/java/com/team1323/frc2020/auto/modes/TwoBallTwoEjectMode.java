@@ -47,7 +47,6 @@ public class TwoBallTwoEjectMode extends AutoModeBase {
         // Startup
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoLeftStartingPose));
-        s.intake.conformToState(Intake.ControlState.EJECT);
         s.turret.setCOFState();
         s.motorizedHood.setState(MotorizedHood.State.VISION);
         s.column.setState(Column.ControlState.OFF);

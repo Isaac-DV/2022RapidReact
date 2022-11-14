@@ -48,7 +48,6 @@ public class TwoBallBackHubHideMode extends AutoModeBase {
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoLeftStartingPose));
 
-        s.intake.conformToState(Intake.ControlState.EJECT);
         s.turret.setCOFState();
         s.column.conformToState(Column.ControlState.OFF);
         s.motorizedHood.setState(MotorizedHood.State.VISION);

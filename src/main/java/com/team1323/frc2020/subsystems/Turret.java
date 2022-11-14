@@ -356,7 +356,6 @@ public class Turret extends Subsystem {
                             //turretAngle = getAngle() + targetInfo.get(0).getDouble(0);
                             System.out.println("Robo Rot Velocity Greate at : "+ swerve.getVelocity().dtheta);
                         }
-                        System.out.println("Turret angle = " + turretAngle);
                         turretAngle = boundToTurretScope(turretAngle);
                         visionAngleInRange = turretAngle >= Constants.Turret.kMinControlAngle && turretAngle <= Constants.Turret.kMaxControlAngle;
                         /*if (turretAngle < Constants.Turret.kMinControlAngle || turretAngle > Constants.Turret.kMaxControlAngle) {

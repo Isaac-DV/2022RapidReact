@@ -49,7 +49,6 @@ public class FiveBallOneEjectMode extends AutoModeBase {
         // Startup 
         super.startTime = Timer.getFPGATimestamp();
         runAction(new ResetPoseAction(Constants.autoRightStartingPose));
-        s.intake.conformToState(Intake.ControlState.EJECT);
         s.turret.setCOFState();
         s.column.conformToState(Column.ControlState.OFF);
         s.motorizedHood.setState(MotorizedHood.State.VISION);
@@ -57,10 +56,10 @@ public class FiveBallOneEjectMode extends AutoModeBase {
 
         // Pick up first ball
         runAction(new SetTrajectoryAction(trajectories.firstBallBackup, 90, 1));
-        runAction(new WaitAction(0.6));
+        s.intakeState();
+        runAction(new WaitAction(0.25));
         s.visionShotState();
         runAction(new WaitAction(0.25));
-        s.intakeState();
         runAction(new WaitForSuperstructureAction());
 
         s.visionShotState();

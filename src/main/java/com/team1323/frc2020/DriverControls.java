@@ -162,7 +162,7 @@ public class DriverControls implements Loop {
         if (driver.bButton.wasActivated())
             swerve.rotate(swerve.getHeading().rotateBy(Rotation2d.fromDegrees(90)).getDegrees());
         else if (driver.aButton.wasActivated()) 
-            swerve.rotate(swerve.getHeading().getDegrees() + 90);
+            swerve.rotate(180);
         else if (driver.xButton.wasActivated())
             //swerve.rotate(270);
             turret.setCOFState();
@@ -253,7 +253,7 @@ public class DriverControls implements Loop {
         if(driver.rightBumper.wasActivated()) {
             motorizedHood.setAngleState(Constants.MotorizedHood.kMinControlAngle);
         }
-
+        
 		////// Official Controls //////
         double coDriverRightX = coDriver.getRightX();
         double coDriverRightY = -coDriver.getRightY();
