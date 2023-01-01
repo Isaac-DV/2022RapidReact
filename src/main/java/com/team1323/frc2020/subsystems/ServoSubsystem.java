@@ -101,12 +101,16 @@ public abstract class ServoSubsystem extends Subsystem {
         allMotors.forEach(m -> m.configSupplyCurrentLimit(currentLimitConfiguration, Constants.kCANTimeoutMs));
     }
 
-    private double encoderUnitsToOutputUnits(double encoderUnits) {
+    protected double encoderUnitsToOutputUnits(double encoderUnits) {
         return encoderUnits / encoderUnitsPerOutputUnit;
     }
 
-    private double outputUnitsToEncoderUnits(double outputUnits) {
+    protected double outputUnitsToEncoderUnits(double outputUnits) {
         return outputUnits * encoderUnitsPerOutputUnit;
+    }
+
+    protected void zeroPosition() {
+        leader.setSelectedSensorPosition(0.0);
     }
 
     protected double getPosition() {
