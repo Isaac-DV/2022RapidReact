@@ -49,10 +49,6 @@ public abstract class ServoSubsystem extends Subsystem {
         allMotors = Arrays.asList(leader);
         allMotors.addAll(followers);
         configureMotors(portNumber, cruiseVelocityScalar, accelerationScalar);
-
-        // TODO: Create zeroing strategies as lambda functions.
-        // One of them should be a generalized version of the DutyCycleEncoder zeroing strategy.
-        // Pass a zeroing strategy into the constructor and execute it when appropriate.
     }
 
     private void configureMotors(int leaderPortNumber, double cruiseVelocityScalar, double accelerationScalar) {
