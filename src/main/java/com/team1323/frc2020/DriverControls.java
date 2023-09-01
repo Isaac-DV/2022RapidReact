@@ -183,27 +183,29 @@ public class DriverControls implements Loop {
         else if(driver.leftBumper.isBeingPressed())
             swerve.rotate(ballSplitter.getEjectRotation(BallSplitter.EjectLocations.TEAM_HANGER.location));*/
 
-        if(s.needsToNotifyDrivers()) {
+        /*if(s.needsToNotifyDrivers()) {
             driver.rumble(1.0, 2.0);
             coDriver.rumble(1.0, 2.0);
-        }
+        }*/
         if(wrist.isDriverIntakeEnabled()) {
             if(driver.leftTrigger.wasActivated()) {
                 wrist.setWeakIntakeState(true);
                 intake.conformToState(Intake.ControlState.INTAKE);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
-                ballFeeder.setState(BallFeeder.State.DETECT);
-                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                column.setState(Column.ControlState.OFF);
+                column.setVelocity(Constants.Column.kQueueVelocitySpeed);
+                /*if(column.getState() != Column.ControlState.FEED_BALLS) {
                     column.setState(Column.ControlState.INDEX_BALLS);
-                }
+                }*/
                 ballFeeder.setPrintFeeder(true);
             } else if(driver.leftTrigger.wasReleased()) {
                 wrist.setWeakIntakeState(false);
                 wrist.setLowStatorLimit(false);
                 intake.conformToState(Intake.ControlState.OFF);
-                ballFeeder.queueShutdown(true);
+                column.setState(Column.ControlState.OFF);
+                column.setVelocity(Constants.Column.kQueueVelocitySpeed);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
-                column.shutDownIfUnused();
+                //column.shutDownIfUnused();
                 ballFeeder.setPrintFeeder(false);
             }
         } else {
@@ -320,9 +322,9 @@ public class DriverControls implements Loop {
             }
 
             if(coDriver.aButton.isBeingPressed()) {
-                if(column.getState() != Column.ControlState.FEED_BALLS) {
+                /*if(column.getState() != Column.ControlState.FEED_BALLS) {
                     column.setState(Column.ControlState.INDEX_BALLS);
-                }
+                }*/
             }
 
             if(coDriver.rightBumper.wasActivated()) {
@@ -344,9 +346,11 @@ public class DriverControls implements Loop {
                 intake.conformToState(Intake.ControlState.INTAKE);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kIntakeAngle);
                 ballFeeder.setState(BallFeeder.State.DETECT);
-                if(column.getState() != Column.ControlState.FEED_BALLS) {
-                    column.setState(Column.ControlState.INDEX_BALLS);
-                }
+                // if(column.getState() != Column.ControlState.FEED_BALLS) {
+                //     column.setState(Column.ControlState.INDEX_BALLS);
+                // }
+                column.setState(Column.ControlState.OFF);
+                column.setVelocity(Constants.Column.kQueueVelocitySpeed);
                 ballFeeder.setPrintFeeder(true);
             } else if(coDriver.aButton.wasReleased()) {
                 wrist.setWeakIntakeState(false);
@@ -355,6 +359,8 @@ public class DriverControls implements Loop {
                 ballFeeder.queueShutdown(true);
                 wrist.setWristAngleWithAcceleration(Constants.Wrist.kBallDebouncerAngle);
                 column.shutDownIfUnused();
+                column.setVelocity(0);
+
                 ballFeeder.setPrintFeeder(false);
             }
 
@@ -470,10 +476,10 @@ public class DriverControls implements Loop {
             ballFeeder.setState(BallFeeder.State.DETECT);
         }
 
-        if(column.needsToNotifyDrivers()) {
+        /*if(column.needsToNotifyDrivers()) {
             coDriver.rumble(2.0, 1.0);
             driver.rumble(2.0, 1.0);
-        }
+        }*/
         if(coDriver.backButton.wasActivated()) {
             s.disableState();
         }

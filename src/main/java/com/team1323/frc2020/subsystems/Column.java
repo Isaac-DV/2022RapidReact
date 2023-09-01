@@ -141,7 +141,7 @@ public class Column extends Subsystem {
         smartTuner.enabled(false);
     }
     public boolean getBanner() {
-        return banner.get();
+        return true;//banner.get();
     }
 
     public enum ControlState {

@@ -147,7 +147,7 @@ public class BallFeeder extends Subsystem {
         DSAlliance = alliance;
     }
     public void updateDetectedBall() {
-        if(banner.get() && !isColorSensorRed()) { //detected a blue ball
+        /*if(banner.get() && !isColorSensorRed()) { //detected a blue ball
             if (canChangeDetectedBall)
                 DetectedBall = Ball.Blue;
         } else if(isColorSensorRed()) { //detected a red ball
@@ -156,7 +156,8 @@ public class BallFeeder extends Subsystem {
         } else if(!banner.get()) { //does not detect a ball
             DetectedBall = Ball.None;
             canChangeDetectedBall = true;
-        }
+        }*/
+        DetectedBall = Ball.Red;
     }
 
     public enum State {
@@ -203,7 +204,7 @@ public class BallFeeder extends Subsystem {
             detectedBallType = BallType.Team;
             setFeederOpenLoop(0);
             if(intake.getState() != Intake.ControlState.EJECT && intake.getState() != Intake.ControlState.INTAKE && intake.getLastState() != Intake.ControlState.EJECT) { //Ensures that the Intake is not in the Eject Mode
-                intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
+                //intake.conformToState(Intake.ControlState.AUTO_FEED_INTAKE);
             }
             intakeStartTimestamp = timestamp;
             /*if(Math.abs(timestamp - splitterStartTimestamp) <= 0.5 && Double.isFinite(splitterStartTimestamp)) {
